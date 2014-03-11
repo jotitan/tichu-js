@@ -1,0 +1,211 @@
+<html>
+
+<head>
+<script type="text/javascript" src="lib/jquery-1.11.0.min.js"></script>
+</head>
+
+<body>
+
+<button id="begin">Start draw</button>
+<button id="end">End draw</button>
+
+<button id="moveMode">Move mode</button>
+<button id="checkMode">Check mode</button>
+
+<br/>
+<canvas id="canvas" width="600" height="300" style="border:solid 1px black"/>
+
+<script>
+$('#begin').click(function(){runDraw();});
+$('#end').click(function(){stopDraw();});
+
+$('#moveMode').click(function(){setMoveMode();});
+$('#checkMode').click(function(){setCheckMode();});
+
+function setMoveMode(){
+	$('#canvas').get(0).removeEventListener('mousedown',changeState,false);
+	
+	$('#canvas').get(0).addEventListener('mousedown',mouseDown,false);
+	$('#canvas').get(0).addEventListener('mousemove',mouseMove,false);
+	$('#canvas').get(0).addEventListener('mouseup',mouseUp,false);
+}
+
+function setCheckMode(){
+	$('#canvas').get(0).removeEventListener('mousedown',mouseDown,false);
+	$('#canvas').get(0).removeEventListener('mousemove',mouseMove,false);
+	$('#canvas').get(0).removeEventListener('mouseup',mouseUp,false);
+	
+	$('#canvas').get(0).addEventListener('mousedown',changeState,false);
+}
+
+var interval = null;
+var canvas = $('#canvas').get(0).getContext('2d');
+
+var move = false;
+function runDraw(){
+	interval = setInterval(function(){refreshDraw();},20);
+}
+
+function stopDraw(){
+	clearInterval(interval);
+}
+
+function refreshDraw(){
+	canvas.clearRect(0,0,550,300);
+	canvas.fillStyle='#000000';
+	cards.forEach(function(c){
+		c.drawing.draw(canvas);
+	});
+	
+}
+
+var cards = new Array();
+
+function changeState(e){
+	var x = e.clientX - $('#canvas').offset().left;
+	var y = e.clientY - $('#canvas').offset().top;
+	var card = findCardsContains(x,y);
+	
+	if(card != null){
+		if(card.checked){
+			card.checked = false;
+			card.y+=10;
+		}
+		else{
+			card.checked = true;
+			card.y-=10;
+		}
+	}
+}
+
+var STATUS_CARD = {
+	NO_STATUS_CARD:0,
+	DISTRIBUTED_CARD:1,
+	TABLE_CARD:2,
+	PLAYED_CARD:3
+}
+
+var COLORS = ["red","green","blue","black"];
+
+function Card(value,color){
+	this.value = value;
+	this.color = color;
+	this.player = null;
+	this.status = STATUS_CARD.NO_STATUS_CARD;
+	
+	this.getValue = function(){
+		switch(this.value){
+			case "5":return 5;
+			case "10":return 10;
+			case "K":return 10;
+		}
+		return 0;
+	}	
+	this.drawing = new DrawingCard(0,0,value,color);
+}
+
+function MoineauCard(){
+
+}
+
+function Player(){
+	this.cards = [];	// List of cards, sorted
+	this.folds = [];	// List of cards wins
+	
+	/* Sort by number and color */
+	this.sortCards = function(){
+	
+	}
+	
+	this.countScore = function(){
+		return this.folds.reduce(function(score,card){return score+card.getValue();},0);		
+	}
+}
+
+function DrawingCard(x,y,value,color){
+	this.x = x;
+	this.y = y;
+	this.width = 25;
+	this.height = 40;
+	this.value = value;
+	this.color = color;
+	this.checked = false;
+	
+	this.set = function(x,y){
+		this.x = x;
+		this.y = y;
+	}
+	
+	this.draw = function(canvas){
+		canvas.fillStyle="#FFFFFF";
+		canvas.fillRect(this.x,this.y,this.width,this.height);
+		canvas.strokeStyle="#000000";
+		canvas.lineWidth=1;
+		canvas.strokeRect(this.x,this.y,this.width,this.height);
+		canvas.fillStyle=color;
+		canvas.font = "6pt Arial";
+		canvas.fillText(value,this.x+2,this.y+10);
+		canvas.fillText(value,this.x+this.width-7,this.y+10);
+		canvas.fillText(value,this.x+2,this.y+35);
+		canvas.fillText(value,this.x+this.width-7,this.y+35);
+	}
+	
+	this.contains = function(x,y){
+		return x>=this.x && x <= this.x+this.width && y>=this.y && y<=this.y + this.height;
+	}
+}
+
+function init(){
+	COLORS.forEach(function(color){
+		for(var i = 0 ; i < 11 ; i++){
+			cards.push(new Card("" + i,color));
+		}
+	});
+	for(var i = 0 ; i < 44 ; i++){
+		cards[i].drawing.set(i * 10 + 10,100);
+	}
+}
+
+init();
+runDraw();
+function findCardsContains(x,y){
+	// Carte affiche dans l'ordre, si plusieurs resultats, la derniere est au dessus, on cherche a l'envers
+	for(var i = cards.length-1 ; i >= 0; i--){
+		if(cards[i].drawing.contains(x,y)){
+			return cards[i].drawing;
+		}
+	}
+	return null;
+}
+
+function mouseMove(e){
+	if(!move || !currentCard){return;}
+	var x = e.clientX - $('#canvas').offset().left;
+	var y = e.clientY - $('#canvas').offset().top;
+	currentCard.x = x;
+	currentCard.y = y;
+}
+var currentCard = null;
+
+function mouseDown(e){
+	// Determine si un element est present (liste des elements fournit une methode)	
+	var x = e.clientX - $('#canvas').offset().left;
+	var y = e.clientY - $('#canvas').offset().top;
+	var card = findCardsContains(x,y);
+	if(card == null){return;}
+	move = true;
+	currentCard = card;
+	mouseMove(e);
+}
+
+function mouseUp(e){
+	move = false;
+	currentCard = null;
+}
+
+</script>
+
+
+</body>
+
+</html>
