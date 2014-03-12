@@ -2,6 +2,8 @@
 
 <head>
 <script type="text/javascript" src="lib/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/tichu.js"></script>
+<script type="text/javascript" src="js/player.js"></script>
 </head>
 
 <body>
@@ -12,8 +14,10 @@
 <button id="moveMode">Move mode</button>
 <button id="checkMode">Check mode</button>
 
+<button onclick="CardManager.distribute()">Distribuer</button>
+
 <br/>
-<canvas id="canvas" width="600" height="300" style="border:solid 1px black"/>
+<canvas id="canvas" width="500" height="300" style="border:solid 1px black"/>
 
 <script>
 $('#begin').click(function(){runDraw();});
@@ -43,7 +47,7 @@ var canvas = $('#canvas').get(0).getContext('2d');
 
 var move = false;
 function runDraw(){
-	interval = setInterval(function(){refreshDraw();},20);
+	interval = setInterval(function(){refreshDraw();},50);
 }
 
 function stopDraw(){
@@ -51,12 +55,11 @@ function stopDraw(){
 }
 
 function refreshDraw(){
-	canvas.clearRect(0,0,550,300);
+	canvas.clearRect(0,0,500,300);
 	canvas.fillStyle='#000000';
-	cards.forEach(function(c){
+	CardManager.cards.forEach(function(c){
 		c.drawing.draw(canvas);
 	});
-	
 }
 
 var cards = new Array();
@@ -87,117 +90,84 @@ var STATUS_CARD = {
 
 var COLORS = ["red","green","blue","black"];
 
-function Card(value,color){
-	this.value = value;
-	this.color = color;
-	this.player = null;
-	this.status = STATUS_CARD.NO_STATUS_CARD;
-	
-	this.getValue = function(){
-		switch(this.value){
-			case "5":return 5;
-			case "10":return 10;
-			case "K":return 10;
-		}
-		return 0;
-	}	
-	this.drawing = new DrawingCard(0,0,value,color);
-}
-
-function MahjongCard(){
-	Card.call(this);
-
-	this.drawing = new ImgCard(0,0,"img/mahjong.png");
-}
-
-function ImgCard(x,y,img){
-	DrawingCard.call(this,x,y);
-	this.img = new Image();
-	this.img.src = img;
-	
-	this.draw = function(canvas){
-		canvas.fillStyle="#FFFFFF";
-		canvas.fillRect(this.x,this.y,this.width,this.height);
-		canvas.strokeStyle="#000000";
-		canvas.lineWidth=1;
-		canvas.strokeRect(this.x,this.y,this.width,this.height);
-		canvas.drawImage(this.img,this.x,this.y,this.width,this.height);
+var CardManager = {
+	cards:[],
+	mahjongCard:null,
+	init:function(){
+		COLORS.forEach(function(color){
+			for(var i = 2 ; i <= 14 ; i++){
+				this.cards.push(new Card(i,color));
+			}
+		},this);
+		this.mahjongCard = new MahjongCard();
+		this.cards.push(this.mahjongCard);
+		this.cards.push(new PhoenixCard());
+		this.cards.push(new DragonCard());
+		this.cards.push(new DogsCard());
+		this.sortCards();		
+	},
+	/* Used to determine which card is up */
+	sortCards:function(){
+		this.cards.sort(function(c1,c2){
+			if(c1.drawing.deep!=c2.drawing.deep){
+				return c1.drawing.deep - c2.drawing.deep;
+			}
+			if(c1.value != c2.value){
+				return c1.value - c2.value;
+			}
+			return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
+		});		
+	},
+	/* Reset all cards */
+	newGame:function(){
+		this.cards.forEach(function(c){c.player = null;c.drawing.recto=false;c.setStatus(STATUS_CARD.NO_STATUS_CARD);});
+		PlayerManager.players.forEach(function(p){p.cards = [];});
+	},
+	/* Distribute cards to all players */
+	distribute:function(){
+		this.newGame();
+		// Duplicate table
+		var copyCards = [];
+		this.cards.forEach(function(c){copyCards.push(c);});
+		PlayerManager.getPlayers().forEach(function(p){
+			for(var i = 0 ; i < 14 ; i++){
+				var pos = Math.round(Math.random()*1000)%copyCards.length;
+				p.giveCard(copyCards[pos]);
+				copyCards.splice(pos,1);
+			}
+			p.sortCards();
+		});	
+			
 	}
 }
 
-function Player(){
-	this.cards = [];	// List of cards, sorted
-	this.folds = [];	// List of cards wins
-	
-	/* Sort by number and color */
-	this.sortCards = function(){
-	
-	}
-	
-	this.countScore = function(){
-		return this.folds.reduce(function(score,card){return score+card.getValue();},0);		
-	}
-}
-
-function DrawingCard(x,y,value,color){
-	this.x = x;
-	this.y = y;
-	this.width = 25;
-	this.height = 40;
-	this.value = value;
-	this.color = color;
-	this.checked = false;
-	switch(this.value){
-		case "11" :this.value='V';break;
-		case "12" :this.value='D';break;
-		case "13" :this.value='K';break;
-		case "14" :this.value='A';break;
-	}
-	console.log(this.value)
-
-	this.set = function(x,y){
-		this.x = x;
-		this.y = y;
-	}
-	
-	this.draw = function(canvas){
-		canvas.fillStyle="#FFFFFF";
-		canvas.fillRect(this.x,this.y,this.width,this.height);
-		canvas.strokeStyle="#000000";
-		canvas.lineWidth=1;
-		canvas.strokeRect(this.x,this.y,this.width,this.height);
-		canvas.fillStyle=color;
-		canvas.font = "6pt Arial";
-		canvas.fillText(this.value,this.x+2,this.y+10);
-		canvas.fillText(this.value,this.x+this.width-7,this.y+10);
-		canvas.fillText(this.value,this.x+2,this.y+35);
-		canvas.fillText(this.value,this.x+this.width-7,this.y+35);
-	}
-	
-	this.contains = function(x,y){
-		return x>=this.x && x <= this.x+this.width && y>=this.y && y<=this.y + this.height;
+var PlayerManager = {
+	players:[],
+	team1:null,
+	team2:null,
+	init:function(){
+		this.players.push(new Player("N"));
+		this.players.push(new Player("S",true));
+		this.players.push(new Player("O"));
+		this.players.push(new Player("E"));
+		
+		this.team1 = new Team(this.players[0],this.players[2]);
+		this.team2 = new Team(this.players[1],this.players[3]);
+	},
+	getPlayers:function(){
+		return this.players;
+	},
+	firstPlayer:function(){
+		return CardManager.mahjongCard.player;
 	}
 }
 
-function init(){
-	COLORS.forEach(function(color){
-		for(var i = 2 ; i <= 14 ; i++){
-			console.log(i)
-			/*switch(i){
-				case 11 :i='V';break;
-				case 12 :i='D';break;
-				case 13 :i='K';break;
-				case 14 :i='A';break;
-			}*/
-			cards.push(new Card("" + i,color));
-		}
-	});
-	cards.push(new MahjongCard());
-	cards.forEach(function(c,i){c.drawing.set(i*10+10,100)});	
-}
+PlayerManager.init();
+CardManager.init();
 
-init();
+
 runDraw();
+
 function findCardsContains(x,y){
 	// Carte affiche dans l'ordre, si plusieurs resultats, la derniere est au dessus, on cherche a l'envers
 	for(var i = cards.length-1 ; i >= 0; i--){
