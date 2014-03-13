@@ -141,6 +141,16 @@ function DrawingCard(x,y,value,color){
 		this.pos = pos*12;
 	}
 
+	this.setDirectCoordinates = function(x,y){
+		this.x = x;
+		this.y = y;
+		this.pos = 0;
+	}
+	
+	this.getCoords = function(){
+		return {x:this.x+this.pos,y:this.y};
+	}
+	
 	this.draw = function(canvas){
 		/* Case when displayed */
 		if(this.status !=STATUS_CARD.DISTRIBUTED_CARD && this.status != STATUS_CARD.TABLE_CARD){return;}
@@ -160,7 +170,7 @@ function DrawingCard(x,y,value,color){
 	}
 	
 	this.contains = function(x,y){
-		return x>=this.x && x <= this.x+this.width && y>=this.y && y<=this.y + this.height;
+		return x>=this.x+this.pos && x <= this.x+this.pos+this.width && y>=this.y && y<=this.y + this.height;
 	}
 }
 

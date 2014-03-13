@@ -11,10 +11,10 @@
 <button id="begin">Start draw</button>
 <button id="end">End draw</button>
 
-<button id="moveMode">Move mode</button>
 <button id="checkMode">Check mode</button>
 
 <button onclick="CardManager.distribute()">Distribuer</button>
+<button onclick="PlayerManager.setSwapMode()">Mode echange</button>
 
 <br/>
 <canvas id="canvas" width="500" height="300" style="border:solid 1px black"/>
@@ -57,9 +57,56 @@ function stopDraw(){
 function refreshDraw(){
 	canvas.clearRect(0,0,500,300);
 	canvas.fillStyle='#000000';
+	
+	ComponentManager.components.forEach(function(c){
+		c.draw(canvas);
+	});
+	
 	CardManager.cards.forEach(function(c){
 		c.drawing.draw(canvas);
 	});
+}
+
+var ComponentManager = {
+	components:[],
+	add:function(component){
+		this.components.push(component);
+	},
+	delete:function(component){
+		var index = this.components.indexOf(component);
+		if(index!=-1){
+			this.components.splice(index,1);
+		}
+	}
+}
+var ID_COMPONENT = 0;
+
+function Component(){
+	this.id = ID_COMPONENT++;
+	this.draw = function(){
+		console.log("Not implemented");
+	}
+}
+
+/* Box to drop a card */
+function BoxCard(x,y,width,height){
+	this.card = null;
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+	
+	this.draw = function(canvas){
+		canvas.strokeStyle = '#000000';
+		canvas.fillStyle = '#FFFFFF';
+		canvas.fillRect(x,y,width,height);
+		canvas.strokeRect(x,y,width,height);
+	}
+	
+	this.contains = function(x,y){
+		return x >= this.x && x<= this.x + this.width 
+				&& y >= this.y && y<= this.y + this.height ;
+	}
 }
 
 var cards = new Array();
@@ -136,8 +183,15 @@ var CardManager = {
 				copyCards.splice(pos,1);
 			}
 			p.sortCards();
-		});	
-			
+		});				
+	},
+	findSelectCards:function(joueur,x,y){
+		for(var i = joueur.cards.length-1 ; i >= 0; i--){
+			if(joueur.cards[i].drawing.contains(x,y)){
+				return joueur.cards[i].drawing;
+			}
+		}
+		return null;
 	}
 }
 
@@ -145,6 +199,7 @@ var PlayerManager = {
 	players:[],
 	team1:null,
 	team2:null,
+	joueur:null,
 	init:function(){
 		this.players.push(new Player("N"));
 		this.players.push(new Player("S",true));
@@ -153,13 +208,94 @@ var PlayerManager = {
 		
 		this.team1 = new Team(this.players[0],this.players[2]);
 		this.team2 = new Team(this.players[1],this.players[3]);
+		this.joueur = this.players[1];
 	},
 	getPlayers:function(){
 		return this.players;
 	},
 	firstPlayer:function(){
 		return CardManager.mahjongCard.player;
+	},
+	setSwapMode:function(){
+		// Display the position card
+		var boxes = [];
+		boxes.push(new BoxCard(150,120,35,50));
+		boxes.push(new BoxCard(200,100,35,50));
+		boxes.push(new BoxCard(250,120,35,50));
+		boxes.forEach(function(b){ComponentManager.add(b);});		
+		this.mouseController.active(boxes);		
+	},
+	mouseController:{
+		moving:false,
+		card:null,
+		boxes:null,
+		active:function(boxes){
+			this.boxes = boxes;
+			var _self = this;
+			$('#canvas').get(0).addEventListener('mousedown',function(e){_self.down(e);},false);
+			$('#canvas').get(0).addEventListener('mousemove',function(e){_self.move(e);},false);
+			$('#canvas').get(0).addEventListener('mouseup',function(e){_self.up(e);},false);
+		},
+		move:function(e){
+			if(!this.moving || !this.card){return;}
+			var coords = this.getPosition(e);
+			this.card.setDirectCoordinates(coords.x-10,coords.y-10);			
+		},
+		down:function(e){
+			var coords = this.getPosition(e);
+			var card = CardManager.findSelectCards(PlayerManager.joueur,coords.x,coords.y);
+			if(card == null){return;}
+			this.card = card;
+			this.card.originPos = card.originPos || card.getCoords();
+			this.moving = true;
+			this.move(e);
+		},
+		getPosition:function(e){
+			var x = e.clientX - $('#canvas').offset().left;
+			var y = e.clientY - $('#canvas').offset().top + $('body').scrollTop();
+			return {x:x,y:y};
+		},
+		_findBox:function(coords){
+			var box = null;
+			this.boxes.forEach(function(b){
+				if(b.contains(coords.x,coords.y)){
+					box = b;
+				}
+			});
+			return box;
+		},
+		up:function(e){
+			if(this.card == null){return;}
+			var coords = this.getPosition(e);
+			var box = this._findBox(coords);
+			// Check if card is in a box
+			if(box!=null){
+				this.card.setDirectCoordinates(box.x+5,box.y+5);
+			}else{
+				// Position the card at the original place
+				this.card.setDirectCoordinates(this.card.originPos.x,this.card.originPos.y);
+			}
+			this.moving = false;
+			this.card = null;
+		}
+	},
+	selectCards:function(e){
+		var x = e.clientX - $('#canvas').offset().left;
+		var y = e.clientY - $('#canvas').offset().top;
+		var card = CardManager.findSelectCards(this.joueur,x,y);
+		
+		if(card != null){
+			if(card.checked){
+				card.checked = false;
+				card.y+=10;
+			}
+			else{
+				card.checked = true;
+				card.y-=10;
+			}
+		}
 	}
+	
 }
 
 PlayerManager.init();
