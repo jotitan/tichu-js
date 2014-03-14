@@ -243,6 +243,10 @@ var PlayerManager = {
 		},
 		down:function(e){
 			var coords = this.getPosition(e);
+			var box = this._findBox(coords);
+			if(box !=null){
+				box.card = null;
+			}			
 			var card = CardManager.findSelectCards(PlayerManager.joueur,coords.x,coords.y);
 			if(card == null){return;}
 			this.card = card;
@@ -271,6 +275,7 @@ var PlayerManager = {
 			// Check if card is in a box
 			if(box!=null){
 				this.card.setDirectCoordinates(box.x+5,box.y+5);
+				box.card = this.card;
 			}else{
 				// Position the card at the original place
 				this.card.setDirectCoordinates(this.card.originPos.x,this.card.originPos.y);
