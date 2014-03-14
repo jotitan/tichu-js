@@ -1,0 +1,85 @@
+<html>
+	<head>
+	<title>Test Combinaison Validator</title>
+	<script language="javascript" src="../lib/jquery-1.11.0.min.js">;</script>   
+	<script language="Javascript" src="../lib/qunit-1.12.0.js">;</script>
+	<script language="Javascript" src="../js/CombinaisonsValidator.js">;</script>
+	<script language="Javascript" src="../js/Card.js">;</script>
+	<link rel="stylesheet" type="text/css" href="../css/qunit-1.12.0.css"/>
+            
+	<script>
+		test("Empty Hand",function(){
+			CombinaisonsValidator.resetTurn();
+
+			var cards = createCards([]); 
+			try{
+				CombinaisonsValidator.detect(cards);
+				equal(true,false,"Hand should be empty");
+			}catch(e){
+				equal(true,true,"Empty hand");
+			}                  
+		});
+			
+		test("Detect single card",function(){
+			CombinaisonsValidator.resetTurn();
+                  
+			var cards = createCards([{v:2,c:"R"}]); 
+			var combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.SINGLE,"Single card, 2");
+			
+			cards = createCards([{v:14,c:"N"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.SINGLE,"Single card, A");
+        });
+			
+		test("Detect pair",function(){
+			CombinaisonsValidator.resetTurn();
+                  
+			var cards = createCards([{v:2,c:"R"},{v:2,c:"B"}]); 
+			var combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.PAIR,"Single Pair of 2");
+			
+			cards = createCards([{v:11,c:"N"},{v:11,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.PAIR,"Single Pair of V");
+        });
+		
+		test("Detect brelan",function(){
+			CombinaisonsValidator.resetTurn();
+                  
+			var cards = createCards([{v:4,c:"R"},{v:4,c:"B"},{v:4,c:"V"}]); 
+			var combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.BRELAN,"Brelan of 4");
+			
+			cards = createCards([{v:13,c:"N"},{v:13,c:"B"},{v:13,c:"N"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.BRELAN,"Single Pair of K");
+        });
+		
+		test("Detect full house",function(){
+			CombinaisonsValidator.resetTurn();
+                  
+			var cards = createCards([{v:3,c:"V"},{v:3,c:"R"},{v:8,c:"R"},{v:8,c:"B"},{v:8,c:"V"}]); 
+			var combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.FULLHOUSE,"FULLHOUSE of 8 by 3");
+			equal(combinaison.high,8,"check FULLHOUSE of 8");
+			
+			var cards = createCards([{v:6,c:"R"},{v:6,c:"B"},{v:6,c:"V"},{v:12,c:"N"},{v:12,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.FULLHOUSE,"FULLHOUSE of 6 by D");
+			equal(combinaison.high,6,"check FULLHOUSE of 6");
+        });
+			
+		function createCards(cardsValue){
+			return cardsValue.map(function(c){
+				return new Card(c.v,c.c);
+			});
+		}
+			
+            </script>
+   </head>
+   <body>
+	  <div id="qunit"></div>
+   </body>
+   
+</html>
