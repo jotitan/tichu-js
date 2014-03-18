@@ -30,6 +30,11 @@
 			cards = createCards([{v:14,c:"N"}]); 
 			combinaison = CombinaisonsValidator.detect(cards);			
 			equal(combinaison.type,CombinaisonType.SINGLE,"Single card, A");
+
+			cards = createCards([{v:16,c:"N"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.SINGLE,"Single card, Phoenix");
+			equal(combinaison.high,1.5,"Phoenix replace 1.5");
         });
 			
 		test("Detect pair",function(){
@@ -42,6 +47,11 @@
 			cards = createCards([{v:11,c:"N"},{v:11,c:"B"}]); 
 			combinaison = CombinaisonsValidator.detect(cards);			
 			equal(combinaison.type,CombinaisonType.PAIR,"Single Pair of V");
+
+			cards = createCards([{v:5,c:"N"},{v:16}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.PAIR,"Single Pair with phoenix");
+			equal(combinaison.jokerValue,5,"Phoenix replace a 5");
         });
 		
 		test("Detect brelan",function(){
@@ -54,9 +64,36 @@
 			cards = createCards([{v:13,c:"N"},{v:13,c:"B"},{v:13,c:"N"}]); 
 			combinaison = CombinaisonsValidator.detect(cards);			
 			equal(combinaison.type,CombinaisonType.BRELAN,"Single Pair of K");
+			equal(combinaison.jokerValue,null,"No Phoenix");
+
+			cards = createCards([{v:7,c:"N"},{v:16},{v:7,c:"N"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.BRELAN,"Single Pair with phoenix");
+			equal(combinaison.jokerValue,7,"Phoenix replace a 7");
         });
 		
-		test("Detect full house",function(){
+		test("Detect straight pair",function(){
+			CombinaisonsValidator.resetTurn();
+                  
+			var cards = createCards([{v:5,c:"V"},{v:5,c:"R"},{v:7,c:"R"},{v:6,c:"B"},{v:6,c:"V"},{v:7,c:"V"}]); 
+			var combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.STRAIGHTPAIR,"STRAIGHT PAIR, from 5 to 7");
+			equal(combinaison.high,5,"check high pair, 5");
+			equal(combinaison.nb,3,"check nb pair, 3");
+
+			cards = createCards([{v:16},{v:2,c:"R"},{v:4,c:"R"},{v:3,c:"B"},{v:4,c:"V"},{v:2,c:"V"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.STRAIGHTPAIR,"STRAIGHT PAIR, from 2 to 4");
+			equal(combinaison.high,2,"check high pair, 2");
+			equal(combinaison.nb,3,"check nb pair, 3");
+			equal(combinaison.jokerValue,3,"Phoenix replace 3");
+
+			cards = createCards([{v:16},{v:2,c:"R"},{v:4,c:"R"},{v:3,c:"B"},{v:5,c:"V"},{v:2,c:"V"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison,null,"Not a Straight pair");			
+	    });
+
+        test("Detect full house",function(){
 			CombinaisonsValidator.resetTurn();
                   
 			var cards = createCards([{v:3,c:"V"},{v:3,c:"R"},{v:8,c:"R"},{v:8,c:"B"},{v:8,c:"V"}]); 
@@ -64,14 +101,63 @@
 			equal(combinaison.type,CombinaisonType.FULLHOUSE,"FULLHOUSE of 8 by 3");
 			equal(combinaison.high,8,"check FULLHOUSE of 8");
 			
-			var cards = createCards([{v:6,c:"R"},{v:6,c:"B"},{v:6,c:"V"},{v:12,c:"N"},{v:12,c:"B"}]); 
+			cards = createCards([{v:6,c:"R"},{v:6,c:"B"},{v:6,c:"V"},{v:12,c:"N"},{v:12,c:"B"}]); 
 			combinaison = CombinaisonsValidator.detect(cards);			
 			equal(combinaison.type,CombinaisonType.FULLHOUSE,"FULLHOUSE of 6 by D");
 			equal(combinaison.high,6,"check FULLHOUSE of 6");
+
+			cards = createCards([{v:4,c:"R"},{v:5,c:"B"},{v:5,c:"V"},{v:5,c:"N"},{v:16,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);
+			equal(combinaison.type,CombinaisonType.FULLHOUSE,"FULLHOUSE of 5 by 4");
+			equal(combinaison.high,5,"check FULLHOUSE of 5");
+			equal(combinaison.jokerValue,4,"Phoenix replace 4");
+
+			cards = createCards([{v:7,c:"R"},{v:10,c:"B"},{v:10,c:"V"},{v:7,c:"N"},{v:16,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);
+			equal(combinaison.type,CombinaisonType.FULLHOUSE,"FULLHOUSE of 10 by 7");
+			equal(combinaison.high,10,"check FULLHOUSE of 10");
+			equal(combinaison.jokerValue,10,"Phoenix replace 10");
+
+			cards = createCards([{v:3,c:"R"},{v:3,c:"B"},{v:9,c:"V"},{v:3,c:"N"},{v:16,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);
+			equal(combinaison.type,CombinaisonType.FULLHOUSE,"FULLHOUSE of 3 by 9");
+			equal(combinaison.high,3,"check FULLHOUSE of 3");
+			equal(combinaison.jokerValue,9,"Phoenix replace 9");
+        });
+
+        test("Detect straight",function(){
+			CombinaisonsValidator.resetTurn();
+                  
+			var cards = createCards([{v:3,c:"V"},{v:8,c:"R"},{v:5,c:"R"},{v:6,c:"B"},{v:7,c:"B"},{v:4,c:"V"}]); 
+			var combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.STRAIGHT,"STRAIGHT of 6 cards from 3");
+			equal(combinaison.high,3,"check STRAIGHTPAIR from 3");
+
+			cards = createCards([{v:5,c:"V"},{v:10,c:"R"},{v:7,c:"R"},{v:6,c:"B"},{v:8,c:"B"},{v:16,c:"V"},{v:11,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.STRAIGHT,"STRAIGHT of 7 cards from 5");
+			equal(combinaison.high,5,"check STRAIGHTPAIR from 5");
+			equal(combinaison.jokerValue,9,"Phoenix replace 9");
+
+			cards = createCards([{v:7,c:"V"},{v:6,c:"R"},{v:8,c:"R"},{v:11,c:"B"},{v:10,c:"B"},{v:16,c:"V"},{v:9,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.STRAIGHT,"STRAIGHT of 7 cards from 6");
+			equal(combinaison.high,6,"check STRAIGHTPAIR from 6");
+			equal(combinaison.jokerValue,12,"Phoenix replace D");
+
+			cards = createCards([{v:12,c:"R"},{v:11,c:"B"},{v:13,c:"B"},{v:16,c:"V"},{v:14,c:"B"}]); 
+			combinaison = CombinaisonsValidator.detect(cards);			
+			equal(combinaison.type,CombinaisonType.STRAIGHT,"STRAIGHT of 5 cards from 10");
+			equal(combinaison.high,10,"check STRAIGHTPAIR from 10");
+			equal(combinaison.jokerValue,10,"Phoenix replace 10");
+			
         });
 			
 		function createCards(cardsValue){
 			return cardsValue.map(function(c){
+				if(c.v == 16){
+					return new PhoenixCard();
+				}
 				return new Card(c.v,c.c);
 			});
 		}

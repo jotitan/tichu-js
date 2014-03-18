@@ -18,6 +18,14 @@ function Card(value,color){
 	this.player = null;
 	this.status = STATUS_CARD.NO_STATUS_CARD;
 	this.id = color + value;
+	this.isPhoenix = function(){
+		return false;
+	}
+
+	this.getValue = function(){
+		return value;
+	}
+
 	this.getScore = function(){
 		switch(this.value){
 			case 5:return 5;
@@ -58,6 +66,14 @@ function DogsCard(){
 function PhoenixCard(){
 	Card.call(this,16);
 	this.drawing = new ImgCard(0,0,"img/phoenix.png",this);
+	this.replaceValue == null;
+
+	this.getValue = function(){
+		return this.replaceValue || this.value;
+	}
+	this.isPhoenix = function(){
+		return true;
+	}
 	
 	this.getScore = function(){return -25;}
 }
@@ -101,10 +117,11 @@ function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation){
 	}else{
 		canvas.fillStyle=value.color;
 		canvas.font = "6pt Arial";
+		var marginRight = canvas.measureText(value.val).width + 3;
 		canvas.fillText(value.val,pos + 2,10 + decalage);
-		canvas.fillText(value.val,pos + width-7,10 + decalage);
-		canvas.fillText(value.val,pos + 2,35 + decalage);
-		canvas.fillText(value.val,pos + width-7,35 + decalage);
+		canvas.fillText(value.val,pos + width-marginRight,10 + decalage);
+		canvas.fillText(value.val,pos + 2,height -5+ decalage);
+		canvas.fillText(value.val,pos + width-marginRight,height -5 + decalage);
 	}
 	canvas.restore();
 }

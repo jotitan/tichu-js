@@ -4,10 +4,11 @@
 /* @param : type of combinaison (CombinaisonType) */
 /* @param hight : higher card of the combinaison (use the first of the series) */
 /* @param nb : number of card (use in straight, pair straight, straight bomb */
-function Combinaison(type,high,nb){
+function Combinaison(type,high,nb,jokerValue){
 	this.type = type;
 	this.high = high;
 	this.nb = nb;
+	this.jokerValue = jokerValue;
 }
 
 var CombinaisonType = {
@@ -43,38 +44,65 @@ var CombinaisonsValidator = {
 		if(cards.length == 0){
 			throw "Empty Hand";
 		}
-		
 		cards.sort(function(c1,c2){
-			if(c1.value == c2.value){
+			if(c1.getValue() == c2.getValue()){
 				return c1.color > c2.color ? 1 : -1;
 			}
-			return c1.value - c2.value;
+			return c1.getValue() - c2.getValue();
 		});
-	
+
+		// Find joker
+		var ctx = this._createContext(cards);
 		if(cards.length == 1){
-			return new Combinaison(CombinaisonType.SINGLE,cards[0].value);
+			var value = cards[0].getValue();
+			if(cards[0].isPhoenix()){
+				value = this.previous != null && this.previous.high!=17 ? this.previous.high + 0.5 : 1.5;				
+			}
+			return new Combinaison(CombinaisonType.SINGLE,value);
 		}
 		if(cards.length == 2){
-			return this._checkSame(cards,CombinaisonType.PAIR);
+			return this._checkSame(cards,CombinaisonType.PAIR,ctx);
 		}
 		if(cards.length == 3){
-			return this._checkSame(cards,CombinaisonType.BRELAN);
+			return this._checkSame(cards,CombinaisonType.BRELAN,ctx);
 		}
 		if(cards.length % 2 == 0){
-			return this._checkStraightPair(cards);
-		}
-		if(cards.length == 5){
-			var combinaison = this._checkFullHouse(cards);
+			var combinaison = this._checkStraightPair(cards,ctx);
 			if(combinaison!=null){
 				return combinaison;
 			}
 		}
+		if(cards.length == 5){
+			var combinaison = this._checkFullHouse(cards,ctx);
+			if(combinaison!=null){
+				return combinaison;
+			}			
+		}
+		if(cards.length >=5){
+			var combinaison = this._checkStraight(cards,ctx);
+			if(combinaison!=null){
+				return combinaison;
+			}			
+		}
+		return null;
 		
 	},
-	_checkSame:function(cards,type){
+	_createContext:function(cards){
+		var jokerCard = null;
+		var joker = cards.some(function(c){
+			if(c.isPhoenix()){
+				jokerCard = c;
+			}
+			return c.isPhoenix()
+		})
+		return {joker:joker,card:jokerCard};
+	},
+	_checkSame:function(cards,type,ctx){
 		var value = cards[0].value;
-		return cards.every(function(c){return c.value == value;})
-			? new Combinaison(type,value) : null;		
+		return cards.every(function(c){
+			if(c.value == value){return true;}
+			if(ctx.joker){ctx.joker = false;ctx.card.replaceValue=value;return true;}
+		}) ? new Combinaison(type,value,null,ctx.card!=null?ctx.card.replaceValue:null) : null;		
 	},
 	_checkBombs:function(cards){
 		if(cards.length == 4){
@@ -92,33 +120,84 @@ var CombinaisonsValidator = {
 		});
 		return check ? new Combinaison(CombinaisonType.STRAIGHTBOMB,value,cards.length):null;	
 	},
-	_checkStraightPair:function(cards){
+	_checkStraightPair:function(cards,ctx){
 		var value = null;
 		var check = cards.every(function(c,i){
-			if(i%2 == 0){
+			if(i%2 == 0 && (value == null || c.value == value+1)){
 				value = c.value;
 				return true;
 			}else{
-				return value == c.value;
+				if(value == c.value || c.isPhoenix()){return true;}
+				if(ctx.joker){
+					ctx.joker = false;
+					ctx.card.replaceValue = value;
+					return true;
+				}
+				return false;
 			}			
 		});
 		
-		return check ? new Combinaison(CombinaisonType.STRAIGHTPAIR,cards[0].value,cards.length/2) : null;
+		return check ? new Combinaison(CombinaisonType.STRAIGHTPAIR,cards[0].value,cards.length/2,ctx.card!=null ? ctx.card.replaceValue:null) : null;
 	},
-	_checkFullHouse:function(cards){
+	_checkFullHouse:function(cards,ctx){
 		var value = cards[0].value;
 		var change = 0;
-		var pos = 0;
+		var values = [];
+		var pos=0;
 		cards.forEach(function(c,i){
 			if(c.value!=value){
 				change++;
 				value = c.value;
 				pos = i;
 			}
+			if(!c.isPhoenix()){
+				if(values[0] == null || values[0].value == value){
+					if(values[0] == null){values[0] = {value:value,nb:0}}
+					values[0].nb++;
+				}
+				else{
+					if(values[1] == null){values[1] = {value:value,nb:0}}
+					values[1].nb++;
+				}
+			}		
 		});
-		if(change == 1){
-			var high = pos == 3 ? cards[0].value : cards[4].value;
-			return new Combinaison(CombinaisonType.FULLHOUSE,high) 
+		if(change == 1 || (change == 2 && ctx.card!=null)) {
+			var high = pos == 3 ? cards[0].value : cards[3].value;
+			if(change == 2){
+				switch(values[0].nb){
+					case 1 : ctx.card.replaceValue = values[0].value;values[1].value;break;
+					case 2 : ctx.card.replaceValue = Math.max(values[0].value,values[1].value);high=ctx.card.replaceValue;break;
+					case 3 : ctx.card.replaceValue = values[1].value;high = values[0].value;break;
+				}
+			}
+			return new Combinaison(CombinaisonType.FULLHOUSE,high,null,ctx.card!=null?ctx.card.replaceValue:null) ;
+		}
+		return null;
+	},
+	_checkStraight:function(cards,ctx){
+		var value = cards[0].value;
+		var check = cards.every(function(c,i){
+			if(i==0 || c.value == ++value){
+				return true;
+			}			
+			if(ctx.joker && c.value == value+1 && !c.isPhoenix()){						
+				ctx.card.replaceValue = value++;
+				ctx.joker = false;
+				return true;
+			}
+			// Case joker, last card			
+			if(c.isPhoenix()){
+				if(ctx.joker){
+					ctx.card.replaceValue = value == 15 ? cards[0].value-1 : value;
+					ctx.joker = false;
+				}
+				return true;
+			}
+			return false
+		});		
+		value = Math.min(cards[0].value,ctx.card!=null?ctx.card.replaceValue:cards[0].value);
+		if(check){
+			return new Combinaison(CombinaisonType.STRAIGHT,value,cards.length,ctx.card!=null?ctx.card.replaceValue:null) ;
 		}
 		return null;
 	}

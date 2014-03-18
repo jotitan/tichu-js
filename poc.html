@@ -15,7 +15,7 @@
 <button id="checkMode">Check mode</button>
 
 <button onclick="CardManager.distribute()">Distribuer</button>
-<button onclick="PlayerManager.enableSwapMode()">Mode echange</button>
+<button onclick="Game.enableSwapMode()">Mode echange</button>
 
 <br/>
 <canvas id="canvas" width="500" height="300" style="border:solid 1px black"></canvas>
@@ -45,6 +45,8 @@ function stopDraw(){
 
 function refreshDraw(){
 	canvas.clearRect(0,0,500,300);
+	canvas.fillStyle='#00723D';
+	canvas.fillRect(0,0,500,300);
 	canvas.fillStyle='#000000';
 	
 	ComponentManager.components.forEach(function(c){
@@ -213,7 +215,7 @@ var Game = {
 		boxes.forEach(function(b){ComponentManager.add(b);});		
 		
 		this.swapMouseController.enable(boxes);		
-		Actions.create([{name:"Echanger",fct:function(){PlayerManager.disableSwapMode();}}]);
+		Actions.create([{name:"Echanger",fct:function(){Game.disableSwapMode();}}]);
 	},
 	disableSwapMode:function(){
 		// Proceed to swap
