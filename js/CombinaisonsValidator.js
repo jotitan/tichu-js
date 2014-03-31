@@ -39,6 +39,7 @@ var CombinaisonsValidator = {
 			
 		}		
 		this.previous = combinaison;
+		return combinaison;
 	},
 	detect:function(cards){
 		if(cards.length == 0){

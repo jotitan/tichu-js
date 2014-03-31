@@ -1,0 +1,32 @@
+<html>
+
+<head>
+<script type="text/javascript" src="lib/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/card.js"></script>
+<script type="text/javascript" src="js/tichu.js"></script>
+<script type="text/javascript" src="js/player.js"></script>
+<script type="text/javascript" src="js/CombinaisonsValidator.js"></script>
+<script type="text/javascript" src="js/network.js"></script>
+</head>
+
+<body>
+
+<script>
+
+var datas = {"name":"test","playerO":"bob","playerN":"teddy","playerE":"machin","playerS":"truc"};
+var url = 'http://localhost:8080/tichu-server/rest/game/create';
+function ret(data){console.log("RET",data)}
+$.ajax({url:url,data:datas,type:'GET',dataType:'jsonp',success:function(data){console.log(data);suite()}});
+
+function suite(){
+
+MessageManager.GameConnection.connect("test","teddy");
+MessageManager.ServerConnect.close();
+}
+
+</script>
+
+
+</body>
+
+</html>

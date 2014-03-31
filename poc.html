@@ -5,7 +5,7 @@
 <script type="text/javascript" src="js/card.js"></script>
 <script type="text/javascript" src="js/tichu.js"></script>
 <script type="text/javascript" src="js/player.js"></script>
-<script type="text/javascript" src="js/CombinaisonValidator.js"></script>
+<script type="text/javascript" src="js/CombinaisonsValidator.js"></script>
 </head>
 
 <body>
@@ -16,6 +16,7 @@
 
 <button onclick="CardManager.distribute()">Distribuer</button>
 <button onclick="Game.enableSwapMode()">Mode echange</button>
+<button onclick="Game.enablePlayMode()">Mode jeu</button>
 
 <br/>
 <canvas id="canvas" width="500" height="300" style="border:solid 1px black"></canvas>
@@ -181,7 +182,6 @@ var CardManager = {
 	}
 }
 
-// Suite a la meme couleur, 4 cartes identiques
 var Actions = {
 	div:$('#actions'),
 	create:function(actions){
@@ -230,7 +230,6 @@ var Game = {
 			ComponentManager.remove(b);
 		});
 		this.swapMouseController.disable();
-		console.log(swapCards);
 		
 		this.enablePlayMode();		
 	},
@@ -239,6 +238,7 @@ var Game = {
 		this.playMouseController.enable();
 	},
 	playMouseController:{
+		cards:[],
 		disable:function(){
 			$('#canvas').unbind('mousedown.play');
 		},
@@ -250,7 +250,31 @@ var Game = {
 			var coords = EventHelper.getPosition(e);
 			var card = CardManager.findSelectCards(PlayerManager.joueur,coords.x,coords.y);
 			if(card == null){return;}
-			card.checked = !card.checked;			
+			this._checkCard(card);
+		}
+		,_checkCard:function(card){
+			card.checked = !card.checked;
+			if(card.checked){
+				this.cards.push(card);
+			}
+			else{
+				var pos = this.cards.indexOf(card);
+				if(pos!=-1){
+					this.cards.splice(pos,1);
+				}
+			}
+			var _self = this;
+			if(this.cards.length){
+				Actions.create([{
+					name:"Jouer",
+					fct:function(){
+						var cards = _self.cards.map(function(c){return c.card;});
+						console.log(CombinaisonsValidator.detect(cards));
+					}
+				}]);
+			}else{
+				Actions.empty();
+			}
 		}		
 	},
 	swapMouseController:{
