@@ -1,9 +1,10 @@
 package fr.titan.tichu.ws;
 
-
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.PlayerStatus;
-import fr.titan.tichu.model.ResponseRest;
+import fr.titan.tichu.model.rest.ResponseRest;
+import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.model.ws.ResponseWS;
 import fr.titan.tichu.service.GameService;
 import fr.titan.tichu.service.MessageService;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -16,11 +17,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * User: Titan
- * Date: 26/03/14
- * Time: 20:36
+ * User: Titan Date: 26/03/14 Time: 20:36
  */
-@ServerEndpoint(value="/chat4")
+@ServerEndpoint(value = "/chat4")
 public class TichuWebSocket {
     private Logger logger = LoggerFactory.getLogger(TichuWebSocket.class);
 
@@ -30,52 +29,61 @@ public class TichuWebSocket {
 
     private Player player;
 
-    public TichuWebSocket(){
+    private RemoteEndpoint.Basic basic;
+
+    public TichuWebSocket() {
         logger.info("INIT WEB");
         messageService = new MessageService();
         gameService = new GameService();
     }
 
     @OnOpen
-    public void open(Session session){
+    public void open(Session session) {
         logger.info("OPEN");
         String token = session.getRequestParameterMap().get("token").get(0);
         this.player = gameService.connectGame(token);
-        if(this.player!=null){
+        if (this.player != null) {
             this.player.setWebSocket(this);
-            sendMessage(new ResponseRest(1, this.player), session);
-        }else{
-            sendMessage(new ResponseRest(0,"erreur"),session);
+            this.basic = session.getBasicRemote();
+            sendMessage(ResponseType.CONNECTION_OK, new ResponseRest(1, this.player));
+        } else {
+            sendMessage(ResponseType.CONNECTION_KO, new ResponseRest(0, "erreur"));
         }
     }
 
-    private void sendMessage(Object object,Session session){
+    /**
+     * 
+     * @param type
+     *            Type of response (new player...)
+     * @param object
+     *            Object with data
+     */
+    public void sendMessage(ResponseType type, Object object) {
         ObjectMapper om = new ObjectMapper();
         ByteArrayOutputStream tab = new ByteArrayOutputStream();
-        try{
-            om.writer().writeValue(tab,object);
-            session.getBasicRemote().sendText(new String(tab.toByteArray()));
-        }   catch(IOException ioex){}
+        try {
+            om.writer().writeValue(tab, new ResponseWS(type, object));
+            this.basic.sendText(new String(tab.toByteArray()));
+        } catch (IOException ioex) {
+        }
     }
 
     /**
      * Can receive annonce (tichu, grand tichu), fold
+     * 
      * @param message
      * @param session
      */
     @OnMessage
-    public void message(String message,Session session){
+    public void message(String message, Session session) {
         logger.info("MESSAGE : " + message);
-        messageService.treatMessage(message);
-        try{
-            session.getBasicRemote().sendText("Salut mon pote " + message);
-        }   catch(IOException ioex){}
+        messageService.treatMessage(this.player, message);
     }
 
     @OnClose
-    public void close(Session session,CloseReason closeReason){
+    public void close(Session session, CloseReason closeReason) {
         System.out.println("CLOSE");
-        if(this.player!=null){
+        if (this.player != null) {
             this.player.setPlayerStatus(PlayerStatus.DISCONNECTED);
         }
 

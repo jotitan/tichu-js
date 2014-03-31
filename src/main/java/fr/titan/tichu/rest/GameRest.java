@@ -2,7 +2,7 @@ package fr.titan.tichu.rest;
 
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
-import fr.titan.tichu.model.ResponseRest;
+import fr.titan.tichu.model.rest.ResponseRest;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.service.GameService;
 import org.codehaus.jackson.map.ObjectMapper;
