@@ -1,5 +1,7 @@
 package fr.titan.tichu.model;
 
+import fr.titan.tichu.model.ws.Fold;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,9 @@ public class Game {
     private int orderEndRound = 0;
 
     /* Cards of game */
-    private List<Card> cards;
+    private List<Card> cads;
+
+    private CardPackage cardPackage = new CardPackage();
 
     private Fold lastFold;
     private List<Fold> folds = new ArrayList<Fold>();
@@ -30,7 +34,6 @@ public class Game {
 
     /* Last player who make a fold */
     private Player lastPlayer = null;
-    private Card mahjongCard;
 
     public Game() {
         for (Player.Orientation or : Player.Orientation.values()) {
@@ -50,20 +53,7 @@ public class Game {
     }
 
     protected void createCards() {
-        if (cards == null) {
-            cards = new ArrayList<Card>();
-            for (String color : new String[] { "green", "blue", "red", "black" }) {
-                for (int i = 2; i < 15; i++) {
-                    cards.add(new ValueCard(i, color));
-                }
-            }
-            this.mahjongCard = SpecialCard.SpecialCardFactory.Mahjong.get();
-            cards.add(this.mahjongCard);
-            cards.add(SpecialCard.SpecialCardFactory.Dogs.get());
-            cards.add(SpecialCard.SpecialCardFactory.Phoenix.get());
-            cards.add(SpecialCard.SpecialCardFactory.Dragon.get());
-
-        }
+        cardPackage.createCards();
     }
 
     public void newTurn() {
@@ -87,17 +77,32 @@ public class Game {
         newRound();
     }
 
-    public void saveScore(){
+    public void saveScore() {
 
+    }
+
+    public boolean isRoundEnded() {
+        int nbEnded = 0;
+        for (Player player : players) {
+            nbEnded += player.ended() ? 1 : 0;
+        }
+        return nbEnded >= 3;
+    }
+
+    public Player getLosePlayer() {
+        for (Player player : players) {
+            if (player.getNbcard() != 0 || player.getEndPosition() == 3) {
+                return player;
+            }
+        }
+        return null; // impossible:
     }
 
     private void resetCards() {
         for (Player player : this.players) {
             player.resetCards();
         }
-        for (Card card : this.cards) {
-            card.setOwner(null);
-        }
+        cardPackage.resetCards();
     }
 
     /**
@@ -108,7 +113,7 @@ public class Game {
     protected void distribute() {
         // Reset cards of player
         resetCards();
-        List<Card> copyCards = new ArrayList<Card>(this.cards);
+        List<Card> copyCards = cardPackage.getCopy();
 
         for (Player player : players) {
             for (int i = 0; i < 14; i++) {
@@ -141,6 +146,18 @@ public class Game {
         return this.lastFold.getType().equals(fold.getType()) && this.lastFold.getHigh() < fold.getHigh();
     }
 
+    public boolean verifyBomb(Fold bomb) {
+        if (this.lastFold == null || !this.lastFold.isBomb()) {
+            return true;
+        }
+        /* Straight bomb higher than square bomb */
+        if (bomb.getType().equals(FoldType.STRAIGHTBOMB) && this.lastFold.getType().equals(FoldType.SQUAREBOMB)) {
+            return true;
+        }
+        /* Higher if bomb is same type and higher combinaison. Otherwise, if bomb is square and the last straight, not good */
+        return bomb.getType().equals(this.lastFold.getType()) && bomb.getHigh() > this.lastFold.getHigh();
+    }
+
     /* Play the fold */
     public void playFold(Fold fold) {
         this.folds.add(fold);
@@ -152,13 +169,27 @@ public class Game {
     }
 
     /* Define the next player */
-    public void nextPlayer() {
+    public void nextPlayer() throws Exception {
+        if (this.orderEndRound >= 2) {
+            throw new Exception("End of game");
+        }
         if (this.currentPlayer == null) {
-            this.currentPlayer = this.mahjongCard.getOwner();
+            this.currentPlayer = this.getCardPackage().getMahjongCard().getOwner();
         } else {
             Player.Orientation or = this.currentPlayer.getOrientation().getNext();
             this.currentPlayer = this.players.get(or.getPos());
+            if (this.currentPlayer.ended()) {
+                nextPlayer();
+            }
         }
+    }
+
+    public Player getPartner(Player player) {
+        return this.players.get(player.getOrientation().getFace().getPos());
+    }
+
+    public Player getPlayer(Player.Orientation orientation) {
+        return this.players.get(orientation.getPos());
     }
 
     public void setGame(String game) {
@@ -181,8 +212,8 @@ public class Game {
         this.players = players;
     }
 
-    public List<Card> getCards() {
-        return cards;
+    public CardPackage getCardPackage() {
+        return cardPackage;
     }
 
     public Fold getLastFold() {
@@ -217,7 +248,7 @@ public class Game {
         return lastPlayer;
     }
 
-    public int getAndIncreaseEndPosition(){
+    public int getAndIncreaseEndPosition() {
         return this.orderEndRound++;
     }
 }

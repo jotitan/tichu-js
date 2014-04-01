@@ -29,7 +29,7 @@ var MessageManager = {
 			this.ws = new WebSocket(this.url + "?token=" + this.token);
 			this.ws.onmessage = function(message){
 				console.log("Receive : ",message);
-				//MessageManager.token = ;
+				MessageManager.ServerConnect.readMessage(message);
 			}
 			this.ws.onopen = function(message){
 				console.log("Open : ",message);
@@ -49,6 +49,12 @@ var MessageManager = {
 			this.ws.close();
 		}
 	}
-	
-
 }
+
+ var MessageDispatcher = {
+    dispatch:function(data){
+        switch(data.responseType){
+            case "CONNECTION_OK" : break;
+        }
+    }
+ }

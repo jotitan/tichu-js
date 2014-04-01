@@ -21,7 +21,7 @@ import java.io.IOException;
  * User: Titan Date: 26/03/14 Time: 20:36
  */
 @ServerEndpoint(value = "/chat4")
-public class TichuWebSocket implements TichuClientCommunication{
+public class TichuWebSocket implements TichuClientCommunication {
     private Logger logger = LoggerFactory.getLogger(TichuWebSocket.class);
 
     private MessageService messageService;
@@ -60,6 +60,9 @@ public class TichuWebSocket implements TichuClientCommunication{
      *            Object with data
      */
     public void send(ResponseType type, Object object) {
+        if (player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
+            return;
+        }
         ObjectMapper om = new ObjectMapper();
         ByteArrayOutputStream tab = new ByteArrayOutputStream();
         try {
@@ -83,6 +86,7 @@ public class TichuWebSocket implements TichuClientCommunication{
 
     @OnClose
     public void close(Session session, CloseReason closeReason) {
+        // Have to stop the game
         System.out.println("CLOSE");
         if (this.player != null) {
             this.player.setPlayerStatus(PlayerStatus.DISCONNECTED);

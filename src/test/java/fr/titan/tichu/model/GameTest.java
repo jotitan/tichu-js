@@ -19,7 +19,7 @@ public class GameTest {
     public void testDistribute() {
         Game game = new Game();
         game.createCards();
-        Assert.assertEquals(56, game.getCards().size());
+        Assert.assertEquals(56, game.getCardPackage().getCards().size());
 
         game.distribute();
         for (Player player : game.getPlayers()) {

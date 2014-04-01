@@ -1,20 +1,22 @@
 package fr.titan.tichu.model;
 
+import fr.titan.tichu.model.ws.CardWS;
+
 /**
- * User: Titan
- * Date: 29/03/14
- * Time: 16:42
+ * User: Titan Date: 29/03/14 Time: 16:42
  */
 public abstract class Card {
 
     private CardType cardType;
     private Player owner;
 
-    public Card(CardType cardType){
+    public Card(CardType cardType) {
         this.cardType = cardType;
     }
 
-    public CardType getType(){
+    public abstract int getScore();
+
+    public CardType getType() {
         return this.cardType;
     }
 
@@ -25,4 +27,6 @@ public abstract class Card {
     public void setOwner(Player owner) {
         this.owner = owner;
     }
+
+    public abstract CardWS toCardWS();
 }

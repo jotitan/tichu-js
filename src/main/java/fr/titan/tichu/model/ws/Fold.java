@@ -1,5 +1,7 @@
-package fr.titan.tichu.model;
+package fr.titan.tichu.model.ws;
 
+import fr.titan.tichu.model.FoldType;
+import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.CardWS;
 
 import java.util.ArrayList;
@@ -18,6 +20,10 @@ public class Fold {
         return cards;
     }
 
+    public void addCard(CardWS card) {
+        this.cards.add(card);
+    }
+
     public void setCards(List<CardWS> cards) {
         this.cards = cards;
     }
@@ -28,6 +34,10 @@ public class Fold {
 
     public void setType(FoldType type) {
         this.type = type;
+    }
+
+    public boolean isBomb() {
+        return type.equals(FoldType.SQUAREBOMB) || type.equals(FoldType.STRAIGHTBOMB);
     }
 
     public int getHigh() {

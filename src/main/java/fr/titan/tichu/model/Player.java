@@ -1,8 +1,8 @@
 package fr.titan.tichu.model;
 
 import fr.titan.tichu.TichuClientCommunication;
+import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.PlayerWS;
-import fr.titan.tichu.ws.TichuWebSocket;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -12,13 +12,17 @@ import java.util.List;
  * User: Titan Date: 29/03/14 Time: 11:47
  */
 public class Player {
-    private List<Card> cards = new ArrayList<Card>();
-    private Orientation orientation;
     private String name;
+    private Orientation orientation;
+    private List<Card> cards = new ArrayList<Card>();
+    /* Stock cards swap between players */
+    private List<Card> changeCards = new ArrayList<Card>();
     private PlayerStatus playerStatus = PlayerStatus.FREE_CHAIR;
     private String token; // To verify identity
     private Game game;
     private TichuClientCommunication client;
+    private AnnonceType annonce = null;
+    private int endPosition = -1;
 
     /* List of win folds */
     private List<Fold> folds = new ArrayList<Fold>();
@@ -30,14 +34,34 @@ public class Player {
             this.pos = pos;
         }
 
-        private Orientation next;
+        private Orientation right;
+        private Orientation left;
+        private Orientation face;
         private int pos;
 
         public Orientation getNext() {
-            if (next == null) {
-                next = getByIndex((this.getPos() + 1) % 4);
+            return getLeft();
+        }
+
+        public Orientation getLeft() {
+            if (left == null) {
+                left = getByIndex((this.getPos() + 1) % 4);
             }
-            return this.next;
+            return this.left;
+        }
+
+        public Orientation getRight() {
+            if (right == null) {
+                right = getByIndex((this.getPos() + 3) % 4);
+            }
+            return this.right;
+        }
+
+        public Orientation getFace() {
+            if (face == null) {
+                face = getByIndex((this.getPos() + 2) % 4);
+            }
+            return this.face;
         }
 
         private Orientation getByIndex(int index) {
@@ -63,14 +87,51 @@ public class Player {
         return cards.size();
     }
 
+    public boolean ended() {
+        return cards.size() == 0;
+    }
+
+    public boolean win() {
+        return cards.size() == 0 && endPosition == 0;
+    }
+
     public void addCard(Card card) {
         this.cards.add(card);
         card.setOwner(this);
     }
 
+    public void receiveCard(Card card) {
+        addCard(card);
+        changeCards.add(card);
+    }
+
+    public void giveCard(Card card, Player player) {
+        card.setOwner(null);
+        cards.remove(card);
+        player.receiveCard(card);
+    }
+
+    public void playFold(List<Card> fold) {
+        for (Card card : fold) {
+            card.setOwner(null);
+        }
+        this.cards.removeAll(fold);
+    }
+
     public void resetCards() {
         cards = new ArrayList<Card>();
+        changeCards = new ArrayList<Card>();
         folds = new ArrayList<Fold>();
+        annonce = null;
+        endPosition = -1;
+    }
+
+    public int getSucceedAnnonce() {
+        if (annonce == null) {
+            return 0;
+        }
+        int score = annonce.equals(AnnonceType.GRAND_TICHU) ? 200 : 100;
+        return endPosition == 0 ? score : -score;
     }
 
     public List<Card> getCards() {
@@ -136,10 +197,26 @@ public class Player {
     }
 
     public PlayerWS getPlayerWS() {
-        return new PlayerWS(this.name, this.orientation);
+        return new PlayerWS(this.name, this.orientation, this.endPosition);
     }
 
     public void addFolds(List<Fold> folds) {
         this.folds.addAll(folds);
+    }
+
+    public void setAnnonce(AnnonceType annonce) {
+        this.annonce = annonce;
+    }
+
+    public void setEndPosition(int endPosition) {
+        this.endPosition = endPosition;
+    }
+
+    public int getEndPosition() {
+        return endPosition;
+    }
+
+    public List<Card> getChangeCards() {
+        return changeCards;
     }
 }

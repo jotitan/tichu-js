@@ -1,10 +1,9 @@
 package fr.titan.tichu.service;
 
-import fr.titan.tichu.model.Fold;
-import fr.titan.tichu.model.FoldType;
+import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.Player;
+import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.RequestWS;
-import fr.titan.tichu.model.ws.ResponseType;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -19,13 +18,17 @@ public class MessageService {
         try {
             RequestWS request = om.reader(RequestWS.class).readValue(message);
             switch (request.getType()) {
-                case CALL : break;
-                case CHANGE_CARDS:
+            case CALL:
+                gameService.callTurn(player);
+                break;
+            case CHANGE_CARDS:
+                ChangeCards cards = (ChangeCards) readObject(request.getValue(), ChangeCards.class);
+                gameService.playerChangeCard(player, cards);
                 break;
             case BOMB:
                 Fold bomb = (Fold) readObject(request.getValue(), Fold.class);
-                gameService.playBomb(player,bomb);
-
+                bomb.setPlayer(player.getOrientation());
+                gameService.playBomb(player, bomb);
                 break;
             case FOLD:
                 Fold fold = (Fold) readObject(request.getValue(), Fold.class);
