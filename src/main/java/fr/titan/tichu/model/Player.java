@@ -1,5 +1,6 @@
 package fr.titan.tichu.model;
 
+import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.ws.PlayerWS;
 import fr.titan.tichu.ws.TichuWebSocket;
 
@@ -17,7 +18,7 @@ public class Player {
     private PlayerStatus playerStatus = PlayerStatus.FREE_CHAIR;
     private String token; // To verify identity
     private Game game;
-    private TichuWebSocket webSocket;
+    private TichuClientCommunication client;
 
     /* List of win folds */
     private List<Fold> folds = new ArrayList<Fold>();
@@ -118,12 +119,12 @@ public class Player {
         return token;
     }
 
-    public TichuWebSocket getWebSocket() {
-        return webSocket;
+    public TichuClientCommunication getClient() {
+        return client;
     }
 
-    public void setWebSocket(TichuWebSocket webSocket) {
-        this.webSocket = webSocket;
+    public void setClientCommunication(TichuClientCommunication client) {
+        this.client = client;
     }
 
     public Game getGame() {

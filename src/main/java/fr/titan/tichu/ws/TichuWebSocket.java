@@ -1,5 +1,6 @@
 package fr.titan.tichu.ws;
 
+import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.PlayerStatus;
 import fr.titan.tichu.model.rest.ResponseRest;
@@ -20,7 +21,7 @@ import java.io.IOException;
  * User: Titan Date: 26/03/14 Time: 20:36
  */
 @ServerEndpoint(value = "/chat4")
-public class TichuWebSocket {
+public class TichuWebSocket implements TichuClientCommunication{
     private Logger logger = LoggerFactory.getLogger(TichuWebSocket.class);
 
     private MessageService messageService;
@@ -43,11 +44,11 @@ public class TichuWebSocket {
         String token = session.getRequestParameterMap().get("token").get(0);
         this.player = gameService.connectGame(token);
         if (this.player != null) {
-            this.player.setWebSocket(this);
+            this.player.setClientCommunication(this);
             this.basic = session.getBasicRemote();
-            sendMessage(ResponseType.CONNECTION_OK, new ResponseRest(1, this.player));
+            send(ResponseType.CONNECTION_OK, new ResponseRest(1, this.player));
         } else {
-            sendMessage(ResponseType.CONNECTION_KO, new ResponseRest(0, "erreur"));
+            send(ResponseType.CONNECTION_KO, new ResponseRest(0, "erreur"));
         }
     }
 
@@ -58,7 +59,7 @@ public class TichuWebSocket {
      * @param object
      *            Object with data
      */
-    public void sendMessage(ResponseType type, Object object) {
+    public void send(ResponseType type, Object object) {
         ObjectMapper om = new ObjectMapper();
         ByteArrayOutputStream tab = new ByteArrayOutputStream();
         try {

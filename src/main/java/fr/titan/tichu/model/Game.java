@@ -18,6 +18,8 @@ public class Game {
     private int score1 = 0;
     private int score2 = 0;
 
+    private int orderEndRound = 0;
+
     /* Cards of game */
     private List<Card> cards;
 
@@ -71,7 +73,9 @@ public class Game {
 
     /* Init the game for the round */
     public void newRound() {
+        saveScore();
         newTurn();
+        orderEndRound = 0;
         this.folds = new ArrayList<Fold>();
         this.lastPlayer = null;
         distribute();
@@ -81,6 +85,10 @@ public class Game {
         this.score1 = 0;
         this.score2 = 0;
         newRound();
+    }
+
+    public void saveScore(){
+
     }
 
     private void resetCards() {
@@ -207,5 +215,9 @@ public class Game {
 
     public Player getLastPlayer() {
         return lastPlayer;
+    }
+
+    public int getAndIncreaseEndPosition(){
+        return this.orderEndRound++;
     }
 }

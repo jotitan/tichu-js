@@ -3,11 +3,6 @@ package fr.titan.tichu.service;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.ResponseType;
-import fr.titan.tichu.rest.GameRest;
-
-import javax.websocket.Session;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ORDER : fold < turn < round < game une main (fold) dans un tour de jeu (turn) au sein d'une partie (round) d'une manche (game) en 1000 points
@@ -19,13 +14,14 @@ public class GameService {
 
     }
 
-    public void createGame(GameRequest gameRequest) throws Exception {
+    public Game createGame(GameRequest gameRequest) throws Exception {
         Game game = new Game(gameRequest.getName());
         game.getPlayers().get(0).setName(gameRequest.getPlayerO());
         game.getPlayers().get(1).setName(gameRequest.getPlayerN());
         game.getPlayers().get(2).setName(gameRequest.getPlayerE());
         game.getPlayers().get(3).setName(gameRequest.getPlayerS());
         games.addGame(game);
+        return game;
     }
 
     public Player joinGame(String gameName, String name, String password) throws Exception {
@@ -63,10 +59,10 @@ public class GameService {
         return player;
     }
 
-    private void broadCast(Game game, ResponseType type, Object object) {
+    protected void broadCast(Game game, ResponseType type, Object object) {
         for (Player player : game.getPlayers()) {
             if (player.getPlayerStatus().equals(PlayerStatus.CONNECTED)) {
-                player.getWebSocket().sendMessage(type, object);
+                player.getClient().send(type, object);
             }
         }
     }
@@ -75,6 +71,7 @@ public class GameService {
         if (game.canPlay()) {
             broadCast(game, ResponseType.GAME_CAN_RUN, "");
             distribute(game);
+            nextPlayer(game);
         }
 
     }
@@ -82,14 +79,17 @@ public class GameService {
     public void distribute(Game game) {
         game.newRound();
         for (Player player : game.getPlayers()) {
-            player.getWebSocket().sendMessage(ResponseType.DISTRIBUTION, player.getCards());
+            player.getClient().send(ResponseType.DISTRIBUTION, player.getCards());
         }
     }
 
     /* Play a bomb */
     public void playBomb(Player player, Fold fold) {
-        if (player.equals(player.getGame().getLastPlayer())) {
-            // Impossible to bomb is game
+        if (fold.getType().equals(FoldType.SQUAREBOMB) || fold.getType().equals(FoldType.STRAIGHTBOMB)) {
+             player.getGame().setCurrentPlayer(player);
+            nextPlayer(player.getGame());
+        } else {
+            player.getClient().send(ResponseType.BAD_FOLD, fold);
         }
     }
 
@@ -97,11 +97,11 @@ public class GameService {
     public void playFold(Player player, Fold fold) {
         Game game = player.getGame();
         if (!player.equals(game.getCurrentPlayer())) {
-            player.getWebSocket().sendMessage(ResponseType.NOT_YOUR_TURN, "");
+            player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
         if (!game.verifyFold(fold)) {
-            player.getWebSocket().sendMessage(ResponseType.BAD_FOLD, "");
+            player.getClient().send(ResponseType.BAD_FOLD, "");
             return;
         }
         game.playFold(fold);
@@ -114,11 +114,13 @@ public class GameService {
         }
     }
 
+
+
     /* Player doesn't play a fold */
     public void callTurn(Player player) {
         Game game = player.getGame();
         if (!player.equals(game.getCurrentPlayer())) {
-            player.getWebSocket().sendMessage(ResponseType.NOT_YOUR_TURN, "");
+            player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
         broadCast(game, ResponseType.PLAYER_CALL, player.getPlayerWS());

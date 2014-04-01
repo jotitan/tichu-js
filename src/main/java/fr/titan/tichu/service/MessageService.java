@@ -24,11 +24,8 @@ public class MessageService {
                 break;
             case BOMB:
                 Fold bomb = (Fold) readObject(request.getValue(), Fold.class);
-                if (bomb.getType().equals(FoldType.SQUAREBOMB) || bomb.getType().equals(FoldType.STRAIGHTBOMB)) {
+                gameService.playBomb(player,bomb);
 
-                } else {
-                    player.getWebSocket().sendMessage(ResponseType.BAD_FOLD, bomb);
-                }
                 break;
             case FOLD:
                 Fold fold = (Fold) readObject(request.getValue(), Fold.class);
