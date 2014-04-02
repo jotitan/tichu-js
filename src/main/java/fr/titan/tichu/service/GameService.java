@@ -93,8 +93,11 @@ public class GameService {
         giveCardToPlayer(cards.getToPartner(), player, player.getOrientation().getFace());
         giveCardToPlayer(cards.getToRight(), player, player.getOrientation().getRight());
 
+        player.getClient().send(ResponseType.CARDS_CHANGED,null);
+
         if (checkPlayersChangeCards(player.getGame())) {
             sendSwapCards(player.getGame());
+            nextPlayer(player.getGame());
         }
 
     }
