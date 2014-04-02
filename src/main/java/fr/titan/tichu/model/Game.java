@@ -16,19 +16,17 @@ public class Game {
     private String password;
     /* 4 players of the game */
     private List<Player> players = new ArrayList<Player>(4);
-    /* Scores */
-    private int score1 = 0;
-    private int score2 = 0;
+
+    private Team team1;
+
+    private Team team2;
 
     private int orderEndRound = 0;
-
-    /* Cards of game */
-    private List<Card> cads;
 
     private CardPackage cardPackage = new CardPackage();
 
     private Fold lastFold;
-    private List<Fold> folds = new ArrayList<Fold>();
+    private List<Card> cardOfFolds = new ArrayList<Card>();
     /* Wait this player to play */
     private Player currentPlayer = null;
 
@@ -39,6 +37,8 @@ public class Game {
         for (Player.Orientation or : Player.Orientation.values()) {
             this.players.add(or.getPos(), new Player(this, or));
         }
+        team1 = new Team(this.players.get(0), this.players.get(2));
+        team2 = new Team(this.players.get(1), this.players.get(3));
         createCards();
     }
 
@@ -57,7 +57,12 @@ public class Game {
     }
 
     public void newTurn() {
-        this.currentPlayer = null;
+        if (this.lastPlayer != null) {
+            this.lastPlayer.addCardsOfFold(this.cardOfFolds);
+        }
+        this.currentPlayer = this.lastPlayer;
+        this.lastPlayer = null;
+        this.cardOfFolds = new ArrayList<Card>();
         this.lastFold = null;
     }
 
@@ -66,19 +71,36 @@ public class Game {
         saveScore();
         newTurn();
         orderEndRound = 0;
-        this.folds = new ArrayList<Fold>();
         this.lastPlayer = null;
+        this.currentPlayer = null;
         distribute();
     }
 
     public void newGame() {
-        this.score1 = 0;
-        this.score2 = 0;
+        this.team1.resetScore();
+        this.team2.resetScore();
         newRound();
     }
 
-    public void saveScore() {
+    public Team getWinner() {
+        if (team1.hasWon() && team2.hasWon()) {
+            return team1.getScore() > team2.getScore() ? team1 : team2;
+        }
+        return team1.hasWon() ? team1 : team2.hasWon() ? team2 : null;
+    }
 
+    public void saveScore() {
+        List<Player> orderPlayers = getPlayersByOrder();
+        if (orderPlayers.size() == 0) {
+            return;
+        }
+        /* First take folds of last */
+        orderPlayers.get(0).addCardsOfFold(orderPlayers.get(3).getCardOfFolds());
+        /* The before last take card in hand of the last */
+        orderPlayers.get(2).addCardsOfFold(orderPlayers.get(3).getCards());
+
+        team1.buildScore(team2.isCapot());
+        team2.buildScore(team1.isCapot());
     }
 
     public boolean isRoundEnded() {
@@ -87,6 +109,14 @@ public class Game {
             nbEnded += player.ended() ? 1 : 0;
         }
         return nbEnded >= 3;
+    }
+
+    public List<Player> getPlayersByOrder() {
+        List<Player> players = new ArrayList<Player>(4);
+        for (Player player : players) {
+            players.add(player.getEndPosition(), player);
+        }
+        return players;
     }
 
     public Player getLosePlayer() {
@@ -159,8 +189,9 @@ public class Game {
     }
 
     /* Play the fold */
-    public void playFold(Fold fold) {
-        this.folds.add(fold);
+    public void playFold(Player player, Fold fold) {
+        this.lastPlayer = player;
+        this.cardOfFolds.addAll(cardPackage.getCards(fold.getCards()));
         this.lastFold = fold;
     }
 
@@ -174,6 +205,7 @@ public class Game {
             throw new Exception("End of game");
         }
         if (this.currentPlayer == null) {
+            /* First round */
             this.currentPlayer = this.getCardPackage().getMahjongCard().getOwner();
         } else {
             Player.Orientation or = this.currentPlayer.getOrientation().getNext();
@@ -224,12 +256,12 @@ public class Game {
         this.lastFold = lastFold;
     }
 
-    public List<Fold> getFolds() {
-        return folds;
+    public List<Card> getCardOfFolds() {
+        return cardOfFolds;
     }
 
-    public void setFolds(List<Fold> folds) {
-        this.folds = folds;
+    public void setCardOfFolds(List<Card> cardOfFolds) {
+        this.cardOfFolds = cardOfFolds;
     }
 
     public Player getCurrentPlayer() {

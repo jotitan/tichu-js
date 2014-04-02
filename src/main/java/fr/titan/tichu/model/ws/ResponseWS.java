@@ -4,20 +4,20 @@ package fr.titan.tichu.model.ws;
  * Object to communicate with client with websocket
  */
 public class ResponseWS {
-    private ResponseType responseType;
+    private ResponseType type;
     private Object object;
 
     public ResponseWS(ResponseType responseType, Object object) {
-        this.responseType = responseType;
+        this.type = responseType;
         this.object = object;
     }
 
-    public ResponseType getResponseType() {
-        return responseType;
+    public ResponseType getType() {
+        return type;
     }
 
-    public void setResponseType(ResponseType responseType) {
-        this.responseType = responseType;
+    public void setType(ResponseType type) {
+        this.type = type;
     }
 
     public Object getObject() {

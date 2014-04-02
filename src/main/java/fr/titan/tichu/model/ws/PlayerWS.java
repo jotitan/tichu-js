@@ -1,13 +1,16 @@
 package fr.titan.tichu.model.ws;
 
 import fr.titan.tichu.model.Player;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * Simple info about player
  */
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class PlayerWS {
     private String name;
     private Player.Orientation orientation;
+    private String token;
     private int orderEnd = -1;
 
     public PlayerWS() {
@@ -37,6 +40,14 @@ public class PlayerWS {
 
     public void setOrientation(Player.Orientation orientation) {
         this.orientation = orientation;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override

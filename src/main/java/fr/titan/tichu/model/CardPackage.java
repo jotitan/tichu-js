@@ -2,6 +2,7 @@ package fr.titan.tichu.model;
 
 import fr.titan.tichu.model.ws.CardWS;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +67,14 @@ public class CardPackage {
         default:
             return indexCards.get(cardWS.getValue() + cardWS.getColor());
         }
+    }
+
+    public List<Card> getCards(List<CardWS> cardsWS) {
+        List<Card> cards = new ArrayList<Card>();
+        for (CardWS card : cardsWS) {
+            cards.add(getCard(card));
+        }
+        return cards;
     }
 
     public Card getMahjongCard() {

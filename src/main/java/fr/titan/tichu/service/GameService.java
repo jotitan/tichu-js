@@ -17,7 +17,6 @@ public class GameService {
     public static Games games = new Games();
 
     public GameService() {
-
     }
 
     public Game createGame(GameRequest gameRequest) throws Exception {
@@ -60,27 +59,27 @@ public class GameService {
         if (player != null) {
             player.setPlayerStatus(PlayerStatus.CONNECTED);
             broadCast(player.getGame(), ResponseType.PLAYER_SEATED, player.getPlayerWS());
-            checkTableFull(player.getGame());
+            checkTableComplete(player.getGame());
         }
         return player;
     }
 
     protected void broadCast(Game game, ResponseType type, Object object) {
         for (Player player : game.getPlayers()) {
-            if (player.getPlayerStatus().equals(PlayerStatus.CONNECTED)) {
+            if (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && player.getClient()!=null) {
                 player.getClient().send(type, object);
             }
         }
     }
 
-    public void checkTableFull(Game game) {
+    private void checkTableComplete(Game game) {
         if (game.canPlay()) {
-            broadCast(game, ResponseType.GAME_CAN_RUN, "");
+            broadCast(game, ResponseType.GAME_MODE, "");
             distribute(game);
         }
     }
 
-    public void distribute(Game game) {
+    private void distribute(Game game) {
         game.newRound();
         for (Player player : game.getPlayers()) {
             player.getClient().send(ResponseType.DISTRIBUTION, player.getCards());
@@ -93,7 +92,7 @@ public class GameService {
         giveCardToPlayer(cards.getToPartner(), player, player.getOrientation().getFace());
         giveCardToPlayer(cards.getToRight(), player, player.getOrientation().getRight());
 
-        player.getClient().send(ResponseType.CARDS_CHANGED,null);
+        player.getClient().send(ResponseType.CARDS_CHANGED, null);
 
         if (checkPlayersChangeCards(player.getGame())) {
             sendSwapCards(player.getGame());
@@ -132,11 +131,6 @@ public class GameService {
         playerFrom.giveCard(card, playerTo);
     }
 
-    public void cardChanged(Game game) {
-
-        nextPlayer(game);
-    }
-
     private List<Card> getCardsFromFold(Game game, Fold fold) {
         List<Card> cards = new ArrayList<Card>();
         for (CardWS card : fold.getCards()) {
@@ -147,11 +141,12 @@ public class GameService {
 
     /** Play a bomb */
     public void playBomb(Player player, Fold fold) {
+        fold.setPlayer(player.getOrientation());
         Game game = player.getGame();
         if (fold.isBomb()) {
             player.getGame().setCurrentPlayer(player);
             if (game.verifyBomb(fold)) {
-                game.playFold(fold);
+                game.playFold(player, fold);
                 broadCast(game, ResponseType.BOMB_PLAYED, fold);
                 afterFold(game, player, fold);
             } else {
@@ -164,6 +159,7 @@ public class GameService {
 
     /** Play a classic fold */
     public void playFold(Player player, Fold fold) {
+        fold.setPlayer(player.getOrientation());
         Game game = player.getGame();
         if (!player.equals(game.getCurrentPlayer())) {
             player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
@@ -173,7 +169,7 @@ public class GameService {
             player.getClient().send(ResponseType.BAD_FOLD, "");
             return;
         }
-        game.playFold(fold);
+        game.playFold(player, fold);
         broadCast(game, ResponseType.FOLD_PLAYED, fold);
         afterFold(game, player, fold);
     }
@@ -185,40 +181,53 @@ public class GameService {
             player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
-        broadCast(game, ResponseType.PLAYER_CALL, player.getPlayerWS());
-        nextPlayer(game);
+        /* Impossible de call when first */
+        if (game.getLastPlayer() == null) {
+            player.getClient().send(ResponseType.NO_CALL_WHEN_FIRST, "");
+            return;
+        }
+        broadCast(game, ResponseType.CALL_PLAYED, player.getPlayerWS());
+        afterFold(game, player, null);
     }
 
     private void afterFold(Game game, Player player, Fold fold) {
-        player.playFold(getCardsFromFold(game, fold));
-        if (player.ended()) {
-            player.setEndPosition(game.getAndIncreaseEndPosition());
-            if (player.win()) {
-                broadCast(game, ResponseType.TURN_WIN, player.getPlayerWS());
-            } else {
-                broadCast(game, ResponseType.PLAYER_END_TURN, player.getPlayerWS());
+        if (fold != null) {
+            player.playFold(getCardsFromFold(game, fold));
+            if (player.ended()) {
+                player.setEndPosition(game.getAndIncreaseEndPosition());
+                if (player.win()) {
+                    broadCast(game, ResponseType.TURN_WIN, player.getPlayerWS());
+                } else {
+                    broadCast(game, ResponseType.PLAYER_END_ROUND, player.getPlayerWS());
+                }
+            }
+            if (game.isRoundEnded()) {
+                endRound(game);
+                return;
             }
         }
-        if (game.isRoundEnded()) {
-            endRound(game);
-            return;
-        }
-
-        if (game.isTurnWin()) {
-            newTurn(player.getGame());
-        } else {
-            nextPlayer(game);
-        }
+        nextPlayer(game);
     }
 
-    public void endRound(Game game) {
+    private void endRound(Game game) {
         game.saveScore();
-        game.newRound();
+        Team team = game.getWinner();
+        if (team != null) {
+            broadCast(game, ResponseType.GAME_WIN, null);
+            game.newGame();
+        } else {
+            broadCast(game, ResponseType.SCORE, null);
+            game.newRound();
+        }
+        distribute(game);
     }
 
-    public void nextPlayer(Game game) {
+    private void nextPlayer(Game game) {
         try {
             game.nextPlayer();
+            if (game.isTurnWin()) {
+                newTurn(game);
+            }
             broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
         } catch (Exception e) {
             // Game ended, no nextPlayer
@@ -227,7 +236,7 @@ public class GameService {
 
     /* When a turn is over, run a new turn */
     private void newTurn(Game game) {
-        broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer());
+        broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
         game.newTurn();
     }
 }

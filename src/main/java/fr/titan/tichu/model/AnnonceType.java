@@ -1,10 +1,18 @@
 package fr.titan.tichu.model;
 
 /**
- * User: Titan
- * Date: 27/03/14
- * Time: 15:19
+ * User: Titan Date: 27/03/14 Time: 15:19
  */
 public enum AnnonceType {
-    TICHU,GRAND_TICHU;
+    TICHU(100), GRAND_TICHU(200);
+
+    AnnonceType(int score) {
+        this.score = score;
+    }
+
+    private int score;
+
+    public int getScore() {
+        return score;
+    }
 }

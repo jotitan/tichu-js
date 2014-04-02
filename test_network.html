@@ -11,17 +11,27 @@
 
 <body>
 
+<input type="button" onclick="createPartie()" value="Create partie"/>
+
+<input type="text" id="idName"/><input type="button" value="Connect" onclick="connect($('#idName').val())"/>
+
 <script>
 
-var datas = {"name":"test","playerO":"bob","playerN":"teddy","playerE":"machin","playerS":"truc"};
-var url = 'http://localhost:8080/tichu-server/rest/game/create';
-function ret(data){console.log("RET",data)}
-$.ajax({url:url,data:datas,type:'GET',dataType:'jsonp',success:function(data){console.log(data);suite()}});
 
-function suite(){
 
-MessageManager.GameConnection.connect("test","teddy");
-MessageManager.ServerConnect.close();
+    function createPartie(){
+        var datas = {"name":"test","playerO":"bob","playerN":"teddy","playerE":"machin","playerS":"truc"};
+    var url = 'http://localhost:8080/tichu-server/rest/game/create';
+    function ret(data){console.log("RET",data)}
+    $.ajax({url:url,data:datas,type:'GET',dataType:'jsonp',success:function(data){console.log(data)}});
+    }
+
+
+
+function connect(name){
+
+MessageManager.GameConnection.connect("test",name);
+//MessageManager.ServerConnect.close();
 }
 
 </script>

@@ -4,6 +4,7 @@ import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.RequestWS;
+import fr.titan.tichu.model.ws.ResponseType;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -27,17 +28,19 @@ public class MessageService {
                 break;
             case BOMB:
                 Fold bomb = (Fold) readObject(request.getValue(), Fold.class);
-                bomb.setPlayer(player.getOrientation());
                 gameService.playBomb(player, bomb);
                 break;
             case FOLD:
                 Fold fold = (Fold) readObject(request.getValue(), Fold.class);
-                fold.setPlayer(player.getOrientation());
                 gameService.playFold(player, fold);
                 break;
             }
         } catch (Exception e) {
         }
+    }
+
+    public void playerDisconnect(Player player) {
+        gameService.broadCast(player.getGame(), ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
     }
 
     private Object readObject(String value, Class c) throws Exception {

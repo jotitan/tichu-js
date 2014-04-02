@@ -5,6 +5,7 @@ import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.CardWS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,6 +16,15 @@ public class Fold {
     private FoldType type;
     private int high;
     private Player.Orientation player;
+
+    public Fold() {
+    }
+
+    public Fold(FoldType type, int high, CardWS... cards) {
+        this.cards = Arrays.asList(cards);
+        this.type = type;
+        this.high = high;
+    }
 
     public List<CardWS> getCards() {
         return cards;
@@ -54,5 +64,10 @@ public class Fold {
 
     public void setPlayer(Player.Orientation player) {
         this.player = player;
+    }
+
+    @Override
+    public String toString() {
+        return "Fold : " + "type=" + type + ", high=" + high + ", player=" + player;
     }
 }

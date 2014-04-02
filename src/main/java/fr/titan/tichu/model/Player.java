@@ -4,6 +4,7 @@ import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.PlayerWS;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,10 @@ public class Player {
     private int endPosition = -1;
 
     /* List of win folds */
-    private List<Fold> folds = new ArrayList<Fold>();
+    private List<Card> cardOfFolds = new ArrayList<Card>();
 
     public enum Orientation {
-        O(0), E(1), S(2), N(3);
+        O(0), N(1), E(2), S(3);
 
         private Orientation(int pos) {
             this.pos = pos;
@@ -95,16 +96,32 @@ public class Player {
         return cards.size() == 0 && endPosition == 0;
     }
 
+    /* Add a card to the hand */
     public void addCard(Card card) {
         this.cards.add(card);
         card.setOwner(this);
     }
 
+    /* Receive a card */
     public void receiveCard(Card card) {
         addCard(card);
         changeCards.add(card);
     }
 
+    public int getPointCards() {
+        int score = 0;
+        for (Card card : this.cardOfFolds) {
+            score += card.getScore();
+        }
+        return score;
+    }
+
+    /**
+     * 
+     * @param card
+     * @param player
+     *            : player to give the card
+     */
     public void giveCard(Card card, Player player) {
         card.setOwner(null);
         cards.remove(card);
@@ -121,7 +138,7 @@ public class Player {
     public void resetCards() {
         cards = new ArrayList<Card>();
         changeCards = new ArrayList<Card>();
-        folds = new ArrayList<Fold>();
+        cardOfFolds = new ArrayList<Card>();
         annonce = null;
         endPosition = -1;
     }
@@ -170,7 +187,9 @@ public class Player {
         try {
             String base = game + orientation + System.currentTimeMillis();
             MessageDigest md5 = MessageDigest.getInstance("md5");
-            this.token = new String(md5.digest(base.getBytes()));
+            byte[] bytes = md5.digest(base.getBytes());
+            BigInteger bi = new BigInteger(1, bytes);
+            this.token = String.format("%0" + (bytes.length << 1) + "X", bi);
         } catch (Exception e) {
 
         }
@@ -200,8 +219,16 @@ public class Player {
         return new PlayerWS(this.name, this.orientation, this.endPosition);
     }
 
-    public void addFolds(List<Fold> folds) {
-        this.folds.addAll(folds);
+    public void addCardsOfFold(List<Card> cards) {
+        this.cardOfFolds.addAll(cards);
+    }
+
+    public List<Card> getCardOfFolds() {
+        return cardOfFolds;
+    }
+
+    public AnnonceType getAnnonce() {
+        return annonce;
     }
 
     public void setAnnonce(AnnonceType annonce) {

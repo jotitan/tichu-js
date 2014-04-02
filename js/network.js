@@ -11,11 +11,13 @@ var MessageManager = {
 				data:{game:game,name:player},
 				dataType:'jsonp',
 				success:function(data){
-					if(data.status && data.status == 0){
+				   if(data.status && data.status == 0){
 						alert(data.message);
 					}else{
 						MessageManager.ServerConnect.init(data.token);
 					}
+				},error:function(a,b,c){
+				    console.log("ERROR",a,b,c);
 				}
 			})
 		}
@@ -29,7 +31,7 @@ var MessageManager = {
 			this.ws = new WebSocket(this.url + "?token=" + this.token);
 			this.ws.onmessage = function(message){
 				console.log("Receive : ",message);
-				MessageManager.ServerConnect.readMessage(message);
+				MessageManager.ServerConnect.readMessage(message.data);
 			}
 			this.ws.onopen = function(message){
 				console.log("Open : ",message);

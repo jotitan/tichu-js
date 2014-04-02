@@ -48,6 +48,7 @@ public class TichuWebSocket implements TichuClientCommunication {
             this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_OK, new ResponseRest(1, this.player));
         } else {
+            this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_KO, new ResponseRest(0, "erreur"));
         }
     }
@@ -60,7 +61,7 @@ public class TichuWebSocket implements TichuClientCommunication {
      *            Object with data
      */
     public void send(ResponseType type, Object object) {
-        if (player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
+        if (player != null && player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
             return;
         }
         ObjectMapper om = new ObjectMapper();
@@ -86,10 +87,11 @@ public class TichuWebSocket implements TichuClientCommunication {
 
     @OnClose
     public void close(Session session, CloseReason closeReason) {
-        // Have to stop the game
-        System.out.println("CLOSE");
+        // Have to pause the game
+        logger.info("CLOSE");
         if (this.player != null) {
             this.player.setPlayerStatus(PlayerStatus.DISCONNECTED);
+            messageService.playerDisconnect(this.player);
         }
 
     }
