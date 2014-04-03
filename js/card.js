@@ -95,36 +95,7 @@ function ImgCard(x,y,img,card){
 	}
 }
 
-function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation){
-	canvas.save();
-	canvas.translate(x,y);
-	var rotate = 0;
-	var decalage = checked ? -10 : 0;
-	switch(orientation){
-		case "N" : rotate = Math.PI;break;
-		case "S" : rotate = 0;break;
-		case "O" : rotate = Math.PI/2;break;
-		case "E" : rotate = -Math.PI/2;break;
-	}
-	canvas.rotate(rotate);
-	canvas.fillStyle="#FFFFFF";
-	canvas.fillRect(pos,decalage,width,height);
-	canvas.strokeStyle="#000000";
-	canvas.lineWidth=1;
-	canvas.strokeRect(pos,decalage,width,height);
-	if(img){	
-		canvas.drawImage(img,pos,decalage,width,height);
-	}else{
-		canvas.fillStyle=value.color;
-		canvas.font = "6pt Arial";
-		var marginRight = canvas.measureText(value.val).width + 3;
-		canvas.fillText(value.val,pos + 2,10 + decalage);
-		canvas.fillText(value.val,pos + width-marginRight,10 + decalage);
-		canvas.fillText(value.val,pos + 2,height -5+ decalage);
-		canvas.fillText(value.val,pos + width-marginRight,height -5 + decalage);
-	}
-	canvas.restore();
-}
+
 
 function DrawingCard(x,y,card){
 	this.card = card;
@@ -195,6 +166,51 @@ function DrawingCard(x,y,card){
 	
 	this.contains = function(x,y){
 		return x>=this.x+this.pos && x <= this.x+this.pos+this.width && y>=this.y && y<=this.y + this.height;
+	}
+}
+
+var COLORS = ["red","green","blue","black"];
+
+var CardManager = {
+	cards:[],
+	mahjongCard:null,
+	init:function(){
+		COLORS.forEach(function(color){
+			for(var i = 2 ; i <= 14 ; i++){
+				this.cards.push(new Card(i,color));
+			}
+		},this);
+		this.mahjongCard = new MahjongCard();
+		this.cards.push(this.mahjongCard);
+		this.cards.push(new PhoenixCard());
+		this.cards.push(new DragonCard());
+		this.cards.push(new DogsCard());
+		this.sortCards();
+	},
+	/* Used to determine which card is up */
+	sortCards:function(){
+		this.cards.sort(function(c1,c2){
+			if(c1.drawing.deep!=c2.drawing.deep){
+				return c1.drawing.deep - c2.drawing.deep;
+			}
+			if(c1.value != c2.value){
+				return c1.value - c2.value;
+			}
+			return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
+		});
+	},
+	/* Reset all cards */
+	newGame:function(){
+		this.cards.forEach(function(c){c.player = null;c.drawing.recto=false;c.setStatus(STATUS_CARD.NO_STATUS_CARD);});
+		PlayerManager.players.forEach(function(p){p.cards = [];});
+	},
+	findSelectCards:function(joueur,x,y){
+		for(var i = joueur.cards.length-1 ; i >= 0; i--){
+			if(joueur.cards[i].drawing.contains(x,y)){
+				return joueur.cards[i].drawing;
+			}
+		}
+		return null;
 	}
 }
 

@@ -44,62 +44,8 @@ function stopDraw(){
 	clearInterval(interval);
 }
 
-function refreshDraw(){
-	canvas.clearRect(0,0,500,300);
-	canvas.fillStyle='#00723D';
-	canvas.fillRect(0,0,500,300);
-	canvas.fillStyle='#000000';
-	
-	ComponentManager.components.forEach(function(c){
-		c.draw(canvas);
-	});
-	
-	CardManager.cards.forEach(function(c){
-		c.drawing.draw(canvas);
-	});
-}
 
-var ComponentManager = {
-	components:[],
-	add:function(component){
-		this.components.push(component);
-	},
-	remove:function(component){
-		var index = this.components.indexOf(component);
-		if(index!=-1){
-			this.components.splice(index,1);
-		}
-	}
-}
-var ID_COMPONENT = 0;
 
-function Component(){
-	this.id = ID_COMPONENT++;
-	this.draw = function(){
-		console.log("Not implemented");
-	}
-}
-
-/* Box to drop a card */
-function BoxCard(x,y,width,height){
-	this.card = null;
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	
-	this.draw = function(canvas){
-		canvas.strokeStyle = '#000000';
-		canvas.fillStyle = '#FFFFFF';
-		canvas.fillRect(x,y,width,height);
-		canvas.strokeRect(x,y,width,height);
-	}
-	
-	this.contains = function(x,y){
-		return x >= this.x && x<= this.x + this.width 
-				&& y >= this.y && y<= this.y + this.height ;
-	}
-}
 
 var cards = new Array();
 
@@ -122,65 +68,7 @@ function changeState(e){
 
 
 
-var COLORS = ["red","green","blue","black"];
 
-var CardManager = {
-	cards:[],
-	mahjongCard:null,
-	init:function(){
-		COLORS.forEach(function(color){
-			for(var i = 2 ; i <= 14 ; i++){
-				this.cards.push(new Card(i,color));
-			}
-		},this);
-		this.mahjongCard = new MahjongCard();
-		this.cards.push(this.mahjongCard);
-		this.cards.push(new PhoenixCard());
-		this.cards.push(new DragonCard());
-		this.cards.push(new DogsCard());
-		this.sortCards();		
-	},
-	/* Used to determine which card is up */
-	sortCards:function(){
-		this.cards.sort(function(c1,c2){
-			if(c1.drawing.deep!=c2.drawing.deep){
-				return c1.drawing.deep - c2.drawing.deep;
-			}
-			if(c1.value != c2.value){
-				return c1.value - c2.value;
-			}
-			return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
-		});		
-	},
-	/* Reset all cards */
-	newGame:function(){
-		this.cards.forEach(function(c){c.player = null;c.drawing.recto=false;c.setStatus(STATUS_CARD.NO_STATUS_CARD);});
-		PlayerManager.players.forEach(function(p){p.cards = [];});
-	},
-	/* Distribute cards to all players */
-	distribute:function(){
-		this.newGame();
-		// Duplicate table
-		var copyCards = [];
-		this.cards.forEach(function(c){copyCards.push(c);});
-		PlayerManager.getPlayers().forEach(function(p){
-			for(var i = 0 ; i < 14 ; i++){
-				var pos = Math.round(Math.random()*1000)%copyCards.length;
-				p.giveCard(copyCards[pos]);
-				copyCards.splice(pos,1);
-			}
-			p.sortCards();
-		});				
-	},
-	findSelectCards:function(joueur,x,y){
-		for(var i = joueur.cards.length-1 ; i >= 0; i--){
-			if(joueur.cards[i].drawing.contains(x,y)){
-				return joueur.cards[i].drawing;
-			}
-		}
-		return null;
-	}
-}
 
 var Actions = {
 	div:$('#actions'),

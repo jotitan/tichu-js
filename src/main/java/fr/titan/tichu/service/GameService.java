@@ -3,10 +3,7 @@ package fr.titan.tichu.service;
 import com.google.common.collect.Lists;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
-import fr.titan.tichu.model.ws.CardWS;
-import fr.titan.tichu.model.ws.ChangeCards;
-import fr.titan.tichu.model.ws.Fold;
-import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.model.ws.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,10 @@ public class GameService {
     public static Games games = new Games();
 
     public GameService() {
+    }
+
+    public GameWS getGame(String game) {
+        return games.getGame(game).toGameWS();
     }
 
     public Game createGame(GameRequest gameRequest) throws Exception {
@@ -37,7 +38,7 @@ public class GameService {
         }
         for (Player player : game.getPlayers()) {
             if (player.getName().equals(name)) {
-                if (player.getPlayerStatus().equals(PlayerStatus.FREE_CHAIR)) {
+                if (player.getPlayerStatus().equals(PlayerStatus.FREE_CHAIR) || player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
                     player.setPlayerStatus(PlayerStatus.AUTHENTICATE);
                     player.createToken(gameName);
                     games.addPlayerByToken(player);
@@ -66,7 +67,7 @@ public class GameService {
 
     protected void broadCast(Game game, ResponseType type, Object object) {
         for (Player player : game.getPlayers()) {
-            if (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && player.getClient()!=null) {
+            if (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && player.getClient() != null) {
                 player.getClient().send(type, object);
             }
         }
@@ -83,7 +84,9 @@ public class GameService {
         game.newRound();
         for (Player player : game.getPlayers()) {
             List<CardWS> cardsWS = Lists.newArrayList();
-            for(Card card : player.getCards()){cardsWS.add(card.toCardWS());}
+            for (Card card : player.getCards()) {
+                cardsWS.add(card.toCardWS());
+            }
             player.getClient().send(ResponseType.DISTRIBUTION, cardsWS);
         }
         broadCast(game, ResponseType.CHANGE_CARD_MODE, null);

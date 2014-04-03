@@ -1,6 +1,7 @@
 package fr.titan.tichu.model;
 
 import fr.titan.tichu.model.ws.Fold;
+import fr.titan.tichu.model.ws.GameWS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -282,5 +283,14 @@ public class Game {
 
     public int getAndIncreaseEndPosition() {
         return this.orderEndRound++;
+    }
+
+    public GameWS toGameWS() {
+        GameWS game = new GameWS();
+        game.setGame(this.game);
+        for (Player player : this.players) {
+            game.addPlayer(player.getPlayerWS());
+        }
+        return game;
     }
 }

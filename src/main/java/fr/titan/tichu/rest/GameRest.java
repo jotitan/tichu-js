@@ -4,6 +4,7 @@ import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.rest.ResponseRest;
 import fr.titan.tichu.model.rest.GameRequest;
+import fr.titan.tichu.model.ws.GameWS;
 import fr.titan.tichu.model.ws.PlayerWS;
 import fr.titan.tichu.service.GameService;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -30,6 +31,18 @@ public class GameRest {
     public Response deleteGame(Game game) {
         logger.info("DELETE " + game.getGame());
         return Response.status(200).build();
+    }
+
+    @GET
+    @Path("/info/{name}")
+    public Response getInfoGame(@PathParam("name") String name, @QueryParam("callback") String callback) {
+        logger.info("INFO " + name);
+        GameWS game = gameService.getGame(name);
+        if (game != null) {
+            return buildResponse(game, callback);
+        } else {
+            return buildResponse(new ResponseRest(0, "No game with this name"), callback);
+        }
     }
 
     @GET
@@ -92,6 +105,7 @@ public class GameRest {
             om.writer().writeValue(tab, o);
             return callback + "(" + new String(tab.toByteArray()) + ")";
         } catch (Exception e) {
+            logger.error("Error JSON " + e.getMessage());
             return "";
         }
     }
