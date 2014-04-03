@@ -1,5 +1,6 @@
 package fr.titan.tichu.service;
 
+import com.google.common.collect.Lists;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.CardWS;
@@ -59,7 +60,6 @@ public class GameService {
         if (player != null) {
             player.setPlayerStatus(PlayerStatus.CONNECTED);
             broadCast(player.getGame(), ResponseType.PLAYER_SEATED, player.getPlayerWS());
-            checkTableComplete(player.getGame());
         }
         return player;
     }
@@ -72,7 +72,7 @@ public class GameService {
         }
     }
 
-    private void checkTableComplete(Game game) {
+    public void checkTableComplete(Game game) {
         if (game.canPlay()) {
             broadCast(game, ResponseType.GAME_MODE, "");
             distribute(game);
@@ -82,7 +82,9 @@ public class GameService {
     private void distribute(Game game) {
         game.newRound();
         for (Player player : game.getPlayers()) {
-            player.getClient().send(ResponseType.DISTRIBUTION, player.getCards());
+            List<CardWS> cardsWS = Lists.newArrayList();
+            for(Card card : player.getCards()){cardsWS.add(card.toCardWS());}
+            player.getClient().send(ResponseType.DISTRIBUTION, cardsWS);
         }
         broadCast(game, ResponseType.CHANGE_CARD_MODE, null);
     }

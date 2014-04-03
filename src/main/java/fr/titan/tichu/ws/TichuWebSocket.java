@@ -46,7 +46,8 @@ public class TichuWebSocket implements TichuClientCommunication {
         if (this.player != null) {
             this.player.setClientCommunication(this);
             this.basic = session.getBasicRemote();
-            send(ResponseType.CONNECTION_OK, new ResponseRest(1, this.player));
+            send(ResponseType.CONNECTION_OK, new ResponseRest(1, this.player.getPlayerWS()));
+            gameService.checkTableComplete(player.getGame());
         } else {
             this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_KO, new ResponseRest(0, "erreur"));
@@ -70,6 +71,7 @@ public class TichuWebSocket implements TichuClientCommunication {
             om.writer().writeValue(tab, new ResponseWS(type, object));
             this.basic.sendText(new String(tab.toByteArray()));
         } catch (IOException ioex) {
+            System.out.println(ioex);
         }
     }
 
