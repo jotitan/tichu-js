@@ -13,14 +13,10 @@
 
 <body>
 
-<button id="end">End draw</button>
-
-<button id="checkMode">Check mode</button>
-
-<button onclick="CardManager.distribute()">Distribuer</button>
 <button onclick="Game.enableSwapMode()">Mode echange</button>
 <button onclick="Game.enablePlayMode()">Mode jeu</button>
 <input type="button" onclick="GameConnection.loadGame('test')" value="Load partie"/>
+<input type="button" onclick="GameConnection.connect('test','teddy')" value="Connexion"/>
 
 <br/>
 <canvas id="canvas" width="700" height="500" style="border:solid 1px black"></canvas>
@@ -28,7 +24,6 @@
 <div id="actions"></div>
 
 <script>
-$('#end').click(function(){stopDraw();});
 
 $('#checkMode').click(function(){setCheckMode();});
 
@@ -36,19 +31,9 @@ function setCheckMode(){
 	$('#canvas').get(0).addEventListener('mousedown',changeState,false);
 }
 
-var interval = null;
 var canvas = $('#canvas').get(0).getContext('2d');
 
 var move = false;
-
-function stopDraw(){
-	clearInterval(interval);
-}
-
-
-
-
-var cards = new Array();
 
 function changeState(e){
 	var x = e.clientX - $('#canvas').offset().left;

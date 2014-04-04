@@ -31,4 +31,8 @@ public class ChangeCards {
     public void setToPartner(CardWS toPartner) {
         this.toPartner = toPartner;
     }
+
+    public boolean isComplete(){
+        return toLeft!=null && toRight!=null && toPartner!=null;
+    }
 }

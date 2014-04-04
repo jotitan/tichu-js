@@ -2,10 +2,12 @@
 
 function Player(orientation,name,visible){
 	this.orientation = orientation;
+	this.orientationTable = orientation;    // Orientation on the table, user always on the bottom
 	this.cards = [];	// List of cards, sorted
 	this.folds = [];	// List of cards wins
 	this.visible = visible || false;
-	this.name;
+	this.name = name;
+    this.connect = false;
 
     this.drawing = new TitleBox(name,orientation);
     ComponentManager.add(this.drawing);
@@ -13,6 +15,20 @@ function Player(orientation,name,visible){
     this.setName = function(name){
         this.name = name;
         this.drawing.setName(name);
+    }
+
+    /* @param user : if true, the player go the south */
+    this.connect = function(user){
+        this.connect = true;
+        if(user){
+            PlayerManager.updateOrientation(this);
+        }
+        this.drawing.setOnline();
+    }
+
+    this.setOrientationTable = function(orientationTable){
+        this.orientationTable = orientationTable;
+        this.drawing.changeOrientation(orientationTable);
     }
 
 	/* Sort by number and color */
@@ -45,13 +61,13 @@ function Player(orientation,name,visible){
 	
 	this.showRecto = function(){
 		this.cards.forEach(function(c){
-			c.drawing.recto = true;
+			c.setRecto(false);
 		});
 	}
 	
 	this.showVerso = function(){
 		this.cards.forEach(function(c){
-			c.drawing.recto = false;
+			c.setRecto(true);
 		});
 	}
 	
@@ -70,13 +86,35 @@ function Player(orientation,name,visible){
 			},this);
 		},this);
 	}
-	
+
+
+
 	this.giveCard = function(card){
 		this.cards.push(card);
 		card.setPlayer(this,this.cards.length);
 		card.setStatus(STATUS_CARD.DISTRIBUTED_CARD);
 	}
-	
+
+	this.createEmptyCards = function(nb){
+	    for(var i = 0 ; i < nb ; i++){
+	        var c = new EmptyCard(i);
+	        this.giveCard(c);
+	        CardManager.emptyCards.push(c);
+	    }
+	}
+
+	this.removeEmptyCards = function(nb){
+	    for(var i = 0 ; i < nb ; i++){
+	        var c = this.cards[this.cards.length -1];
+	        this.cards.splice(this.cards.length-1,1);
+	        var pos = CardManager.emptyCards.indexOf(c);
+	        if(pos!=-1){
+	            CardManager.emptyCards.splice(pos,1);
+	        }
+
+	    }
+	}
+
 	this.getNbCards = function(){
 		return this.cards.length;
 	}
@@ -95,24 +133,41 @@ function Team(player1,player2){
 var PlayerManager = {
     players:[],
     playersByOrientation:[],
+    playerUser:null,    // Player of the browser
     team1:null,
     team2:null,
-    joueur:null,
+    orientations : ["N","E","S","O"],
     init:function(){
-        this.players.push(new Player("N","Joueur 1"));
-        this.players.push(new Player("E","Joueur 2"));
-        this.players.push(new Player("S","Joueur 3",true));
-        this.players.push(new Player("O","Joueur 4"));
+        this.orientations.forEach(function(o,i){
+            this.players.push(new Player(o,"Joueur " + i,o == "S"));
+        },this);
         this.players.forEach(function(p){
             this.playersByOrientation[p.orientation] = p;
         },this);
 
         this.team1 = new Team(this.players[0],this.players[2]);
         this.team2 = new Team(this.players[1],this.players[3]);
-        this.joueur = this.players[1];
+        this.playerUser = this.players[2];
     },
     getByOrientation:function(orientation){
         return this.playersByOrientation[orientation];
+    },
+    getPlayerUser :function(){
+        return this.playerUser;
+    },
+    /* Place the player at the good place and shift the others */
+    updateOrientation:function(southPlayer){
+        this.playerUser = southPlayer;
+        southPlayer.setOrientationTable("S");
+        var oldPos = this.orientations.indexOf(southPlayer.orientation);
+        var newPos = this.orientations.indexOf("S");
+        var shift = newPos -oldPos+4;
+        this.players.forEach(function(p){
+        if(p.orientation != southPlayer.orientation){
+            var newOrientation = this.orientations[(this.orientations.indexOf(p.orientation) + shift)%4];
+            p.setOrientationTable(newOrientation);
+        }
+       },this);
     },
     getPlayers:function(){
         return this.players;

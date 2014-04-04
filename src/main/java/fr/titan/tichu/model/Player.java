@@ -1,13 +1,16 @@
 package fr.titan.tichu.model;
 
 import fr.titan.tichu.TichuClientCommunication;
+import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.PlayerWS;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: Titan Date: 29/03/14 Time: 11:47
@@ -17,7 +20,7 @@ public class Player {
     private Orientation orientation;
     private List<Card> cards = new ArrayList<Card>();
     /* Stock cards swap between players */
-    private List<Card> changeCards = new ArrayList<Card>();
+    private ChangeCards changeCards = new ChangeCards();
     private PlayerStatus playerStatus = PlayerStatus.FREE_CHAIR;
     private String token; // To verify identity
     private Game game;
@@ -102,12 +105,6 @@ public class Player {
         card.setOwner(this);
     }
 
-    /* Receive a card */
-    public void receiveCard(Card card) {
-        addCard(card);
-        changeCards.add(card);
-    }
-
     public int getPointCards() {
         int score = 0;
         for (Card card : this.cardOfFolds) {
@@ -119,13 +116,11 @@ public class Player {
     /**
      * 
      * @param card
-     * @param player
      *            : player to give the card
      */
-    public void giveCard(Card card, Player player) {
+    public void giveCard(Card card) {
         card.setOwner(null);
         cards.remove(card);
-        player.receiveCard(card);
     }
 
     public void playFold(List<Card> fold) {
@@ -137,7 +132,7 @@ public class Player {
 
     public void resetCards() {
         cards = new ArrayList<Card>();
-        changeCards = new ArrayList<Card>();
+        changeCards = new ChangeCards();
         cardOfFolds = new ArrayList<Card>();
         annonce = null;
         endPosition = -1;
@@ -243,7 +238,7 @@ public class Player {
         return endPosition;
     }
 
-    public List<Card> getChangeCards() {
+    public ChangeCards getChangeCards() {
         return changeCards;
     }
 }

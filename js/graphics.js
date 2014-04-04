@@ -25,6 +25,9 @@ var ComponentManager = {
         CardManager.cards.forEach(function(c){
             c.drawing.draw(canvas);
         });
+        CardManager.emptyCards.forEach(function(c){
+            c.drawing.draw(canvas);
+        });
 	},
 	add:function(component){
 		this.components.push(component);
@@ -39,8 +42,6 @@ var ComponentManager = {
         return this.ID_COMPONENT++;
 	}
 }
-
-
 
 function Component(){
 	this.id = ComponentManager.getNextId();
@@ -70,17 +71,16 @@ function BoxCard(x,y,width,height){
 	}
 }
 
-
 function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation){
 	canvas.save();
 	canvas.translate(x,y);
 	var rotate = 0;
 	var decalage = checked ? -10 : 0;
 	switch(orientation){
-		case "N" : rotate = Math.PI;break;
-		case "S" : rotate = 0;break;
 		case "O" : rotate = Math.PI/2;break;
+		case "N" : rotate = Math.PI;break;
 		case "E" : rotate = -Math.PI/2;break;
+		case "S" : rotate = 0;break;
 	}
 	canvas.rotate(rotate);
 	canvas.fillStyle="#FFFFFF";
@@ -100,4 +100,55 @@ function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation){
 		canvas.fillText(value.val,pos + width-marginRight,height -5 + decalage);
 	}
 	canvas.restore();
+}
+
+/* Display the name, the orientation and the status of the player */
+function TitleBox(name,orientation){
+    Component.call(this);
+    this.name = name;
+    this.orientation = orientation;
+    this.status = 0;    // 0 : OFFLINE, 1 : ONLINE
+    this.rotate = 0;
+    this.color = '#FF0000';
+    this.x = 0;this.y = 0;
+
+    this.init = function(){
+        switch(this.orientation){
+            case "S" : this.x = 50;this.y = ComponentManager.variables.height - 80;this.rotate=0;break;
+            case "O" : this.x = 80;this.y = 50;this.rotate = Math.PI/2;break;
+            case "N" : this.x = ComponentManager.variables.width - 150;this.y = 30;this.rotate=0;break;
+            case "E" : this.x = ComponentManager.variables.width - 80;this.y = ComponentManager.variables.height - 50;this.rotate = -Math.PI/2;break;
+        }
+    }
+
+    this.draw = function(canvas){
+        this.init();
+        canvas.save();
+        canvas.translate(this.x,this.y);
+        canvas.rotate(this.rotate);
+        canvas.strokeStyle=this.color;
+        canvas.strokeRect(0,0,100,50);
+        canvas.font = "14px Arial";
+        canvas.fillText(this.name,50 - canvas.measureText(this.name).width/2,20);
+        canvas.restore();
+    }
+
+    this.setOnline = function(){
+        this.color = '#00FF00';
+    }
+
+    this.setOffline = function(){
+        this.color = '#FF0000';
+    }
+
+    this.setName = function(name){
+        this.name = name;
+    }
+
+    this.changeOrientation = function(orientation){
+        this.orientation = orientation;
+        this.init();
+    }
+
+    this.init();
 }

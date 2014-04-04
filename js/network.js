@@ -16,7 +16,6 @@ var Logger = {
 
 var	GameConnection = {
     baseUrl:'http://localhost:8081/tichu-server/rest',
-    url:this.baseUrl + '/game/join',
     loadGame:function(name){
         $.ajax({
             url:this.baseUrl + '/game/info/' + name,
@@ -28,8 +27,9 @@ var	GameConnection = {
     },
     /* Create connection to a party */
     connect:function(game,player){
+        console.log(this.url)
         $.ajax({
-            url:this.url,
+            url:this.baseUrl + '/game/join',
             data:{game:game,name:player},
             dataType:'jsonp',
             success:function(data){
@@ -70,10 +70,9 @@ var WebSocketManager = {
     readMessage:function(message){
         try{
             var data = JSON.parse(message);
-            console.log(data)
             MessageDispatcher.dispatch(data);
         }catch(e){
-            Logger.error("NOT JSON : " + message);
+            Logger.error("NOT JSON : " + message + e);
         }
     },
     sendMessage:function(message){
@@ -84,13 +83,32 @@ var WebSocketManager = {
     }
 }
 
+var SenderManager = {
+    changeCards:function(toLeft,toPartner,toRight){
+        var cards = {
+            toLeft:{value:toLeft.value,color:toLeft.color},
+            toPartner:{value:toPartner.value,color:toPartner.color},
+            toRight:{value:toRight.value,color:toRight.color}
+        }
+        var data = {type:'CHANGE_CARDS',value:JSON.stringify(cards)};
+        WebSocketManager.sendMessage(JSON.stringify(data));
+    }
+}
+
  var MessageDispatcher = {
     dispatch:function(data){
-        switch(data.responseType){
+        switch(data.type){
             case "CONNECTION_KO" : WebSocketManager.close();break;
-            case "CONNECTION_OK" : Logger.info("Well Connected");break;
-            case "PLAYER_DISCONNECTED" : Logger.info("Pause");break;
-            case "PLAYER_SEATED" : Table.connectPlayer(data.orientation);Logger.info("Show place color");break;
+            case "CONNECTION_OK" :
+                Table.connectPlayer(data.object.orientation,true);
+                Logger.info("Well Connected");
+            break;
+            case "PLAYER_DISCONNECTED" : Table.disconnectPlayer(data.object.orientation);break;
+            case "PLAYER_SEATED" : Table.connectPlayer(data.object.orientation,false);break;
+            case "DISTRIBUTION" : Table.distribute(data.object); break;
+            case "CHANGE_CARD_MODE":Table.behaviours.changeMode.enable();break;
+            case "CARDS_CHANGED":Table.behaviours.changeMode.disable();break;
+            case "NEW_CARDS":Table.receiveCards(data.object);break;
         }
     }
  }

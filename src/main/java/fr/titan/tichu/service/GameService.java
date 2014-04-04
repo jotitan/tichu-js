@@ -17,8 +17,9 @@ public class GameService {
     public GameService() {
     }
 
-    public GameWS getGame(String game) {
-        return games.getGame(game).toGameWS();
+    public GameWS getGame(String name) {
+        Game game = games.getGame(name);
+        return game != null ? game.toGameWS() : null;
     }
 
     public Game createGame(GameRequest gameRequest) throws Exception {
@@ -92,10 +93,14 @@ public class GameService {
         broadCast(game, ResponseType.CHANGE_CARD_MODE, null);
     }
 
+    enum Position {
+        LEFT, CENTER, RIGHT
+    };
+
     public void playerChangeCard(Player player, ChangeCards cards) {
-        giveCardToPlayer(cards.getToLeft(), player, player.getOrientation().getLeft());
-        giveCardToPlayer(cards.getToPartner(), player, player.getOrientation().getFace());
-        giveCardToPlayer(cards.getToRight(), player, player.getOrientation().getRight());
+        giveCardToPlayer(cards.getToLeft(), player, player.getOrientation().getLeft(), Position.RIGHT);
+        giveCardToPlayer(cards.getToPartner(), player, player.getOrientation().getFace(), Position.CENTER);
+        giveCardToPlayer(cards.getToRight(), player, player.getOrientation().getRight(), Position.LEFT);
 
         player.getClient().send(ResponseType.CARDS_CHANGED, null);
 
@@ -113,27 +118,34 @@ public class GameService {
      */
     private void sendSwapCards(Game game) {
         for (Player player : game.getPlayers()) {
-            Fold fold = new Fold();
-            for (Card card : player.getChangeCards()) {
-                fold.addCard(card.toCardWS());
-            }
-            player.getClient().send(ResponseType.NEW_CARDS, fold);
+            player.getClient().send(ResponseType.NEW_CARDS, player.getChangeCards());
         }
     }
 
     private boolean checkPlayersChangeCards(Game game) {
         for (Player player : game.getPlayers()) {
-            if (player.getChangeCards().size() != 3) {
+            if (!player.getChangeCards().isComplete()) {
                 return false;
             }
         }
         return true;
     }
 
-    private void giveCardToPlayer(CardWS cardWS, Player playerFrom, Player.Orientation to) {
+    private void giveCardToPlayer(CardWS cardWS, Player playerFrom, Player.Orientation to, Position position) {
         Card card = playerFrom.getGame().getCardPackage().getCard(cardWS);
         Player playerTo = playerFrom.getGame().getPlayer(to);
-        playerFrom.giveCard(card, playerTo);
+        playerFrom.giveCard(card);
+        switch (position) {
+        case LEFT:
+            playerTo.getChangeCards().setToLeft(cardWS);
+            break;
+        case CENTER:
+            playerTo.getChangeCards().setToPartner(cardWS);
+            break;
+        case RIGHT:
+            playerTo.getChangeCards().setToRight(cardWS);
+            break;
+        }
     }
 
     private List<Card> getCardsFromFold(Game game, Fold fold) {

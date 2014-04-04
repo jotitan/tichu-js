@@ -2,8 +2,9 @@
 var STATUS_CARD = {
 	NO_STATUS_CARD:0,
 	DISTRIBUTED_CARD:1,
-	TABLE_CARD:2,
-	PLAYED_CARD:3
+	CHANGED_CARD:2,
+	TABLE_CARD:3,
+	PLAYED_CARD:4
 }
 
 /* Represent the value of phoenix card */
@@ -39,14 +40,18 @@ function Card(value,color){
 	/* Position de la carte */
 	this.setPlayer = function(player,pos){
 		this.player = player;
-		this.drawing.setOrientation(player.orientation,pos);
+		this.drawing.setOrientation(player.orientationTable,pos);
 	}
 	
 	this.setStatus = function(status){
 		this.status = status;
 		this.drawing.status = status;
 	}
-	
+
+	this.setRecto = function(recto){
+	    this.drawing.recto = recto;
+	}
+
 	this.toString = function(){
 		return value + " " + color;
 	}
@@ -95,9 +100,18 @@ function ImgCard(x,y,img,card){
 	}
 }
 
+/* Represent the card of others players. No cheat cause the browser doesn't know the real value */
+function EmptyCard(pos){
+    Card.call(this,pos,'');
+    this.drawing.recto = true;
 
+    this.setRecto = function(recto){
+        this.drawing.recto = true;
+    }
+}
 
 function DrawingCard(x,y,card){
+	Component.call(this);
 	this.card = card;
 	this.x = x;
 	this.y = y;
@@ -124,10 +138,10 @@ function DrawingCard(x,y,card){
 		this.orientation = orientation;
 		switch(orientation){
 			case "C" : this.x = 150 + nb*5;this.y = 80 + nb*15;break;
-			case "N" : this.x = 400;this.y = 50;break;
-			case "S" : this.x = 100;this.y = 200;break;
-			case "O" : this.x = 70;this.y = 50;break;
-			case "E" : this.x = 450;this.y = 200;break;
+			case "N" : this.x = ComponentManager.variables.width-170;this.y = 80;break;
+			case "S" : this.x = 170;this.y = ComponentManager.variables.height-80;break;
+			case "O" : this.x = 80;this.y = 170;break;
+			case "E" : this.x = ComponentManager.variables.width-80;this.y = ComponentManager.variables.height-170;break;
 		}
 		this.setPosition(pos);
 	}
@@ -148,7 +162,7 @@ function DrawingCard(x,y,card){
 	
 	this.draw = function(canvas){
 		/* Case when displayed */
-		if(this.status !=STATUS_CARD.DISTRIBUTED_CARD && this.status != STATUS_CARD.TABLE_CARD){return;}
+		if(this.status !=STATUS_CARD.DISTRIBUTED_CARD && this.status != STATUS_CARD.TABLE_CARD && this.status != STATUS_CARD.CHANGED_CARD){return;}
 		
 		if(this.recto){
 			return this.drawRecto(canvas);
@@ -173,6 +187,8 @@ var COLORS = ["red","green","blue","black"];
 
 var CardManager = {
 	cards:[],
+	emptyCards:[],
+	cardsByValue:[],
 	mahjongCard:null,
 	init:function(){
 		COLORS.forEach(function(color){
@@ -185,7 +201,15 @@ var CardManager = {
 		this.cards.push(new PhoenixCard());
 		this.cards.push(new DragonCard());
 		this.cards.push(new DogsCard());
+		this.cards.forEach(function(c){
+		    this.cardsByValue[c.value+c.color] = c;
+		},this);
+
 		this.sortCards();
+
+	},
+	get:function(value,color){
+        return this.cardsByValue[value+color];
 	},
 	/* Used to determine which card is up */
 	sortCards:function(){
