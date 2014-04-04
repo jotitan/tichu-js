@@ -15,7 +15,17 @@ var Logger = {
 
 
 var	GameConnection = {
-    url:'http://localhost:8081/tichu-server/rest/game/join',
+    baseUrl:'http://localhost:8081/tichu-server/rest',
+    url:this.baseUrl + '/game/join',
+    loadGame:function(name){
+        $.ajax({
+            url:this.baseUrl + '/game/info/' + name,
+            dataType:'jsonp',
+            success:function(data){
+                Table.display(data);
+            }
+        });
+    },
     /* Create connection to a party */
     connect:function(game,player){
         $.ajax({
@@ -80,7 +90,7 @@ var WebSocketManager = {
             case "CONNECTION_KO" : WebSocketManager.close();break;
             case "CONNECTION_OK" : Logger.info("Well Connected");break;
             case "PLAYER_DISCONNECTED" : Logger.info("Pause");break;
-            case "PLAYER_SEATED" : Logger.info("Show place color");break;
+            case "PLAYER_SEATED" : Table.connectPlayer(data.orientation);Logger.info("Show place color");break;
         }
     }
  }

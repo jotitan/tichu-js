@@ -1,12 +1,20 @@
 /* Represent a player */
 
-function Player(orientation,visible){
+function Player(orientation,name,visible){
 	this.orientation = orientation;
 	this.cards = [];	// List of cards, sorted
 	this.folds = [];	// List of cards wins
 	this.visible = visible || false;
 	this.name;
-	
+
+    this.drawing = new TitleBox(name,orientation);
+    ComponentManager.add(this.drawing);
+
+    this.setName = function(name){
+        this.name = name;
+        this.drawing.setName(name);
+    }
+
 	/* Sort by number and color */
 	this.sortCards = function(){
 		this.cards.sort(function(c1,c2){
@@ -72,10 +80,6 @@ function Player(orientation,visible){
 	this.getNbCards = function(){
 		return this.cards.length;
 	}
-	
-	this.setName = function(name){
-		this.name = name;
-	}
 }
 
 function Team(player1,player2){
@@ -85,4 +89,35 @@ function Team(player1,player2){
 	this.getScore = function(){
 		return this.player1.countScore() + this.player2.countScore();
 	}
+}
+
+
+var PlayerManager = {
+    players:[],
+    playersByOrientation:[],
+    team1:null,
+    team2:null,
+    joueur:null,
+    init:function(){
+        this.players.push(new Player("N","Joueur 1"));
+        this.players.push(new Player("E","Joueur 2"));
+        this.players.push(new Player("S","Joueur 3",true));
+        this.players.push(new Player("O","Joueur 4"));
+        this.players.forEach(function(p){
+            this.playersByOrientation[p.orientation] = p;
+        },this);
+
+        this.team1 = new Team(this.players[0],this.players[2]);
+        this.team2 = new Team(this.players[1],this.players[3]);
+        this.joueur = this.players[1];
+    },
+    getByOrientation:function(orientation){
+        return this.playersByOrientation[orientation];
+    },
+    getPlayers:function(){
+        return this.players;
+    },
+    firstPlayer:function(){
+        return CardManager.mahjongCard.player;
+    }
 }

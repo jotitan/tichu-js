@@ -5,6 +5,9 @@
 <script type="text/javascript" src="js/card.js"></script>
 <script type="text/javascript" src="js/tichu.js"></script>
 <script type="text/javascript" src="js/player.js"></script>
+<script type="text/javascript" src="js/table.js"></script>
+<script type="text/javascript" src="js/graphics.js"></script>
+<script type="text/javascript" src="js/network.js"></script>
 <script type="text/javascript" src="js/CombinaisonsValidator.js"></script>
 </head>
 
@@ -17,9 +20,10 @@
 <button onclick="CardManager.distribute()">Distribuer</button>
 <button onclick="Game.enableSwapMode()">Mode echange</button>
 <button onclick="Game.enablePlayMode()">Mode jeu</button>
+<input type="button" onclick="GameConnection.loadGame('test')" value="Load partie"/>
 
 <br/>
-<canvas id="canvas" width="500" height="300" style="border:solid 1px black"></canvas>
+<canvas id="canvas" width="700" height="500" style="border:solid 1px black"></canvas>
 
 <div id="actions"></div>
 
@@ -36,9 +40,6 @@ var interval = null;
 var canvas = $('#canvas').get(0).getContext('2d');
 
 var move = false;
-function runDraw(){
-	interval = setInterval(function(){refreshDraw();},50);
-}
 
 function stopDraw(){
 	clearInterval(interval);
@@ -232,34 +233,11 @@ var Game = {
 	}
 }
 
-var PlayerManager = {
-	players:[],
-	team1:null,
-	team2:null,
-	joueur:null,
-	init:function(){
-		this.players.push(new Player("N"));
-		this.players.push(new Player("S",true));
-		this.players.push(new Player("O"));
-		this.players.push(new Player("E"));
-		
-		this.team1 = new Team(this.players[0],this.players[2]);
-		this.team2 = new Team(this.players[1],this.players[3]);
-		this.joueur = this.players[1];
-	},
-	getPlayers:function(){
-		return this.players;
-	},
-	firstPlayer:function(){
-		return CardManager.mahjongCard.player;
-	}	
-}
 
 PlayerManager.init();
 CardManager.init();
 
-
-runDraw();
+ComponentManager.run();
 
 
 </script>

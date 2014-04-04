@@ -5,14 +5,17 @@ var ComponentManager = {
 	components:[],
 	interval:null,
 	canvas:null,
+    variables:{
+        width:700,height:500
+    },
 	run:function(){
 	    this.canvas = $('#canvas').get(0).getContext('2d');
 	    this.interval = setInterval(function(){ComponentManager.refresh();},50);
 	},
 	refresh:function(){
-        canvas.clearRect(0,0,500,300);
+        canvas.clearRect(0,0,this.variables.width,this.variables.height);
         canvas.fillStyle='#00723D';
-        canvas.fillRect(0,0,500,300);
+        canvas.fillRect(0,0,this.variables.width,this.variables.height);
         canvas.fillStyle='#000000';
 
         ComponentManager.components.forEach(function(c){
@@ -36,6 +39,8 @@ var ComponentManager = {
         return this.ID_COMPONENT++;
 	}
 }
+
+
 
 function Component(){
 	this.id = ComponentManager.getNextId();
