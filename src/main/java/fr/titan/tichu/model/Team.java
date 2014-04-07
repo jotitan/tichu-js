@@ -14,6 +14,8 @@ public class Team {
     public Team(Player player1, Player player2) {
         this.player1 = player1;
         this.player2 = player2;
+        this.player1.setPartner(this.player2);
+        this.player2.setPartner(this.player1);
     }
 
     public void buildScore(boolean isOtherCapot) {

@@ -10,6 +10,13 @@ function Player(orientation,name,visible){
     this.connect = false;
     this.select = false;
 
+    this.equals = function(player){
+        if(player == null){
+            return false;
+        }
+        return this.name == player.name;
+    }
+
     this.drawing = new TitleBox(name,orientation);
     ComponentManager.add(this.drawing);
 
@@ -149,6 +156,7 @@ var PlayerManager = {
     team1:null,
     team2:null,
     orientations : ["N","E","S","O"],
+    currentPlayer:null,
     init:function(){
         this.orientations.forEach(function(o,i){
             this.players.push(new Player(o,"Joueur " + i,o == "S"));
@@ -160,6 +168,19 @@ var PlayerManager = {
         this.team1 = new Team(this.players[0],this.players[2]);
         this.team2 = new Team(this.players[1],this.players[3]);
         this.playerUser = this.players[2];
+    },
+    nextPlayer:function(player){
+        if(this.currentPlayer!=null){
+            this.currentPlayer.setSelected(false);
+        }
+        this.currentPlayer = this.getByOrientation(player.orientation);
+        this.currentPlayer.setSelected(true);
+        if(this.currentPlayer.equals(this.playerUser)){
+            Table.behaviours.gameMode.enable();
+        }
+        else{
+            Table.behaviours.gameMode.disable();
+        }
     },
     getByOrientation:function(orientation){
         return this.playersByOrientation[orientation];
@@ -186,5 +207,8 @@ var PlayerManager = {
     },
     firstPlayer:function(){
         return CardManager.mahjongCard.player;
+    },
+    winTurn:function(player){
+        alert("Player " + player + " win the round first");
     }
 }

@@ -9,6 +9,7 @@ function Combinaison(type,high,nb,jokerValue){
 	this.high = high;
 	this.nb = nb;
 	this.jokerValue = jokerValue;
+	this.cards=[];
 }
 
 var CombinaisonType = {
@@ -27,6 +28,12 @@ var CombinaisonsValidator = {
 	resetTurn:function(){
 		this.previous = null;
 	},
+	addFold:function(fold){
+	    this.previous = fold;
+	},
+	removeLast:function(){
+
+	},
 	check:function(cards){
 		var combinaison = this.detect(cards);
 		if(combinaison == null){
@@ -37,7 +44,10 @@ var CombinaisonsValidator = {
 				throw "Combinaison with different type, " + this.previous.type + " asked";
 			}
 			
-		}		
+		}
+		cards.forEach(function(c){
+		   combinaison.cards.push({value:c.value,color:c.color});
+		});
 		this.previous = combinaison;
 		return combinaison;
 	},

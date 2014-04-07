@@ -80,33 +80,7 @@ var EventHelper = {
 }
 
 var Game = {
-	enableSwapMode:function(){
-		// Display the position card
-		var boxes = [];
-		boxes.push(new BoxCard(150,120,35,50));
-		boxes.push(new BoxCard(200,100,35,50));
-		boxes.push(new BoxCard(250,120,35,50));
-		boxes.forEach(function(b){ComponentManager.add(b);});		
-		
-		this.swapMouseController.enable(boxes);		
-		Actions.create([{name:"Echanger",fct:function(){Game.disableSwapMode();}}]);
-	},
-	disableSwapMode:function(){
-		// Proceed to swap
-		var boxes = this.swapMouseController.boxes;
-		var check = boxes.every(function(b){return b.card!=null;});
-		if(!check){
-			alert("impossible, choose one card for each");
-			return;
-		}
-		var swapCards = {left:boxes[0].card.card,center:boxes[1].card.card,right:boxes[2].card.card};
-		boxes.forEach(function(b){
-			ComponentManager.remove(b);
-		});
-		this.swapMouseController.disable();
-		
-		this.enablePlayMode();		
-	},
+
 	/* Can select the card */
 	enablePlayMode:function(){
 		this.playMouseController.enable();

@@ -66,6 +66,30 @@ public class GameService {
         return player;
     }
 
+    /* Show to the player the last 5 cards */
+    public void getSuiteCards(Player player) {
+        List<Card> cards = player.getCards().subList(8, player.getCards().size());
+        player.getClient().send(ResponseType.DISTRIBUTION_PART2, cards);
+        player.setDistributeAllCards(true);
+    }
+
+    public void makeAnnonce(Player player, AnnonceType annonce) {
+        // Verifiy if player has already played a card
+        switch (annonce) {
+        case TICHU:
+            if (!player.canTichu()) {
+                player.getClient().send(ResponseType.ANNONCE_FORBIDDEN, "");
+                return;
+            }
+            break;
+        case GRAND_TICHU:
+            break;
+        }
+
+        player.setAnnonce(annonce);
+        broadCast(player.getGame(), ResponseType.PLAYER_ANNONCE, annonce);
+    }
+
     protected void broadCast(Game game, ResponseType type, Object object) {
         for (Player player : game.getPlayers()) {
             if (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && player.getClient() != null) {
@@ -88,7 +112,8 @@ public class GameService {
             for (Card card : player.getCards()) {
                 cardsWS.add(card.toCardWS());
             }
-            player.getClient().send(ResponseType.DISTRIBUTION, cardsWS);
+            player.getClient().send(ResponseType.DISTRIBUTION_PART1, cardsWS);
+            player.setDistributeAllCards(false);
         }
         broadCast(game, ResponseType.CHANGE_CARD_MODE, null);
     }

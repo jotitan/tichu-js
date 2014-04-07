@@ -3,6 +3,7 @@
 
 
 var Table = {
+    folds:[],
     display:function(data){
         data.players.forEach(function(p){
             var pl = PlayerManager.getByOrientation(p.orientation);
@@ -15,9 +16,6 @@ var Table = {
     disconnectPlayer:function(orientation,currentUser){
         PlayerManager.getByOrientation(orientation).drawing.setOffline();
     },
-    nextPlayer:function(player){
-      PlayerManager.getByOrientation(player.orientation).setSelected(true);
-    },
     receiveCards:function(cards){
         var cl = CardManager.get(cards.toLeft.value,cards.toLeft.color);
         var cp = CardManager.get(cards.toPartner.value,cards.toPartner.color);
@@ -27,10 +25,39 @@ var Table = {
         PlayerManager.getPlayerUser().giveCard(cp);
         PlayerManager.getPlayerUser().giveCard(cr);
         this.behaviours.changeMode.showChangedCards(cl,cp,cr);
+        this.resetTurn();
+    },
+    resetTurn:function(){
+        CombinaisonsValidator.resetTurn();
+        this.folds = [];
+    },
+    playFold:function(fold){
+        var player = PlayerManager.getByOrientation(fold.player);
+        var cards = fold.cards.map(function(c){return CardManager.get(c.value,c.color);});
+        cards.forEach(function(c,i){
+            c.setStatus(STATUS_CARD.TABLE_CARD);
+            c.drawing.recto = false;
+            c.setChecked(false);
+            c.drawing.setOrientation("C",i,this.folds.length);
+            c.drawing.deep = this.folds.length;
+            // If the brower player play, remove the cards of his hand, otherwise, remove hide cards
+            if(player.equals(PlayerManager.getPlayerUser())){
+                player.playCard(c);
+            }else{
+                player.removeEmptyCards(1);
+            }
+        },this);
+
+        this.folds.push(fold.cards);
+        player.sortCards();
+    },
+    /* Call only ffor the player who play a bad fold */
+    cancelLastFold:function(){
+        this.folds.splice(this.folds.length -1,1);
     },
     distribute:function(cards){
         PlayerManager.players.forEach(function(p){
-           if(p.name == PlayerManager.getPlayerUser().name){
+           if(p.equals(PlayerManager.getPlayerUser())){
             var user = PlayerManager.getPlayerUser();
             cards.forEach(function(card){
                 user.giveCard(CardManager.get(card.value,card.color));
@@ -41,9 +68,18 @@ var Table = {
            p.sortCards();
         });
     },
+    /* First part of card (can make grand tichu) */
+    distributeFirstPart:function(cards){
+        Actions.create([{name:"Grand Tichu",fct:function(){}}]);
+        this.distribute(cards);
+    },
+    distributeSecondPart:function(cards){
+        Actions.empty();
+        this.distribute(cards);
+    },
     behaviours:{
         changeMode:{
-        boxes:[],
+            boxes:[],
             enable:function(){
                 /* Add box to drop the card */
                 this._buildBoxes();
@@ -159,49 +195,52 @@ var Table = {
                     this.moving = false;
                     this.card = null;
                 }
+            }
         },
-            /* Can select the card */
-            enablePlayMode:function(){
-                this.playMouseController.enable();
+        gameMode:{
+            cards:[],
+            enable:function(){
+                $('#canvas').bind('mousedown.play',function(e){Table.behaviours.gameMode._down(e);});
             },
-            playMouseController:{
-                cards:[],
-                disable:function(){
-                    $('#canvas').unbind('mousedown.play');
-                },
-                enable:function(){
-                    var _self = this;
-                    $('#canvas').bind('mousedown.play',function(e){_self._down(e);});
-                },
-                _down:function(e){
-                    var coords = EventHelper.getPosition(e);
-                    var card = CardManager.findSelectCards(PlayerManager.getPlayerUser(),coords.x,coords.y);
-                    if(card == null){return;}
-                    this._checkCard(card);
+            disable:function(){
+                $('#canvas').unbind('mousedown.play');
+            },
+            _down:function(e){
+                var coords = EventHelper.getPosition(e);
+                var card = CardManager.findSelectCards(PlayerManager.getPlayerUser(),coords.x,coords.y);
+                if(card == null){return;}
+                this._checkCard(card);
+            } ,
+            _checkCard:function(card){
+                card.checked = !card.checked;
+                if(card.checked){
+                    this.cards.push(card);
                 }
-                ,_checkCard:function(card){
-                    card.checked = !card.checked;
-                    if(card.checked){
-                        this.cards.push(card);
+                else{
+                    var pos = this.cards.indexOf(card);
+                    if(pos!=-1){
+                        this.cards.splice(pos,1);
                     }
-                    else{
-                        var pos = this.cards.indexOf(card);
-                        if(pos!=-1){
-                            this.cards.splice(pos,1);
+                }
+                var _self = this;
+                if(this.cards.length){
+                    Actions.create([{
+                        name:"Play",
+                        fct:function(){
+                            Table.behaviours.gameMode.playFold();
                         }
-                    }
-                    var _self = this;
-                    if(this.cards.length){
-                        Actions.create([{
-                            name:"Jouer",
-                            fct:function(){
-                                var cards = _self.cards.map(function(c){return c.card;});
-                                console.log(CombinaisonsValidator.detect(cards));
-                            }
-                        }]);
-                    }else{
-                        Actions.empty();
-                    }
+                    }]);
+                }else{
+                    Actions.empty();
+                }
+            },
+            _playFold:function(){
+                var cards = this.cards.map(function(c){return c.card;});
+                try{
+                    var fold = CombinaisonsValidator.check(cards);
+                    SenderMessage.sendCards(fold);
+                }catch(e){
+                    alert("ERROR : " + e);
                 }
             }
         }

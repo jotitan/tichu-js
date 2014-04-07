@@ -1,5 +1,6 @@
 package fr.titan.tichu.service;
 
+import fr.titan.tichu.model.AnnonceType;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ChangeCards;
@@ -19,6 +20,12 @@ public class MessageService {
         try {
             RequestWS request = om.reader(RequestWS.class).readValue(message);
             switch (request.getType()) {
+            case SUITE_CARDS:
+                gameService.getSuiteCards(player);
+                break;
+            case ANNONCE:
+                gameService.makeAnnonce(player, AnnonceType.valueOf(request.getValue()));
+                break;
             case CALL:
                 gameService.callTurn(player);
                 break;

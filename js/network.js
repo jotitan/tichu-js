@@ -90,7 +90,16 @@ var SenderManager = {
             toPartner:{value:toPartner.value,color:toPartner.color},
             toRight:{value:toRight.value,color:toRight.color}
         }
-        var data = {type:'CHANGE_CARDS',value:JSON.stringify(cards)};
+        this._send('CHANGE_CARDS',cards);
+    },
+    showLastCards:function(){
+        this._send('SUITE_CARDS','');
+    },
+    sendCards:function(fold){
+        this._send("FOLD",fold);
+    },
+    _send:function(type,object){
+        var data = {type:type,value:JSON.stringify(object)};
         WebSocketManager.sendMessage(JSON.stringify(data));
     }
 }
@@ -106,31 +115,28 @@ var SenderManager = {
             case "PLAYER_DISCONNECTED" : Table.disconnectPlayer(data.object.orientation);break;
             case "PLAYER_SEATED" : Table.connectPlayer(data.object.orientation,false);break;
             case "DISTRIBUTION" : Table.distribute(data.object); break;
+            case "DISTRIBUTION_PART1" : Table.distributeFirstPart(data.object); break;
+            case "DISTRIBUTION_PART2" : Table.distributeSecondPart(data.object); break;
             case "CHANGE_CARD_MODE":Table.behaviours.changeMode.enable();break;
             case "CARDS_CHANGED":Table.behaviours.changeMode.disable();break;
             case "NEW_CARDS":Table.receiveCards(data.object);break;
-            case "NEXT_PLAYER":Table.nextPlayer(data.object);break;
+            case "NEXT_PLAYER":PlayerManager.nextPlayer(data.object);break;
+            case "GAME_MODE":break;
+            case "NOT_YOUR_TURN":alert("Not your turn, stop it");break;
+            case "FOLD_PLAYED":PlayerManager.playFold(data.object);break;
+            case "CALL_PLAYED":console.log("CALL");break;
+            case "NO_CALL_WHEN_FIRST":alert("Have to play a card");break;
+            case "BAD_FOLD":Table.cancelLastFold();break;
+            case "TURN_WIN":PlayerManager.winTurn(data.object);break;
+            case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break
+            case "PLAYER_ANNONCE":console.log("nnon");break
         }
     }
  }
      /*
-  CONNECTION_OK
-  CONNECTION_KO
-  PLAYER_DISCONNECTED
-  PLAYER_SEATED
-GAME_MODEDISTRIBUTION
-CHANGE_CARD_MODE
-CARDS_CHANGED
-NEW_CARDS
-FOLD_PLAYED
+
 BOMB_PLAYED
-CALL_PLAYED
-NOT_YOUR_TURN
-NO_CALL_WHEN_FIRST
-BAD_FOLD
-NEXT_PLAYER
-TURN_WIN
-PLAYER_END_ROUND
+
 SCORE
 GAME_WIN
 */

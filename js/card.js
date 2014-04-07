@@ -19,9 +19,18 @@ function Card(value,color){
 	this.player = null;
 	this.status = STATUS_CARD.NO_STATUS_CARD;
 	this.id = color + value;
+	this.checked = false;
+
+	this.drawing = new DrawingCard(0,0,this);
+
 	this.isPhoenix = function(){
 		return false;
 	}
+
+    this.setChecked = function(checked){
+        this.checked = checked;
+        this.drawing.checked = checked;
+    }
 
 	this.getValue = function(){
 		return value;
@@ -34,9 +43,8 @@ function Card(value,color){
 			case 13:return 10;
 		}
 		return 0;
-	}	
-	this.drawing = new DrawingCard(0,0,this);
-	
+	}
+
 	/* Position de la carte */
 	this.setPlayer = function(player,pos){
 		this.player = player;
@@ -206,7 +214,6 @@ var CardManager = {
 		},this);
 
 		this.sortCards();
-
 	},
 	get:function(value,color){
         return this.cardsByValue[value+color];
@@ -243,10 +250,8 @@ var Plateau = {
 	turn:0,		// Turn of game
 	folds:[],	// List of folds on table
 	playFold:function(cards,player){
-		// Verify the fold
-		
-		// Sort cards to represent combination
-		// Show fold
+		// If the brower player play, remove the cards of his hand, otherwise, remove hide cards
+		if(player.equals)
 		cards.forEach(function(c,i){
 			c.setStatus(STATUS_CARD.TABLE_CARD);
 			c.drawing.recto = false;

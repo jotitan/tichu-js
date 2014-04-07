@@ -17,19 +17,22 @@ import java.util.Map;
  */
 public class Player {
     private String name;
+    private String token; // To verify identity
     private Orientation orientation;
     private List<Card> cards = new ArrayList<Card>();
     /* Stock cards swap between players */
     private ChangeCards changeCards = new ChangeCards();
     private PlayerStatus playerStatus = PlayerStatus.FREE_CHAIR;
-    private String token; // To verify identity
+    private Player partner;
     private Game game;
-    private TichuClientCommunication client;
     private AnnonceType annonce = null;
+    /* Order of position when end the round */
     private int endPosition = -1;
-
+    private boolean distributeAllCards = false;
     /* List of win folds */
     private List<Card> cardOfFolds = new ArrayList<Card>();
+
+    private TichuClientCommunication client;
 
     public enum Orientation {
         O(0), N(1), E(2), S(3);
@@ -190,6 +193,10 @@ public class Player {
         }
     }
 
+    public boolean canTichu() {
+        return this.cards.size() == 14 && this.partner.annonce == null;
+    }
+
     public String getToken() {
         return token;
     }
@@ -240,5 +247,13 @@ public class Player {
 
     public ChangeCards getChangeCards() {
         return changeCards;
+    }
+
+    public void setPartner(Player partner) {
+        this.partner = partner;
+    }
+
+    public void setDistributeAllCards(boolean distributeAllCards) {
+        this.distributeAllCards = distributeAllCards;
     }
 }
