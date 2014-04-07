@@ -8,9 +8,15 @@ function Player(orientation,name,visible){
 	this.visible = visible || false;
 	this.name = name;
     this.connect = false;
+    this.select = false;
 
     this.drawing = new TitleBox(name,orientation);
     ComponentManager.add(this.drawing);
+
+    this.setSelected = function(select){
+        this.select = select;
+        this.drawing.select = select;
+    }
 
     this.setName = function(name){
         this.name = name;
@@ -32,7 +38,8 @@ function Player(orientation,name,visible){
     }
 
 	/* Sort by number and color */
-	this.sortCards = function(){
+    /* @param fullSort : init also the orientation */
+	this.sortCards = function(fullSort){
 		this.cards.sort(function(c1,c2){
 			if(c1.value != c2.value){
 				return c1.value - c2.value;
@@ -40,8 +47,13 @@ function Player(orientation,name,visible){
 			return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
 		});
 		this.cards.forEach(function(c,i){
-			c.drawing.setPosition(i);
-		});
+			if(fullSort){
+                c.drawing.setOrientation(this.orientationTable,i);
+            }
+            else{
+                c.drawing.setPosition(i);
+            }
+		},this);
 		if(!this.visible){
 			this.showRecto();
 		}

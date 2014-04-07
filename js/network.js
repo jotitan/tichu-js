@@ -109,6 +109,7 @@ var SenderManager = {
             case "CHANGE_CARD_MODE":Table.behaviours.changeMode.enable();break;
             case "CARDS_CHANGED":Table.behaviours.changeMode.disable();break;
             case "NEW_CARDS":Table.receiveCards(data.object);break;
+            case "NEXT_PLAYER":Table.nextPlayer(data.object);break;
         }
     }
  }

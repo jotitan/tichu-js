@@ -15,6 +15,9 @@ var Table = {
     disconnectPlayer:function(orientation,currentUser){
         PlayerManager.getByOrientation(orientation).drawing.setOffline();
     },
+    nextPlayer:function(player){
+      PlayerManager.getByOrientation(player.orientation).setSelected(true);
+    },
     receiveCards:function(cards){
         var cl = CardManager.get(cards.toLeft.value,cards.toLeft.color);
         var cp = CardManager.get(cards.toPartner.value,cards.toPartner.color);
@@ -64,7 +67,7 @@ var Table = {
                 }
                 this.boxes.forEach(function(b){
                     PlayerManager.getPlayerUser().playCard(b.card.card);
-                    b.card.card.setStatus(STATUS_CARD.CHANGED_CARD);
+                    //b.card.card.setStatus(STATUS_CARD.CHANGED_CARD);
                 });
                 SenderManager.changeCards(this.boxes[0].card.card,this.boxes[1].card.card,this.boxes[2].card.card);
             },
@@ -78,15 +81,18 @@ var Table = {
             },
             /* Display received cards */
             showChangedCards:function(fromLeft,fromPartner,fromRight){
-                fromLeft.card.setDirectCoordinates(this.boxes[0].x+5,this.boxes[0].y+5);
-                fromPartner.card.setDirectCoordinates(this.boxes[1].x+5,this.boxes[1].y+5);
-                fromRight.card.setDirectCoordinates(this.boxes[2].x+5,this.boxes[2].y+5);
+                this.boxes.forEach(function(b){
+                    b.card.card.setStatus(STATUS_CARD.NO_STATUS_CARD);
+                });
+                fromLeft.drawing.setDirectCoordinates(this.boxes[0].x+5,this.boxes[0].y+5);
+                fromPartner.drawing.setDirectCoordinates(this.boxes[1].x+5,this.boxes[1].y+5);
+                fromRight.drawing.setDirectCoordinates(this.boxes[2].x+5,this.boxes[2].y+5);
 
                 Actions.create([{name:"Ok",fct:function(){Table.behaviours.changeMode.endChangeCards();}}]);
             },
             endChangeCards:function(){
                 this.boxes = [];
-                PlayerManager.getPlayerUser().sortCards();
+                PlayerManager.getPlayerUser().sortCards(true);
 
             },
             mouseController:{

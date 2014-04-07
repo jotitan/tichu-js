@@ -138,10 +138,10 @@ function DrawingCard(x,y,card){
 		this.orientation = orientation;
 		switch(orientation){
 			case "C" : this.x = 150 + nb*5;this.y = 80 + nb*15;break;
-			case "N" : this.x = ComponentManager.variables.width-170;this.y = 80;break;
-			case "S" : this.x = 170;this.y = ComponentManager.variables.height-80;break;
-			case "O" : this.x = 80;this.y = 170;break;
-			case "E" : this.x = ComponentManager.variables.width-80;this.y = ComponentManager.variables.height-170;break;
+			case "N" : this.x = ComponentManager.variables.width-140;this.y = 80;break;
+			case "S" : this.x = 140;this.y = ComponentManager.variables.height-80;break;
+			case "O" : this.x = 80;this.y = 140;break;
+			case "E" : this.x = ComponentManager.variables.width-80;this.y = ComponentManager.variables.height-140;break;
 		}
 		this.setPosition(pos);
 	}
@@ -162,7 +162,7 @@ function DrawingCard(x,y,card){
 	
 	this.draw = function(canvas){
 		/* Case when displayed */
-		if(this.status !=STATUS_CARD.DISTRIBUTED_CARD && this.status != STATUS_CARD.TABLE_CARD && this.status != STATUS_CARD.CHANGED_CARD){return;}
+		if(this.status !=STATUS_CARD.DISTRIBUTED_CARD && this.status != STATUS_CARD.TABLE_CARD){return;}
 		
 		if(this.recto){
 			return this.drawRecto(canvas);

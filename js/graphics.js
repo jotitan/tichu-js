@@ -6,7 +6,7 @@ var ComponentManager = {
 	interval:null,
 	canvas:null,
     variables:{
-        width:700,height:500
+        width:600,height:400
     },
 	run:function(){
 	    this.canvas = $('#canvas').get(0).getContext('2d');
@@ -111,13 +111,14 @@ function TitleBox(name,orientation){
     this.rotate = 0;
     this.color = '#FF0000';
     this.x = 0;this.y = 0;
+    this.select = false;
 
     this.init = function(){
         switch(this.orientation){
-            case "S" : this.x = 50;this.y = ComponentManager.variables.height - 80;this.rotate=0;break;
-            case "O" : this.x = 80;this.y = 50;this.rotate = Math.PI/2;break;
-            case "N" : this.x = ComponentManager.variables.width - 150;this.y = 30;this.rotate=0;break;
-            case "E" : this.x = ComponentManager.variables.width - 80;this.y = ComponentManager.variables.height - 50;this.rotate = -Math.PI/2;break;
+            case "S" : this.x = 20;this.y = ComponentManager.variables.height - 70;this.rotate=0;break;
+            case "O" : this.x = 70;this.y = 20;this.rotate = Math.PI/2;break;
+            case "N" : this.x = ComponentManager.variables.width - 120;this.y = 20;this.rotate=0;break;
+            case "E" : this.x = ComponentManager.variables.width - 70;this.y = ComponentManager.variables.height - 20;this.rotate = -Math.PI/2;break;
         }
     }
 
@@ -127,6 +128,7 @@ function TitleBox(name,orientation){
         canvas.translate(this.x,this.y);
         canvas.rotate(this.rotate);
         canvas.strokeStyle=this.color;
+        canvas.lineWidth = this.select ? 5 : 1;
         canvas.strokeRect(0,0,100,50);
         canvas.font = "14px Arial";
         canvas.fillText(this.name,50 - canvas.measureText(this.name).width/2,20);
