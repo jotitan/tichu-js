@@ -52,6 +52,13 @@ public class GameService {
         throw new Exception("No player with this name");
     }
 
+    /* Get context about the current game :
+    * - Connected players
+    * - Status of game */
+    private void getContextGame(){
+
+    }
+
     /**
      * When player connect to ws
      * 
@@ -70,6 +77,7 @@ public class GameService {
     public void getSuiteCards(Player player) {
         List<Card> cards = player.getCards().subList(8, player.getCards().size());
         player.getClient().send(ResponseType.DISTRIBUTION_PART2, cards);
+        player.getClient().send(ResponseType.CHANGE_CARD_MODE, null);
         player.setDistributeAllCards(true);
     }
 
@@ -109,13 +117,12 @@ public class GameService {
         game.newRound();
         for (Player player : game.getPlayers()) {
             List<CardWS> cardsWS = Lists.newArrayList();
-            for (Card card : player.getCards()) {
+            for (Card card : player.getCards().subList(0,9)) {
                 cardsWS.add(card.toCardWS());
             }
             player.getClient().send(ResponseType.DISTRIBUTION_PART1, cardsWS);
             player.setDistributeAllCards(false);
         }
-        broadCast(game, ResponseType.CHANGE_CARD_MODE, null);
     }
 
     enum Position {

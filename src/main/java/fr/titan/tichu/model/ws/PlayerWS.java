@@ -12,6 +12,7 @@ public class PlayerWS {
     private Player.Orientation orientation;
     private String token;
     private int orderEnd = -1;
+    private int nbCard;
 
     public PlayerWS() {
     }
@@ -48,6 +49,14 @@ public class PlayerWS {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public int getNbCard() {
+        return nbCard;
+    }
+
+    public void setNbCard(int nbCard) {
+        this.nbCard = nbCard;
     }
 
     @Override

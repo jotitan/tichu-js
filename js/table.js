@@ -70,7 +70,14 @@ var Table = {
     },
     /* First part of card (can make grand tichu) */
     distributeFirstPart:function(cards){
-        Actions.create([{name:"Grand Tichu",fct:function(){}}]);
+        Actions.create([
+            {name:"Grand Tichu",fct:function(){
+                SenderManager.annonceGrandTichu();
+            }},
+            {name:"Last Cards",fct:function(){
+                SenderManager.showLastCards();
+            }}
+        ]);
         this.distribute(cards);
     },
     distributeSecondPart:function(cards){

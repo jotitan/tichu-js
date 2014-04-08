@@ -92,6 +92,12 @@ var SenderManager = {
         }
         this._send('CHANGE_CARDS',cards);
     },
+    annonceGrandTichu:function(){
+        this._sendJSON('ANNONCE','GRAND_TICHU')
+    },
+    annonceTichu:function(){
+        this._send('ANNONCE','TICHU')
+    },
     showLastCards:function(){
         this._send('SUITE_CARDS','');
     },
@@ -99,7 +105,10 @@ var SenderManager = {
         this._send("FOLD",fold);
     },
     _send:function(type,object){
-        var data = {type:type,value:JSON.stringify(object)};
+        this._sendJSON(type,JSON.stringify(data));
+    },
+    _sendJSON:function(type,json){
+        var data = {type:type,value:json};
         WebSocketManager.sendMessage(JSON.stringify(data));
     }
 }
