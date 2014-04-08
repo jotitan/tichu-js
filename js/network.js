@@ -65,6 +65,7 @@ var WebSocketManager = {
         }
         this.ws.onopen = function(message){
             Logger.info("Open connexion");
+            Chat.connect(WebSocketManager.token);
         }
     },
     readMessage:function(message){
@@ -104,8 +105,11 @@ var SenderManager = {
     sendCards:function(fold){
         this._send("FOLD",fold);
     },
+    callGame:function(){
+
+    },
     _send:function(type,object){
-        this._sendJSON(type,JSON.stringify(data));
+        this._sendJSON(type,JSON.stringify(object));
     },
     _sendJSON:function(type,json){
         var data = {type:type,value:json};
@@ -118,7 +122,8 @@ var SenderManager = {
         switch(data.type){
             case "CONNECTION_KO" : WebSocketManager.close();break;
             case "CONNECTION_OK" :
-                Table.connectPlayer(data.object.orientation,true);
+                Table.display(data.object);
+                Table.connectPlayer(data.object.playerUser.orientation,true);
                 Logger.info("Well Connected");
             break;
             case "PLAYER_DISCONNECTED" : Table.disconnectPlayer(data.object.orientation);break;

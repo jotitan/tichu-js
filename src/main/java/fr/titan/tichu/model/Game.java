@@ -90,18 +90,21 @@ public class Game {
         return team1.hasWon() ? team1 : team2.hasWon() ? team2 : null;
     }
 
-    public void saveScore() {
+    public GameWS saveScore() {
         List<Player> orderPlayers = getPlayersByOrder();
         if (orderPlayers.size() == 0) {
-            return;
+            return null;
         }
         /* First take folds of last */
         orderPlayers.get(0).addCardsOfFold(orderPlayers.get(3).getCardOfFolds());
         /* The before last take card in hand of the last */
         orderPlayers.get(2).addCardsOfFold(orderPlayers.get(3).getCards());
 
-        team1.buildScore(team2.isCapot());
-        team2.buildScore(team1.isCapot());
+        GameWS game = new GameWS();
+
+        game.setScore1(team1.buildScore(team2.isCapot()));
+        game.setScore2(team2.buildScore(team1.isCapot()));
+        return game;
     }
 
     public boolean isRoundEnded() {

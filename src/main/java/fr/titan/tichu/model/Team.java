@@ -1,5 +1,9 @@
 package fr.titan.tichu.model;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 /**
  *
  */
@@ -7,6 +11,8 @@ public class Team {
     private int score;
     private Player player1;
     private Player player2;
+
+    private List<Score> scores = Lists.newArrayList();
 
     public Team() {
     }
@@ -18,14 +24,29 @@ public class Team {
         this.player2.setPartner(this.player1);
     }
 
-    public void buildScore(boolean isOtherCapot) {
+    public Score buildScore(boolean isOtherCapot) {
         int partialScore = (isOtherCapot) ? 200 : 0;
         if (!isOtherCapot) {
             partialScore += player1.getPointCards() + player2.getPointCards();
         }
-        partialScore += getPointAnnonce(player1) + getPointAnnonce(player2);
-
+        int pointAnnonce = getPointAnnonce(player1) + getPointAnnonce(player2);
+        partialScore += pointAnnonce;
         score += partialScore;
+
+        // keep historic
+        Score scoreHisto = new Score(partialScore);
+        scoreHisto.setCapot(isCapot());
+        scoreHisto.setAnnonce(getAnnonce());
+        // If annonce and win the annonce (point positive)
+        scoreHisto.setWin(pointAnnonce >= 0);
+        scoreHisto.setCumulateScore(score);
+        scores.add(scoreHisto);
+
+        return scoreHisto;
+    }
+
+    private AnnonceType getAnnonce() {
+        return player1.getAnnonce() != null ? player1.getAnnonce() : player2.getAnnonce() != null ? player2.getAnnonce() : null;
     }
 
     public boolean hasWon() {

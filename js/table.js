@@ -4,11 +4,25 @@
 
 var Table = {
     folds:[],
+    /* Display the context */
     display:function(data){
         data.players.forEach(function(p){
             var pl = PlayerManager.getByOrientation(p.orientation);
             pl.setName(p.name);
+            if(p.connected){
+                pl.drawing.setOnline();
+            }else{
+                pl.drawing.setOffline();
+            }
+            if(!pl.equals(PlayerManager.getPlayerUser())){
+                pl.createEmptyCards(p.nbCard);
+            }
         });
+        if(data.cards && data.cards.length > 0){
+            data.cards.forEach(function(c){
+               PlayerManager.getPlayerUser().giveCard(CardManager.get(c.value,c.color));
+            });
+        }
     },
     connectPlayer:function(orientation,currentUser){
         PlayerManager.getByOrientation(orientation).connect(currentUser);
@@ -70,14 +84,7 @@ var Table = {
     },
     /* First part of card (can make grand tichu) */
     distributeFirstPart:function(cards){
-        Actions.create([
-            {name:"Grand Tichu",fct:function(){
-                SenderManager.annonceGrandTichu();
-            }},
-            {name:"Last Cards",fct:function(){
-                SenderManager.showLastCards();
-            }}
-        ]);
+        Actions.build('grand-tichu','last-cards');
         this.distribute(cards);
     },
     distributeSecondPart:function(cards){
@@ -91,7 +98,7 @@ var Table = {
                 /* Add box to drop the card */
                 this._buildBoxes();
                 this.mouseController.enable(this.boxes);
-                Actions.create([{name:"Change",fct:function(){Table.behaviours.changeMode.validate();}}]);
+                Actions.build('swap-cards');
             },
             _buildBoxes:function(){
                 var width = ComponentManager.variables.width/2;
@@ -131,7 +138,7 @@ var Table = {
                 fromPartner.drawing.setDirectCoordinates(this.boxes[1].x+5,this.boxes[1].y+5);
                 fromRight.drawing.setDirectCoordinates(this.boxes[2].x+5,this.boxes[2].y+5);
 
-                Actions.create([{name:"Ok",fct:function(){Table.behaviours.changeMode.endChangeCards();}}]);
+                Actions.build('accept-cards');
             },
             endChangeCards:function(){
                 this.boxes = [];
@@ -208,6 +215,7 @@ var Table = {
             cards:[],
             enable:function(){
                 $('#canvas').bind('mousedown.play',function(e){Table.behaviours.gameMode._down(e);});
+                 Actions.build('call');
             },
             disable:function(){
                 $('#canvas').unbind('mousedown.play');
@@ -231,14 +239,9 @@ var Table = {
                 }
                 var _self = this;
                 if(this.cards.length){
-                    Actions.create([{
-                        name:"Play",
-                        fct:function(){
-                            Table.behaviours.gameMode.playFold();
-                        }
-                    }]);
+                    Actions.build('play','call');
                 }else{
-                    Actions.empty();
+                    Actions.build('call');
                 }
             },
             _playFold:function(){

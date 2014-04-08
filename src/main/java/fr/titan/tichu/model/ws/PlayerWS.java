@@ -11,8 +11,9 @@ public class PlayerWS {
     private String name;
     private Player.Orientation orientation;
     private String token;
-    private int orderEnd = -1;
     private int nbCard;
+    private boolean connected;
+    private int orderEnd = -1;
 
     public PlayerWS() {
     }
@@ -57,6 +58,14 @@ public class PlayerWS {
 
     public void setNbCard(int nbCard) {
         this.nbCard = nbCard;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 
     @Override

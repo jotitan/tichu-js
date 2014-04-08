@@ -52,11 +52,24 @@ public class GameService {
         throw new Exception("No player with this name");
     }
 
-    /* Get context about the current game :
-    * - Connected players
-    * - Status of game */
-    private void getContextGame(){
-
+    /*
+     * Get context about the current game : - Connected players - Status of game
+     */
+    public ContextWS getContextGame(Player player) {
+        ContextWS context = new ContextWS();
+        for (Player p : player.getGame().getPlayers()) {
+            PlayerWS playerWS = p.getPlayerWS();
+            playerWS.setNbCard(p.getNbcard());
+            playerWS.setConnected(p.isConnected());
+            context.addPlayer(playerWS);
+            if (p.equals(player)) {
+                context.setPlayerUser(playerWS);
+                for (Card card : player.getCards()) {
+                    context.addCard(card.toCardWS());
+                }
+            }
+        }
+        return context;
     }
 
     /**
@@ -71,6 +84,10 @@ public class GameService {
             broadCast(player.getGame(), ResponseType.PLAYER_SEATED, player.getPlayerWS());
         }
         return player;
+    }
+
+    public Player getPlayerByToken(String token) {
+        return games.getPlayerByToken(token);
     }
 
     /* Show to the player the last 5 cards */
@@ -117,7 +134,7 @@ public class GameService {
         game.newRound();
         for (Player player : game.getPlayers()) {
             List<CardWS> cardsWS = Lists.newArrayList();
-            for (Card card : player.getCards().subList(0,9)) {
+            for (Card card : player.getCards().subList(0, 9)) {
                 cardsWS.add(card.toCardWS());
             }
             player.getClient().send(ResponseType.DISTRIBUTION_PART1, cardsWS);
@@ -259,13 +276,14 @@ public class GameService {
     }
 
     private void endRound(Game game) {
-        game.saveScore();
+        GameWS gameWS = game.saveScore();
         Team team = game.getWinner();
         if (team != null) {
             broadCast(game, ResponseType.GAME_WIN, null);
             game.newGame();
         } else {
-            broadCast(game, ResponseType.SCORE, null);
+            // Send the score of the teams
+            broadCast(game, ResponseType.SCORE, gameWS);
             game.newRound();
         }
         distribute(game);

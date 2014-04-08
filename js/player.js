@@ -106,8 +106,6 @@ function Player(orientation,name,visible){
 		},this);
 	}
 
-
-
 	this.giveCard = function(card){
 		this.cards.push(card);
 		card.setPlayer(this,this.cards.length);

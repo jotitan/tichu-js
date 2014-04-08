@@ -4,6 +4,7 @@ import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.PlayerWS;
+import fr.titan.tichu.ws.ChatWebSocket;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -33,6 +34,7 @@ public class Player {
     private List<Card> cardOfFolds = new ArrayList<Card>();
 
     private TichuClientCommunication client;
+    private ChatWebSocket chatClient;
 
     public enum Orientation {
         O(0), N(1), E(2), S(3);
@@ -88,6 +90,10 @@ public class Player {
     public Player(Game game, Orientation orientation) {
         this.game = game;
         this.orientation = orientation;
+    }
+
+    public boolean isConnected(){
+        return this.client != null;
     }
 
     public int getNbcard() {
@@ -255,5 +261,13 @@ public class Player {
 
     public void setDistributeAllCards(boolean distributeAllCards) {
         this.distributeAllCards = distributeAllCards;
+    }
+
+    public ChatWebSocket getChatClient() {
+        return chatClient;
+    }
+
+    public void setChatClient(ChatWebSocket chatClient) {
+        this.chatClient = chatClient;
     }
 }

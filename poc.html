@@ -8,6 +8,8 @@
 <script type="text/javascript" src="js/table.js"></script>
 <script type="text/javascript" src="js/graphics.js"></script>
 <script type="text/javascript" src="js/network.js"></script>
+<script type="text/javascript" src="js/chat.js"></script>
+<script type="text/javascript" src="js/actions.js"></script>
 <script type="text/javascript" src="js/CombinaisonsValidator.js"></script>
 </head>
 
@@ -33,8 +35,6 @@ function setCheckMode(){
 
 var canvas = $('#canvas').get(0).getContext('2d');
 
-var move = false;
-
 function changeState(e){
 	var x = e.clientX - $('#canvas').offset().left;
 	var y = e.clientY - $('#canvas').offset().top;
@@ -52,25 +52,6 @@ function changeState(e){
 	}
 }
 
-
-
-
-
-var Actions = {
-	div:$('#actions'),
-	create:function(actions){
-		this.empty();
-		actions.forEach(function(action){
-			var button = $('<button>' + action.name + '</button>');
-			button.bind('click',action.fct);
-			this.div.append(button);
-		},this);
-	},
-	empty:function(){
-		this.div.empty()
-	}
-}
-
 var EventHelper = {
 	getPosition:function(e){
 		var x = e.clientX - $('#canvas').offset().left;
@@ -78,120 +59,6 @@ var EventHelper = {
 		return {x:x,y:y};
 	}
 }
-
-var Game = {
-
-	/* Can select the card */
-	enablePlayMode:function(){
-		this.playMouseController.enable();
-	},
-	playMouseController:{
-		cards:[],
-		disable:function(){
-			$('#canvas').unbind('mousedown.play');
-		},
-		enable:function(){
-			var _self = this;
-			$('#canvas').bind('mousedown.play',function(e){_self._down(e);});
-		},
-		_down:function(e){
-			var coords = EventHelper.getPosition(e);
-			var card = CardManager.findSelectCards(PlayerManager.joueur,coords.x,coords.y);
-			if(card == null){return;}
-			this._checkCard(card);
-		}
-		,_checkCard:function(card){
-			card.checked = !card.checked;
-			if(card.checked){
-				this.cards.push(card);
-			}
-			else{
-				var pos = this.cards.indexOf(card);
-				if(pos!=-1){
-					this.cards.splice(pos,1);
-				}
-			}
-			var _self = this;
-			if(this.cards.length){
-				Actions.create([{
-					name:"Jouer",
-					fct:function(){
-						var cards = _self.cards.map(function(c){return c.card;});
-						console.log(CombinaisonsValidator.detect(cards));
-					}
-				}]);
-			}else{
-				Actions.empty();
-			}
-		}		
-	},
-	swapMouseController:{
-		moving:false,
-		card:null,
-		boxes:null,
-		disable:function(){
-			this.boxes = null;
-			$('#canvas').unbind('mousemove.swap');
-			$('#canvas').unbind('mouseup.swap');
-			$('#canvas').unbind('mousedown.swap');
-		},
-		enable:function(boxes){
-			this.boxes = boxes;
-			var _self = this;			
-			$('#canvas').bind('mousemove.swap',function(e){_self.move(e);});
-			$('#canvas').bind('mouseup.swap',function(e){_self.up(e);});
-			$('#canvas').bind('mousedown.swap',function(e){_self.down(e);});			
-		},
-		move:function(e){
-			if(!this.moving || !this.card){return;}
-			var coords = this.getPosition(e);
-			this.card.setDirectCoordinates(coords.x-10,coords.y-10);			
-		},
-		down:function(e){
-			var coords = this.getPosition(e);
-			var box = this._findBox(coords);
-			if(box !=null){
-				box.card = null;
-			}			
-			var card = CardManager.findSelectCards(PlayerManager.joueur,coords.x,coords.y);
-			if(card == null){return;}
-			this.card = card;
-			this.card.originPos = card.originPos || card.getCoords();
-			this.moving = true;
-			this.move(e);
-		},
-		getPosition:function(e){
-			var x = e.clientX - $('#canvas').offset().left;
-			var y = e.clientY - $('#canvas').offset().top + $('body').scrollTop();
-			return {x:x,y:y};
-		},
-		_findBox:function(coords){
-			var box = null;
-			this.boxes.forEach(function(b){
-				if(b.contains(coords.x,coords.y)){
-					box = b;
-				}
-			});
-			return box;
-		},
-		up:function(e){
-			if(this.card == null){return;}
-			var coords = this.getPosition(e);
-			var box = this._findBox(coords);
-			// Check if card is in a box
-			if(box!=null){
-				this.card.setDirectCoordinates(box.x+5,box.y+5);
-				box.card = this.card;
-			}else{
-				// Position the card at the original place
-				this.card.setDirectCoordinates(this.card.originPos.x,this.card.originPos.y);
-			}
-			this.moving = false;
-			this.card = null;
-		}
-	}
-}
-
 
 PlayerManager.init();
 CardManager.init();
