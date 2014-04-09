@@ -3,9 +3,10 @@
 var Actions = {
 	div:$('#actions'),
 	build:function(){
-	  var actions = arguments.map(function(name){
-	    return Actions.actions[name];
-	  });
+	  var actions = [];
+        for(var i in arguments){
+            actions.push(Actions.actions[arguments[i]]);
+        }
 	  this.create(actions);
 	},
 	create:function(actions){
@@ -33,25 +34,25 @@ var Actions = {
                 Actions.empty();
             }
         },
-        grand-tichu:{
+        grandTichu:{
             name:"Grand Tichu",
             fct:function(){
                 SenderManager.annonceGrandTichu();
             }
         },
-        last-cards:{
+        lastCards:{
             name:"Last cards",
             fct:function(){
                 SenderManager.showLastCards();
             }
         },
-        swap-cards:{
+        swapCards:{
             name:"Change",
             fct:function(){
                 Table.behaviours.changeMode.validate();
             }
         },
-        accept-cards:{
+        acceptCards:{
             name:"Ok",
             fct:function(){
                 Table.behaviours.changeMode.endChangeCards();

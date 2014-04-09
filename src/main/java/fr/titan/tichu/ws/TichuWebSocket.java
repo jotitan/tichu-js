@@ -62,6 +62,7 @@ public class TichuWebSocket implements TichuClientCommunication {
      *            Object with data
      */
     public void send(ResponseType type, Object object) {
+        logger.info("Response " + type);
         if (this.basic != null && player != null && player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
             return;
         }

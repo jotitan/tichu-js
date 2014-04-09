@@ -91,8 +91,9 @@ public class Game {
     }
 
     public GameWS saveScore() {
+        if(players == null || players.size()!=4){return null;}
         List<Player> orderPlayers = getPlayersByOrder();
-        if (orderPlayers.size() == 0) {
+        if(orderPlayers.size() == 0){
             return null;
         }
         /* First take folds of last */

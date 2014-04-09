@@ -84,7 +84,7 @@ var Table = {
     },
     /* First part of card (can make grand tichu) */
     distributeFirstPart:function(cards){
-        Actions.build('grand-tichu','last-cards');
+        Actions.build('grandTichu','lastCards');
         this.distribute(cards);
     },
     distributeSecondPart:function(cards){
@@ -98,7 +98,7 @@ var Table = {
                 /* Add box to drop the card */
                 this._buildBoxes();
                 this.mouseController.enable(this.boxes);
-                Actions.build('swap-cards');
+                Actions.build('swapCards');
             },
             _buildBoxes:function(){
                 var width = ComponentManager.variables.width/2;
@@ -138,7 +138,7 @@ var Table = {
                 fromPartner.drawing.setDirectCoordinates(this.boxes[1].x+5,this.boxes[1].y+5);
                 fromRight.drawing.setDirectCoordinates(this.boxes[2].x+5,this.boxes[2].y+5);
 
-                Actions.build('accept-cards');
+                Actions.build('acceptCards');
             },
             endChangeCards:function(){
                 this.boxes = [];
