@@ -11,6 +11,9 @@
 <script type="text/javascript" src="js/chat.js"></script>
 <script type="text/javascript" src="js/actions.js"></script>
 <script type="text/javascript" src="js/CombinaisonsValidator.js"></script>
+
+<style></style>
+
 </head>
 
 <body>
@@ -21,6 +24,10 @@
 
 <br/>
 <canvas id="canvas" width="600" height="400" style="border:solid 1px black"></canvas>
+<div id="actions"></div>
+<div style="width:600px;height:150px;" id="idChatDiv"></div>
+<input type="text" style="width:500px;" id="idMessage"/>
+
 
 
 <script>
@@ -36,13 +43,8 @@ var EventHelper = {
 PlayerManager.init();
 CardManager.init();
 Actions.init();
-
-
+    Chat.init();
 ComponentManager.run();
-
-    if(document.URL.indexOf("test=true")!=-1){
-        $('#canvas').attr('height','5');
-    }
 
 
 </script>

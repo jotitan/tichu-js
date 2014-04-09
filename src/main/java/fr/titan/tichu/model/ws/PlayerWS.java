@@ -1,5 +1,6 @@
 package fr.titan.tichu.model.ws;
 
+import fr.titan.tichu.model.AnnonceType;
 import fr.titan.tichu.model.Player;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -14,6 +15,7 @@ public class PlayerWS {
     private int nbCard;
     private boolean connected;
     private int orderEnd = -1;
+    private AnnonceType annonce;
 
     public PlayerWS() {
     }
@@ -66,6 +68,14 @@ public class PlayerWS {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
+    }
+
+    public AnnonceType getAnnonce() {
+        return annonce;
+    }
+
+    public void setAnnonce(AnnonceType annonce) {
+        this.annonce = annonce;
     }
 
     @Override

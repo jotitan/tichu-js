@@ -14,11 +14,22 @@ function Player(orientation,name,visible){
         if(player == null){
             return false;
         }
-        return this.name == player.name;
+        return this.orientation == player.orientation;
     }
 
     this.drawing = new TitleBox(name,orientation);
     ComponentManager.add(this.drawing);
+
+    this.setAnnonce = function(annonce){
+        if(annonce == null){
+            this.drawing.annonce = null;
+        }else{
+            switch(annonce){
+                case "GRAND_TICHU":this.drawing.annonce = "GT";break
+                case "TICHU":this.drawing.annonce = "T";break
+            }
+        }
+    }
 
     this.setSelected = function(select){
         this.select = select;
@@ -114,10 +125,11 @@ function Player(orientation,name,visible){
 
 	this.createEmptyCards = function(nb){
 	    for(var i = 0 ; i < nb ; i++){
-	        var c = new EmptyCard(i);
+	        var c = new EmptyCard(this.cards.length);
 	        this.giveCard(c);
 	        CardManager.emptyCards.push(c);
 	    }
+	    this.sortCards();
 	}
 
 	this.removeEmptyCards = function(nb){
@@ -134,6 +146,10 @@ function Player(orientation,name,visible){
 
 	this.getNbCards = function(){
 		return this.cards.length;
+	}
+
+	this.initRound = function(){
+	    this.setAnnonce(null);
 	}
 }
 

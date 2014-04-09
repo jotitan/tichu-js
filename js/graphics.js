@@ -13,21 +13,21 @@ var ComponentManager = {
 	    this.interval = setInterval(function(){ComponentManager.refresh();},50);
 	},
 	refresh:function(){
-        canvas.clearRect(0,0,this.variables.width,this.variables.height);
-        canvas.fillStyle='#00723D';
-        canvas.fillRect(0,0,this.variables.width,this.variables.height);
-        canvas.fillStyle='#000000';
+        this.canvas.clearRect(0,0,this.variables.width,this.variables.height);
+        this.canvas.fillStyle='#00723D';
+        this.canvas.fillRect(0,0,this.variables.width,this.variables.height);
+        this.canvas.fillStyle='#000000';
 
         ComponentManager.components.forEach(function(c){
-            c.draw(canvas);
-        });
+            c.draw(this.canvas);
+        },this);
 
         CardManager.cards.forEach(function(c){
-            c.drawing.draw(canvas);
-        });
+            c.drawing.draw(this.canvas);
+        },this);
         CardManager.emptyCards.forEach(function(c){
-            c.drawing.draw(canvas);
-        });
+            c.drawing.draw(this.canvas);
+        },this);
 	},
 	add:function(component){
 		this.components.push(component);
@@ -112,6 +112,7 @@ function TitleBox(name,orientation){
     this.color = '#FF0000';
     this.x = 0;this.y = 0;
     this.select = false;
+    this.annonce = null;
 
     this.init = function(){
         switch(this.orientation){
@@ -131,7 +132,8 @@ function TitleBox(name,orientation){
         canvas.lineWidth = this.select ? 5 : 1;
         canvas.strokeRect(0,0,100,50);
         canvas.font = "14px Arial";
-        canvas.fillText(this.name,50 - canvas.measureText(this.name).width/2,20);
+        var name = this.name + ((this.annonce!=null)?' - ' + this.annonce:'');
+        canvas.fillText(name,50 - canvas.measureText(name).width/2,20);
         canvas.restore();
     }
 

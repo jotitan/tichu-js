@@ -122,15 +122,15 @@ var SenderManager = {
         switch(data.type){
             case "CONNECTION_KO" : WebSocketManager.close();break;
             case "CONNECTION_OK" :
-                Table.display(data.object);
                 Table.connectPlayer(data.object.playerUser.orientation,true);
-                Logger.info("Well Connected");
+                Table.display(data.object);
             break;
             case "PLAYER_DISCONNECTED" : Table.disconnectPlayer(data.object.orientation);break;
             case "PLAYER_SEATED" : Table.connectPlayer(data.object.orientation,false);break;
             case "DISTRIBUTION" : Table.distribute(data.object); break;
             case "DISTRIBUTION_PART1" : Table.distributeFirstPart(data.object); break;
             case "DISTRIBUTION_PART2" : Table.distributeSecondPart(data.object); break;
+            case "SEE_ALL_CARDS" : Table.notifyPlayerSeeCards(data.object); break;
             case "CHANGE_CARD_MODE":Table.behaviours.changeMode.enable();break;
             case "CARDS_CHANGED":Table.behaviours.changeMode.disable();break;
             case "NEW_CARDS":Table.receiveCards(data.object);break;
@@ -143,7 +143,8 @@ var SenderManager = {
             case "BAD_FOLD":Table.cancelLastFold();break;
             case "TURN_WIN":PlayerManager.winTurn(data.object);break;
             case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break
-            case "PLAYER_ANNONCE":console.log("nnon");break
+            case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break
+            case "ANNONCE_FORBIDDEN":alert("Annonce forbidden " + data.object);break
         }
     }
  }

@@ -36,6 +36,8 @@ public class Player {
     private TichuClientCommunication client;
     private ChatWebSocket chatClient;
 
+    private boolean reconnect = false;
+
     public enum Orientation {
         O(0), N(1), E(2), S(3);
 
@@ -92,7 +94,7 @@ public class Player {
         this.orientation = orientation;
     }
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         return this.client != null;
     }
 
@@ -145,6 +147,7 @@ public class Player {
         cardOfFolds = new ArrayList<Card>();
         annonce = null;
         endPosition = -1;
+        distributeAllCards = false;
     }
 
     public int getSucceedAnnonce() {
@@ -224,7 +227,9 @@ public class Player {
     }
 
     public PlayerWS getPlayerWS() {
-        return new PlayerWS(this.name, this.orientation, this.endPosition);
+        PlayerWS player = new PlayerWS(this.name, this.orientation, this.endPosition);
+        player.setAnnonce(this.annonce);
+        return player;
     }
 
     public void addCardsOfFold(List<Card> cards) {
@@ -263,11 +268,23 @@ public class Player {
         this.distributeAllCards = distributeAllCards;
     }
 
+    public boolean isDistributeAllCards() {
+        return distributeAllCards;
+    }
+
     public ChatWebSocket getChatClient() {
         return chatClient;
     }
 
     public void setChatClient(ChatWebSocket chatClient) {
         this.chatClient = chatClient;
+    }
+
+    public boolean isReconnect() {
+        return reconnect;
+    }
+
+    public void setReconnect(boolean reconnect) {
+        this.reconnect = reconnect;
     }
 }

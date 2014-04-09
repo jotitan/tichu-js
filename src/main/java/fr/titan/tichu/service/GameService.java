@@ -40,6 +40,7 @@ public class GameService {
         for (Player player : game.getPlayers()) {
             if (player.getName().equals(name)) {
                 if (player.getPlayerStatus().equals(PlayerStatus.FREE_CHAIR) || player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
+                    player.setReconnect(player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED));
                     player.setPlayerStatus(PlayerStatus.AUTHENTICATE);
                     player.createToken(gameName);
                     games.addPlayerByToken(player);
@@ -59,13 +60,17 @@ public class GameService {
         ContextWS context = new ContextWS();
         for (Player p : player.getGame().getPlayers()) {
             PlayerWS playerWS = p.getPlayerWS();
-            playerWS.setNbCard(p.getNbcard());
+            playerWS.setNbCard(p.getNbcard() > 0 ? p.isDistributeAllCards() ? 14 : 9 : 0);
             playerWS.setConnected(p.isConnected());
             context.addPlayer(playerWS);
+            /* Context for user */
             if (p.equals(player)) {
                 context.setPlayerUser(playerWS);
-                for (Card card : player.getCards()) {
-                    context.addCard(card.toCardWS());
+                if (player.getCards() != null && player.getCards().size() == 14) {
+                    List<Card> cards = player.isDistributeAllCards() ? player.getCards() : player.getCards().subList(0, 9);
+                    for (Card card : cards) {
+                        context.addCard(card.toCardWS());
+                    }
                 }
             }
         }
@@ -92,10 +97,14 @@ public class GameService {
 
     /* Show to the player the last 5 cards */
     public void getSuiteCards(Player player) {
-        List<Card> cards = player.getCards().subList(8, player.getCards().size());
-        player.getClient().send(ResponseType.DISTRIBUTION_PART2, cards);
+        List<CardWS> cardsWS = Lists.newArrayList();
+        for (Card card : player.getCards().subList(9, player.getCards().size())) {
+            cardsWS.add(card.toCardWS());
+        }
+        player.getClient().send(ResponseType.DISTRIBUTION_PART2, cardsWS);
         player.getClient().send(ResponseType.CHANGE_CARD_MODE, null);
         player.setDistributeAllCards(true);
+        broadCast(player.getGame(), ResponseType.SEE_ALL_CARDS, player.getPlayerWS());
     }
 
     public void makeAnnonce(Player player, AnnonceType annonce) {
@@ -103,16 +112,19 @@ public class GameService {
         switch (annonce) {
         case TICHU:
             if (!player.canTichu()) {
-                player.getClient().send(ResponseType.ANNONCE_FORBIDDEN, "");
+                player.getClient().send(ResponseType.ANNONCE_FORBIDDEN, annonce);
                 return;
             }
             break;
         case GRAND_TICHU:
+            if (player.isDistributeAllCards() || !player.canTichu()) {
+                player.getClient().send(ResponseType.ANNONCE_FORBIDDEN, annonce);
+                return;
+            }
             break;
         }
-
         player.setAnnonce(annonce);
-        broadCast(player.getGame(), ResponseType.PLAYER_ANNONCE, annonce);
+        broadCast(player.getGame(), ResponseType.PLAYER_ANNONCE, player.getPlayerWS());
     }
 
     protected void broadCast(Game game, ResponseType type, Object object) {

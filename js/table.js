@@ -14,6 +14,7 @@ var Table = {
             }else{
                 pl.drawing.setOffline();
             }
+            pl.setAnnonce(p.annonce);
             if(!pl.equals(PlayerManager.getPlayerUser())){
                 pl.createEmptyCards(p.nbCard);
             }
@@ -22,7 +23,15 @@ var Table = {
             data.cards.forEach(function(c){
                PlayerManager.getPlayerUser().giveCard(CardManager.get(c.value,c.color));
             });
+            PlayerManager.getPlayerUser().sortCards();
+            if(data.cards.length == 9){
+                Actions.build('grandTichu','lastCards');
+            }
         }
+    },
+    playerDoAnnonce:function(player,annonce){
+        var pl = PlayerManager.getByOrientation(player.orientation);
+        pl.setAnnonce(annonce);
     },
     connectPlayer:function(orientation,currentUser){
         PlayerManager.getByOrientation(orientation).connect(currentUser);
@@ -40,6 +49,12 @@ var Table = {
         PlayerManager.getPlayerUser().giveCard(cr);
         this.behaviours.changeMode.showChangedCards(cl,cp,cr);
         this.resetTurn();
+    },
+    notifyPlayerSeeCards:function(player){
+      var p = PlayerManager.getByOrientation(player.orientation);
+      if(!p.equals(PlayerManager.getPlayerUser())){
+        p.createEmptyCards(5);
+      }
     },
     resetTurn:function(){
         CombinaisonsValidator.resetTurn();
@@ -69,7 +84,9 @@ var Table = {
     cancelLastFold:function(){
         this.folds.splice(this.folds.length -1,1);
     },
-    distribute:function(cards){
+    /* First part of card (can make grand tichu) */
+    distributeFirstPart:function(cards){
+        Actions.build('grandTichu','lastCards');
         PlayerManager.players.forEach(function(p){
            if(p.equals(PlayerManager.getPlayerUser())){
             var user = PlayerManager.getPlayerUser();
@@ -77,19 +94,19 @@ var Table = {
                 user.giveCard(CardManager.get(card.value,card.color));
             });
            }else{
-            p.createEmptyCards(14);
+                // Players see just the 9 first cards
+                p.createEmptyCards(9);
            }
            p.sortCards();
         });
     },
-    /* First part of card (can make grand tichu) */
-    distributeFirstPart:function(cards){
-        Actions.build('grandTichu','lastCards');
-        this.distribute(cards);
-    },
     distributeSecondPart:function(cards){
         Actions.empty();
-        this.distribute(cards);
+        var user = PlayerManager.getPlayerUser();
+        cards.forEach(function(card){
+            user.giveCard(CardManager.get(card.value,card.color));
+        });
+        user.sortCards();
     },
     behaviours:{
         changeMode:{

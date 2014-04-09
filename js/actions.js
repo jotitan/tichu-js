@@ -1,7 +1,10 @@
 /* User action */
 
 var Actions = {
-	div:$('#actions'),
+	div:null,
+	init:function(){
+	    this.div = $('#actions');
+	},
 	build:function(){
 	  var actions = [];
         for(var i in arguments){
@@ -14,7 +17,7 @@ var Actions = {
 		actions.forEach(function(action){
 			var button = $('<button>' + action.name + '</button>');
 			button.bind('click',action.fct);
-			this.div.append(button);
+            this.div.append(button);
 		},this);
 	},
 	empty:function(){

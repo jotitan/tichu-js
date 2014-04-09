@@ -47,7 +47,10 @@ public class TichuWebSocket implements TichuClientCommunication {
             this.player.setClientCommunication(this);
             this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_OK, gameService.getContextGame(this.player));
-            gameService.checkTableComplete(player.getGame());
+            // If reconnection, no checktabke
+            if (!player.isReconnect()) {
+                gameService.checkTableComplete(player.getGame());
+            }
         } else {
             this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_KO, new ResponseRest(0, "erreur"));
