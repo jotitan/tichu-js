@@ -103,10 +103,10 @@ var SenderManager = {
         this._send('SUITE_CARDS','');
     },
     sendCards:function(fold){
-        this._send("FOLD",fold);
+        this._send('FOLD',fold);
     },
     callGame:function(){
-
+        this._send('CALL','')
     },
     _send:function(type,object){
         this._sendJSON(type,JSON.stringify(object));

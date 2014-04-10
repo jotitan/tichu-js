@@ -1,5 +1,7 @@
 package fr.titan.tichu.model;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.Fold;
@@ -8,10 +10,7 @@ import fr.titan.tichu.ws.ChatWebSocket;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: Titan Date: 29/03/14 Time: 11:47
@@ -89,6 +88,15 @@ public class Player {
         }
     }
 
+    private void sortCards() {
+        Collections.sort(this.cards, new Comparator<Card>() {
+            @Override
+            public int compare(Card o1, Card o2) {
+                return o1.getValue() - o2.getValue();
+            }
+        });
+    }
+
     public Player(Game game, Orientation orientation) {
         this.game = game;
         this.orientation = orientation;
@@ -114,6 +122,153 @@ public class Player {
     public void addCard(Card card) {
         this.cards.add(card);
         card.setOwner(this);
+        sortCards();
+    }
+
+    public boolean hasCard(int value) {
+        for (Card card : cards) {
+            if (card.getValue() == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasPhoenix() {
+        for (Card card : cards) {
+            if (card.isPhoenix()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* Find if a combinaison with a specific value exist (case mahjong) */
+    public boolean findCombinaisonWithValue(int value, FoldType type, Integer high, Integer length) {
+        if (!hasCard(value)) {
+            return false;
+        }
+        /* Can play what he wants */
+        if (type == null) {
+            return true;
+        }
+
+        /* When previous card is higher */
+        if (high != null && value <= high && (type.equals(FoldType.SINGLE) || type.equals(FoldType.PAIR) || type.equals(FoldType.BRELAN))) {
+            return false;
+        }
+        boolean phoenix = hasPhoenix();
+        switch (type) {
+        case SINGLE:
+            if (high != null && value <= high) {
+                return false;
+            }
+            return true;
+        case PAIR:
+            if (phoenix) {
+                return true;
+            }
+            int nb = countCards(value);
+            return nb >= 2;
+
+        case BRELAN:
+            nb = countCards(value);
+            return nb >= 3 || (nb == 2 && phoenix);
+        case FULLHOUSE:
+            return false;
+        case STRAIGHTPAIR:
+            int previous = 0;
+            Map<Integer, Integer> values = Maps.newHashMap();
+            for (Card card : cards) {
+                if (!values.containsKey(card.getValue())) {
+                    values.put(card.getValue(), 1);
+                } else {
+                    values.put(card.getValue(), values.get(card.getValue()) + 1);
+                }
+            }
+            List<Integer> nbPairs = Lists.newArrayList();
+            int nbPair = 0;
+            boolean jokerNotUsed = phoenix;
+            int previousValue = 0;
+            for (Integer valueCard : values.keySet()) {
+                if (valueCard > high) {
+                    if (previousValue == 0 || previousValue == valueCard - 1) {
+                        if (values.get(valueCard) >= 2) {
+                            nbPair++;
+                            previousValue = valueCard;
+                        } else {
+                            if (jokerNotUsed) {
+                                jokerNotUsed = false;
+                                nbPair++;
+                                previousValue = valueCard;
+                            }
+                        }
+                    } else {
+                        // Save and rebegin
+                        if (value <= previousValue && value >= previousValue - nbPair) {
+                            nbPairs.add(nbPair);
+                        }
+                        nbPair = 0;
+                        previousValue = 0;
+                        jokerNotUsed = phoenix;
+                    }
+                }
+            }
+            // Last element
+            if (value <= previousValue && value >= previousValue - nbPair) {
+                nbPairs.add(nbPair);
+            }
+            for (Integer i : nbPairs) {
+                if (i >= length) {
+                    return true;
+                }
+            }
+            return false;
+        case SQUAREBOMB:
+            return countCards(value) == 4;
+        case STRAIGHT:
+            if (value <= high || value > (high + length)) {
+                return false;
+            }
+            List<LinkedList<Card>> parts = Lists.newArrayList();
+            LinkedList<Card> currentPart = Lists.newLinkedList();
+            previous = 0;
+            for (Card card : cards) {
+                if (card.getValue() != previous) {
+                    if (previous == 0 || !(previous + 1 == card.getValue())) {
+                        currentPart = Lists.newLinkedList();
+                        parts.add(currentPart);
+                    }
+                    currentPart.add(card);
+                    previous = card.getValue();
+                }
+            }
+            // Compare length
+            for (int i = 0; i < parts.size(); i++) {
+                LinkedList<Card> list = parts.get(i);
+                if ((list.size() >= length || (phoenix && list.size() >= length - 1)) && list.getFirst().getValue() > high
+                        && value >= list.getFirst().getValue() && value <= list.getLast().getValue()) {
+                    return true;
+                }
+                // Try to link this list with next if phoenix exist
+                if (phoenix && i < parts.size() - 1) {
+                    if (list.getLast().getValue() == parts.get(i + 1).getFirst().getValue() - 2 && list.size() + parts.get(i + 1).size() >= length - 1) {
+                        return true;
+                    }
+                }
+            }
+
+        default:
+            return false;
+        }
+    }
+
+    private int countCards(int value) {
+        int nb = 0;
+        for (Card card : cards) {
+            nb += (card.getValue() == value) ? 1 : 0;
+        }
+        return nb;
     }
 
     public int getPointCards() {

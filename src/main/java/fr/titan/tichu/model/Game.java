@@ -26,6 +26,9 @@ public class Game {
 
     private CardPackage cardPackage = new CardPackage();
 
+    /* Card requested after mahjong card */
+    private Integer mahjongValue = null;
+
     private Fold lastFold;
     private List<Card> cardOfFolds = new ArrayList<Card>();
     /* Wait this player to play */
@@ -91,9 +94,11 @@ public class Game {
     }
 
     public GameWS saveScore() {
-        if(players == null || players.size()!=4){return null;}
+        if (players == null || players.size() != 4) {
+            return null;
+        }
         List<Player> orderPlayers = getPlayersByOrder();
-        if(orderPlayers.size() == 0){
+        if (orderPlayers.size() == 0) {
             return null;
         }
         /* First take folds of last */
@@ -173,12 +178,37 @@ public class Game {
         return true;
     }
 
-    /* Verify if fold can be play */
-    public boolean verifyFold(Fold fold) {
-        if (this.lastFold == null) {
-            return true;
+    private boolean isMajhongPresent(Fold fold) {
+        return isMajhongPresent(cardPackage.getCards(fold.getCards()));
+    }
+
+    private boolean isMajhongPresent(List<Card> cards) {
+        if (this.mahjongValue == null) {
+            return false;
         }
-        return this.lastFold.getType().equals(fold.getType()) && this.lastFold.getHigh() < fold.getHigh();
+        for (Card card : cards) {
+            if (card.getValue() == this.mahjongValue) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* Verify if fold can be play */
+    public boolean verifyFold(Fold fold, Player player) {
+        // Verify if the mahjongValue contract is respected
+        if (this.lastFold == null) {
+            if (this.mahjongValue == null) {
+                return true;
+            }
+            if (!player.hasCard(this.mahjongValue)) {
+                return true;
+            } else {
+                return isMajhongPresent(fold);
+            }
+        } else {
+            return this.lastFold.getType().equals(fold.getType()) && this.lastFold.getHigh() < fold.getHigh();
+        }
     }
 
     public boolean verifyBomb(Fold bomb) {
@@ -196,8 +226,15 @@ public class Game {
     /* Play the fold */
     public void playFold(Player player, Fold fold) {
         this.lastPlayer = player;
-        this.cardOfFolds.addAll(cardPackage.getCards(fold.getCards()));
+        List<Card> cards = cardPackage.getCards(fold.getCards());
+        this.cardOfFolds.addAll(cards);
         this.lastFold = fold;
+        // Check if contract is ok
+        if (this.mahjongValue != null) {
+            if (isMajhongPresent(cards)) {
+                this.mahjongValue = null;
+            }
+        }
     }
 
     public boolean isTurnWin() {

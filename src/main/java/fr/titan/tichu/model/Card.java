@@ -29,4 +29,11 @@ public abstract class Card {
     }
 
     public abstract CardWS toCardWS();
+
+    public abstract int getValue();
+
+    public boolean isPhoenix() {
+        return false;
+    }
+
 }

@@ -66,8 +66,9 @@ public class GameService {
             /* Context for user */
             if (p.equals(player)) {
                 context.setPlayerUser(playerWS);
-                if (player.getCards() != null && player.getCards().size() == 14) {
-                    List<Card> cards = player.isDistributeAllCards() ? player.getCards() : player.getCards().subList(0, 9);
+                if (player.getCards() != null && player.getCards().size() > 0) {
+                    List<Card> cards = player.getCards().size() != 14 || player.isDistributeAllCards() ? player.getCards() : player.getCards().subList(
+                            0, 9);
                     for (Card card : cards) {
                         context.addCard(card.toCardWS());
                     }
@@ -196,6 +197,7 @@ public class GameService {
         Card card = playerFrom.getGame().getCardPackage().getCard(cardWS);
         Player playerTo = playerFrom.getGame().getPlayer(to);
         playerFrom.giveCard(card);
+        playerTo.addCard(card);
         switch (position) {
         case LEFT:
             playerTo.getChangeCards().setToLeft(cardWS);
@@ -243,7 +245,7 @@ public class GameService {
             player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
-        if (!game.verifyFold(fold)) {
+        if (!game.verifyFold(fold,player)) {
             player.getClient().send(ResponseType.BAD_FOLD, "");
             return;
         }

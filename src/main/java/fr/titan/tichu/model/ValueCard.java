@@ -53,4 +53,8 @@ public class ValueCard extends Card {
     public void setColor(String color) {
         this.color = color;
     }
+
+    public String toString() {
+        return "Card : " + value + " : " + color;
+    }
 }

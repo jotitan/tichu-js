@@ -9,7 +9,7 @@ function Player(orientation,name,visible){
 	this.name = name;
     this.connect = false;   // Player connected
     this.select = false;    // Current player
-    this.served = false;
+    this.served = false;    // Player has all cards (14)
 
     this.equals = function(player){
         if(player == null){
@@ -82,9 +82,12 @@ function Player(orientation,name,visible){
 		return this.folds.reduce(function(score,card){return score+card.getScore();},0);		
 	}
 	
-	this.playFold = function(cards){
+	this.playFold = function(fold){
 		try{
-			Plateau.playFold(cards);
+		    if(fold.mahjongValue!=null){
+		        alert("Want a " + fold.mahjongValue);
+		    }
+			Plateau.playFold(fold.cards);
 		}catch(impossible){
 			alert("Impossible combinaison");
 		}
@@ -192,7 +195,10 @@ var PlayerManager = {
         this.currentPlayer = this.getByOrientation(player.orientation);
         this.currentPlayer.setSelected(true);
         if(this.currentPlayer.equals(this.playerUser)){
-            Table.behaviours.gameMode.enable();
+            // Show option only if all cards are received
+            if(this.currentPlayer.served){
+                Table.behaviours.gameMode.enable();
+            }
         }
         else{
             Table.behaviours.gameMode.disable();

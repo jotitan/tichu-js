@@ -1,6 +1,7 @@
 /* Manage and test cards during a turn */
 
 
+/* Represent a fold */
 /* @param : type of combinaison (CombinaisonType) */
 /* @param hight : higher card of the combinaison (use the first of the series) */
 /* @param nb : number of card (use in straight, pair straight, straight bomb */
@@ -9,6 +10,7 @@ function Combinaison(type,high,nb,jokerValue){
 	this.high = high;
 	this.nb = nb;
 	this.jokerValue = jokerValue;
+	this.mahjongValue = null;
 	this.cards=[];
 }
 

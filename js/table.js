@@ -132,6 +132,7 @@ var Table = {
                     alert("impossible, choose one card for each");
                     return;
                 }
+                Actions.empty();
                 this.boxes.forEach(function(b){
                     PlayerManager.getPlayerUser().playCard(b.card.card);
                     //b.card.card.setStatus(STATUS_CARD.CHANGED_CARD);
@@ -162,9 +163,8 @@ var Table = {
                 PlayerManager.getPlayerUser().sortCards(true);
                 Actions.empty();
                 if(PlayerManager.getPlayerUser().equals(PlayerManager.currentPlayer)){
-                    Actions.build('call');
+                    Table.behaviours.gameMode.enable();
                 }
-                Actions.empty();
             },
             mouseController:{
                 moving:false,
@@ -220,7 +220,7 @@ var Table = {
                     var coords = this.getPosition(e);
                     var box = this._findBox(coords);
                     // Check if card is in a box
-                    if(box!=null){
+                    if(box!=null && box.card == null){
                         this.card.setDirectCoordinates(box.x+5,box.y+5);
                         box.card = this.card;
                     }else{
@@ -265,11 +265,16 @@ var Table = {
                     Actions.build('call');
                 }
             },
-            _playFold:function(){
+            playFold:function(){
                 var cards = this.cards.map(function(c){return c.card;});
+
                 try{
                     var fold = CombinaisonsValidator.check(cards);
-                    SenderMessage.sendCards(fold);
+                    // Mahjong case
+                    if(cards[0].value == 1){
+                        fold.mahjongValue = prompt("Value for prompt");
+                    }
+                    SenderManager.sendCards(fold);
                 }catch(e){
                     alert("ERROR : " + e);
                 }

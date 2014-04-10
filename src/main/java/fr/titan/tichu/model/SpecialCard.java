@@ -8,11 +8,21 @@ import fr.titan.tichu.model.ws.CardWS;
 public class SpecialCard extends Card {
     private int score;
     private int code;
+    private boolean isPhoenix = false;
 
     public SpecialCard(CardType cardType, int code, int score) {
         super(cardType);
         this.score = score;
         this.code = code;
+    }
+
+    public SpecialCard(CardType cardType, int code, int score, boolean isPhoenix) {
+        this(cardType, score, code);
+        this.isPhoenix = isPhoenix;
+    }
+
+    public int getValue() {
+        return code;
     }
 
     public int getScore() {
@@ -22,7 +32,7 @@ public class SpecialCard extends Card {
     enum SpecialCardFactory {
         Phoenix {
             Card get() {
-                return new SpecialCard(CardType.PHOENIX, 16, -25);
+                return new SpecialCard(CardType.PHOENIX, 16, -25, true);
             }
         },
         Dogs {
@@ -42,6 +52,11 @@ public class SpecialCard extends Card {
         };
 
         abstract Card get();
+    }
+
+    @Override
+    public boolean isPhoenix() {
+        return isPhoenix;
     }
 
     @Override

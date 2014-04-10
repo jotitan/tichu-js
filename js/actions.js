@@ -33,7 +33,7 @@ var Actions = {
         call:{
             name:"Call",
             fct:function(){
-                SenderMessage.callGame();
+                SenderManager.callGame();
                 Actions.empty();
             }
         },
@@ -58,6 +58,7 @@ var Actions = {
         acceptCards:{
             name:"Ok",
             fct:function(){
+                PlayerManager.getPlayerUser().served = true;    // get all cards
                 Table.behaviours.changeMode.endChangeCards();
             }
         }
