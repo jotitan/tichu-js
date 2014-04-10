@@ -160,7 +160,11 @@ var Table = {
             endChangeCards:function(){
                 this.boxes = [];
                 PlayerManager.getPlayerUser().sortCards(true);
-
+                Actions.empty();
+                if(PlayerManager.getPlayerUser().equals(PlayerManager.currentPlayer)){
+                    Actions.build('call');
+                }
+                Actions.empty();
             },
             mouseController:{
                 moving:false,

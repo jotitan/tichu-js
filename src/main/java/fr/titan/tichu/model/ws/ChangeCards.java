@@ -1,5 +1,7 @@
 package fr.titan.tichu.model.ws;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
 *
  */
@@ -32,6 +34,7 @@ public class ChangeCards {
         this.toPartner = toPartner;
     }
 
+    @JsonIgnore
     public boolean isComplete(){
         return toLeft!=null && toRight!=null && toPartner!=null;
     }

@@ -309,6 +309,7 @@ public class GameService {
             }
             broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             // Game ended, no nextPlayer
         }
     }

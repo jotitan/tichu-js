@@ -7,8 +7,9 @@ function Player(orientation,name,visible){
 	this.folds = [];	// List of cards wins
 	this.visible = visible || false;
 	this.name = name;
-    this.connect = false;
-    this.select = false;
+    this.connect = false;   // Player connected
+    this.select = false;    // Current player
+    this.served = false;
 
     this.equals = function(player){
         if(player == null){
@@ -150,6 +151,7 @@ function Player(orientation,name,visible){
 
 	this.initRound = function(){
 	    this.setAnnonce(null);
+        this.served = false;
 	}
 }
 
