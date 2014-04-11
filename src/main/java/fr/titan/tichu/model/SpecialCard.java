@@ -17,7 +17,7 @@ public class SpecialCard extends Card {
     }
 
     public SpecialCard(CardType cardType, int code, int score, boolean isPhoenix) {
-        this(cardType, score, code);
+        this(cardType, code, score);
         this.isPhoenix = isPhoenix;
     }
 

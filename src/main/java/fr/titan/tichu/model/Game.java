@@ -195,6 +195,7 @@ public class Game {
     }
 
     /* Verify if fold can be play */
+    /* Change the return to explain problem */
     public boolean verifyFold(Fold fold, Player player) {
         // Verify if the mahjongValue contract is respected
         if (this.lastFold == null) {
@@ -207,6 +208,11 @@ public class Game {
                 return isMajhongPresent(fold);
             }
         } else {
+            if (this.mahjongValue != null
+                    && player.canPlayMahjongValue(this.mahjongValue, lastFold.getType(), lastFold.getCards().size(), lastFold.getHigh())
+                    && !isMajhongPresent(fold)) {
+                return false;
+            }
             return this.lastFold.getType().equals(fold.getType()) && this.lastFold.getHigh() < fold.getHigh();
         }
     }
@@ -229,7 +235,7 @@ public class Game {
         List<Card> cards = cardPackage.getCards(fold.getCards());
         this.cardOfFolds.addAll(cards);
         this.lastFold = fold;
-        // Check if contract is ok
+        // Check if mahjong contract is ok
         if (this.mahjongValue != null) {
             if (isMajhongPresent(cards)) {
                 this.mahjongValue = null;

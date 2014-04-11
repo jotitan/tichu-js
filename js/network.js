@@ -145,6 +145,8 @@ var SenderManager = {
             case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break
             case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break
             case "ANNONCE_FORBIDDEN":alert("Annonce forbidden " + data.object);break
+            case "SCORE":Scorer.addResult(data.object);break
+            case "GAME_WIN":alert("End of the game");break
         }
     }
  }
@@ -152,6 +154,6 @@ var SenderManager = {
 
 BOMB_PLAYED
 
-SCORE
+
 GAME_WIN
 */

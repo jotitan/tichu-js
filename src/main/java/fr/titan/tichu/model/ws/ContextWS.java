@@ -10,8 +10,11 @@ import com.google.common.collect.Lists;
 public class ContextWS {
     private List<PlayerWS> players = Lists.newArrayList();
     private PlayerWS playerUser;
+    private PlayerWS currentPlayer;
     private boolean gameBegin;
     private List<CardWS> cards = Lists.newArrayList();
+
+    private ResponseType type; // Dernier evenement ?
 
     public List<PlayerWS> getPlayers() {
         return players;
@@ -51,5 +54,21 @@ public class ContextWS {
 
     public void setPlayerUser(PlayerWS playerUser) {
         this.playerUser = playerUser;
+    }
+
+    public PlayerWS getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(PlayerWS currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public ResponseType getType() {
+        return type;
+    }
+
+    public void setType(ResponseType type) {
+        this.type = type;
     }
 }

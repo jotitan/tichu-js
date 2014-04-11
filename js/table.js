@@ -1,6 +1,13 @@
 /* Manage the table of game */
 /* Behave : build table, show new player (name, connected or not) */
 
+var EventHelper = {
+	getPosition:function(e){
+		var x = e.clientX - $('#canvas').offset().left;
+		var y = e.clientY - $('#canvas').offset().top + $('body').scrollTop();
+		return {x:x,y:y};
+	}
+}
 
 var Table = {
     folds:[],
@@ -24,9 +31,19 @@ var Table = {
                PlayerManager.getPlayerUser().giveCard(CardManager.get(c.value,c.color));
             });
             PlayerManager.getPlayerUser().sortCards();
-            if(data.cards.length == 9){
-                Actions.build('grandTichu','lastCards');
+            if(data.type == "NEXT_PLAYER"){
+                // Player served, reconnect, he can see all his cards
+                PlayerManager.getPlayerUser().served = true;
             }
+
+        }
+        this._dispatchState(data);
+    },
+    _dispatchState:function(data){
+        switch(data.type){
+            case "CHANGE_CARD_MODE":Table.behaviours.changeMode.enable();break;
+            case "DISTRIBUTION_PART1":Actions.build('grandTichu','lastCards');break;
+            case "NEXT_PLAYER":PlayerManager.nextPlayer(data.currentPlayer);break;
         }
     },
     playerDoAnnonce:function(player,annonce){
@@ -80,7 +97,7 @@ var Table = {
         this.folds.push(fold.cards);
         player.sortCards();
     },
-    /* Call only ffor the player who play a bad fold */
+    /* Call only for the player who play a bad fold */
     cancelLastFold:function(){
         this.folds.splice(this.folds.length -1,1);
     },

@@ -2,6 +2,7 @@ package fr.titan.tichu.model;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.Fold;
@@ -144,7 +145,7 @@ public class Player {
     }
 
     /* Find if a combinaison with a specific value exist (case mahjong) */
-    public boolean findCombinaisonWithValue(int value, FoldType type, Integer high, Integer length) {
+    public boolean canPlayMahjongValue(int value, FoldType type, Integer high, Integer length) {
         if (!hasCard(value)) {
             return false;
         }
@@ -177,25 +178,31 @@ public class Player {
         case FULLHOUSE:
             nb = Math.min(3, countCards(value));
             // Pas obligatoire d etre au dessus
-            int maxOther = getMaxCards(value,0);
-            switch(nb){
-                case 3 :
-                    if(value <= high){
-                        // VAlue is the Pair, have to find brelan
-                        maxOther = getMaxCards(value,high);
-                        return  maxOther>=3 || (maxOther == 2 && phoenix);
-                    }
+            int maxOther = getMaxCards(value, 0);
+            switch (nb) {
+            case 3:
+                if (value <= high) {
+                    // Value is the Pair, have to find brelan
+                    maxOther = getMaxCards(value, high);
+                    return maxOther >= 3 || (maxOther == 2 && phoenix);
+                }
+                // Find PAIR
+                return maxOther >= 2 || (maxOther == 1 && phoenix);
+            case 2:
+                if (value > high && phoenix) {
                     // Find PAIR
-                    return  maxOther>=2 || (maxOther == 1 && phoenix);
-                case 2 :
-                    // Find BRELAN or PAIR with phoenix
-                    return  maxOther>=3 || (maxOther == 2 && phoenix);
-                case 1 :
-                    // Find BRELAN
-                    if(!phoenix){
-                        return false;
-                    }
-                    return maxOther>=3;
+                    return maxOther >= 2;
+                }
+                maxOther = getMaxCards(value, high);
+                // Find BRELAN or PAIR with phoenix
+                return maxOther >= 3 || (maxOther == 2 && phoenix);
+            case 1:
+                // Find BRELAN
+                if (!phoenix) {
+                    return false;
+                }
+                maxOther = getMaxCards(value, high);
+                return maxOther >= 3;
             }
             return false;
         case STRAIGHTPAIR:
@@ -248,6 +255,39 @@ public class Player {
             return false;
         case SQUAREBOMB:
             return countCards(value) == 4;
+        case STRAIGHTBOMB:
+            Map<String, List<Card>> colorStraight = Maps.newHashMap();
+            for (Card card : cards) {
+                if (card.getValue() > high && card instanceof ValueCard) {
+                    String color = ((ValueCard) card).getColor();
+                    if (!colorStraight.containsKey(color)) {
+                        colorStraight.put(color, new ArrayList<Card>());
+                    }
+                    colorStraight.get(color).add(card);
+                }
+            }
+
+            for (String color : colorStraight.keySet()) {
+                previous = 0;
+                nb = 0;
+                int first = colorStraight.get(color).get(0).getValue();
+                for (Card card : colorStraight.get(color)) {
+                    if (previous == 0 || previous == card.getValue() - 1) {
+                        nb++;
+                    } else {
+                        if (nb >= length && value >= first && value <= first + length) {
+                            return true;
+                        }
+                        nb = 0;
+                        first = card.getValue();
+                    }
+                    previous = card.getValue();
+                }
+                if (nb >= length && value >= first && value <= first + length) {
+                    return true;
+                }
+            }
+            return false;
         case STRAIGHT:
             if (value <= high || value > (high + length)) {
                 return false;
@@ -285,6 +325,7 @@ public class Player {
         }
     }
 
+    /* Count card with this value */
     private int countCards(int value) {
         int nb = 0;
         for (Card card : cards) {
@@ -293,23 +334,32 @@ public class Player {
         return nb;
     }
 
-    private int getMaxCards(int exceptValue,int min){
+    /* Count the biggest number of card */
+    /**
+     * @param exceptValue
+     *            : not use like possible value
+     */
+    /**
+     * @param min
+     *            : value are greater than min
+     */
+    private int getMaxCards(int exceptValue, int min) {
         int previous = 0;
         int nb = 0;
         int max = 0;
-        for(Card card : cards){
-            if(card.getValue()!=exceptValue & card.getValue() >=min){
-                if(previous == 0 || card.getValue() == previous){
+        for (Card card : cards) {
+            if (card.getValue() != exceptValue & card.getValue() > min) {
+                if (previous == 0 || card.getValue() == previous) {
                     previous = card.getValue();
                     nb++;
-                }else{
-                    max = Math.max(nb,max);
+                } else {
+                    max = Math.max(nb, max);
                     previous = card.getValue();
                     nb = 1;
                 }
             }
         }
-        return Math.max(nb,max);
+        return Math.max(nb, max);
     }
 
     public int getPointCards() {

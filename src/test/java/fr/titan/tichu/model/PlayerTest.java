@@ -30,20 +30,20 @@ public class PlayerTest {
 
         p.addCard(cp.getCard(new CardWS(3, "red")));
 
-        Assert.assertTrue(p.findCombinaisonWithValue(3, FoldType.SINGLE, 2, null));
-        Assert.assertFalse(p.findCombinaisonWithValue(3, FoldType.PAIR, 2, null));
+        Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.SINGLE, 2, null));
+        Assert.assertFalse(p.canPlayMahjongValue(3, FoldType.PAIR, 2, null));
 
         p.addCard(cp.getCard(new CardWS(3, "blue")));
-        Assert.assertTrue(p.findCombinaisonWithValue(3, FoldType.PAIR, 2, null));
-        Assert.assertFalse(p.findCombinaisonWithValue(3, FoldType.PAIR, 4, null));
-        Assert.assertFalse(p.findCombinaisonWithValue(3, FoldType.BRELAN, 2, null));
+        Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.PAIR, 2, null));
+        Assert.assertFalse(p.canPlayMahjongValue(3, FoldType.PAIR, 4, null));
+        Assert.assertFalse(p.canPlayMahjongValue(3, FoldType.BRELAN, 2, null));
 
         p.addCard(cp.getCard(new CardWS(3, "black")));
-        Assert.assertTrue(p.findCombinaisonWithValue(3, FoldType.BRELAN, 2, null));
-        Assert.assertFalse(p.findCombinaisonWithValue(3, FoldType.SQUAREBOMB, 2, null));
+        Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.BRELAN, 2, null));
+        Assert.assertFalse(p.canPlayMahjongValue(3, FoldType.SQUAREBOMB, 2, null));
 
         p.addCard(cp.getCard(new CardWS(3, "green")));
-        Assert.assertTrue(p.findCombinaisonWithValue(3, FoldType.SQUAREBOMB, 2, null));
+        Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.SQUAREBOMB, 2, null));
 
         p.addCard(cp.getCard(new CardWS(4, "blue")));
         p.addCard(cp.getCard(new CardWS(4, "green")));
@@ -51,42 +51,93 @@ public class PlayerTest {
         p.addCard(cp.getCard(new CardWS(7, "red")));
         p.addCard(cp.getCard(new CardWS(8, "black")));
 
-        Assert.assertFalse(p.findCombinaisonWithValue(3, FoldType.STRAIGHT, 2, 5));
+        Assert.assertFalse(p.canPlayMahjongValue(3, FoldType.STRAIGHT, 2, 5));
 
         p.addCard(cp.getCard(new CardWS(6, "green")));
-        Assert.assertTrue(p.findCombinaisonWithValue(3, FoldType.STRAIGHT, 2, 5));
-        Assert.assertTrue(p.findCombinaisonWithValue(3, FoldType.STRAIGHT, 2, 6));
-        Assert.assertFalse(p.findCombinaisonWithValue(3, FoldType.STRAIGHT, 2, 7));
+        Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.STRAIGHT, 2, 5));
+        Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.STRAIGHT, 2, 6));
+        Assert.assertFalse(p.canPlayMahjongValue(3, FoldType.STRAIGHT, 2, 7));
 
         p.giveCard(cp.getCard(new CardWS(6, "green")));
-        Assert.assertFalse(p.findCombinaisonWithValue(3, FoldType.STRAIGHT, 2, 6));
+        Assert.assertFalse(p.canPlayMahjongValue(3, FoldType.STRAIGHT, 2, 6));
 
         p.addCard(cp.getCard(new CardWS(16, "white")));
-        Assert.assertTrue(p.findCombinaisonWithValue(3, FoldType.STRAIGHT, 2, 6));
+        Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.STRAIGHT, 2, 6));
 
         p.resetCards();
 
         p.addCard(cp.getCard(new CardWS(5, "red")));
-        Assert.assertFalse(p.findCombinaisonWithValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+        Assert.assertFalse(p.canPlayMahjongValue(5, FoldType.STRAIGHTPAIR, 4, 2));
 
         p.addCard(cp.getCard(new CardWS(5, "blue")));
-        Assert.assertFalse(p.findCombinaisonWithValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+        Assert.assertFalse(p.canPlayMahjongValue(5, FoldType.STRAIGHTPAIR, 4, 2));
 
         p.addCard(cp.getCard(new CardWS(6, "blue")));
-        Assert.assertFalse(p.findCombinaisonWithValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+        Assert.assertFalse(p.canPlayMahjongValue(5, FoldType.STRAIGHTPAIR, 4, 2));
 
         p.addCard(cp.getCard(new CardWS(6, "green")));
-        Assert.assertTrue(p.findCombinaisonWithValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+        Assert.assertTrue(p.canPlayMahjongValue(5, FoldType.STRAIGHTPAIR, 4, 2));
 
         p.giveCard(cp.getCard(new CardWS(6, "blue")));
-        Assert.assertFalse(p.findCombinaisonWithValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+        Assert.assertFalse(p.canPlayMahjongValue(5, FoldType.STRAIGHTPAIR, 4, 2));
 
         p.addCard(cp.getCard(new CardWS(16, "white")));
-        Assert.assertTrue(p.findCombinaisonWithValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+        Assert.assertTrue(p.canPlayMahjongValue(5, FoldType.STRAIGHTPAIR, 4, 2));
 
         p.giveCard(cp.getCard(new CardWS(8, "blue")));
         p.giveCard(cp.getCard(new CardWS(11, "red")));
-        Assert.assertTrue(p.findCombinaisonWithValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+        Assert.assertTrue(p.canPlayMahjongValue(5, FoldType.STRAIGHTPAIR, 4, 2));
+
+        p.resetCards();
+        p.addCard(cp.getCard(new CardWS(4, "red")));
+        p.addCard(cp.getCard(new CardWS(4, "black")));
+        p.addCard(cp.getCard(new CardWS(4, "blue")));
+        p.addCard(cp.getCard(new CardWS(6, "blue")));
+        p.addCard(cp.getCard(new CardWS(6, "red")));
+
+        Assert.assertTrue(p.canPlayMahjongValue(6, FoldType.FULLHOUSE, 3, null));
+        Assert.assertFalse(p.canPlayMahjongValue(6, FoldType.FULLHOUSE, 4, null));
+        Assert.assertFalse(p.canPlayMahjongValue(5, FoldType.FULLHOUSE, null, null));
+
+        p.giveCard(cp.getCard(new CardWS(4, "blue")));
+        p.addCard(cp.getCard(new CardWS(6, "black")));
+        Assert.assertTrue(p.canPlayMahjongValue(6, FoldType.FULLHOUSE, 4, null));
+        Assert.assertTrue(p.canPlayMahjongValue(6, FoldType.FULLHOUSE, 5, null));
+        Assert.assertTrue(p.canPlayMahjongValue(4, FoldType.FULLHOUSE, 5, null));
+
+        p.giveCard(cp.getCard(new CardWS(6, "black")));
+        Assert.assertFalse(p.canPlayMahjongValue(6, FoldType.FULLHOUSE, 4, null));
+
+        p.addCard(cp.getCard(new CardWS(16, "white")));
+        Assert.assertTrue(p.canPlayMahjongValue(6, FoldType.FULLHOUSE, 4, null));
+        Assert.assertTrue(p.canPlayMahjongValue(4, FoldType.FULLHOUSE, 5, null));
+
+        p.resetCards();
+        p.addCard(cp.getCard(new CardWS(4, "red")));
+        p.addCard(cp.getCard(new CardWS(6, "blue")));
+        p.addCard(cp.getCard(new CardWS(6, "red")));
+        p.addCard(cp.getCard(new CardWS(16, "white")));
+
+        Assert.assertFalse(p.canPlayMahjongValue(4, FoldType.FULLHOUSE, 5, null));
+
+        p.addCard(cp.getCard(new CardWS(6, "black")));
+        Assert.assertTrue(p.canPlayMahjongValue(4, FoldType.FULLHOUSE, 5, null));
+
+        p.resetCards();
+        p.addCard(cp.getCard(new CardWS(8, "blue")));
+        p.addCard(cp.getCard(new CardWS(9, "green")));
+        p.addCard(cp.getCard(new CardWS(9, "blue")));
+        p.addCard(cp.getCard(new CardWS(10, "blue")));
+        p.addCard(cp.getCard(new CardWS(11, "blue")));
+        p.addCard(cp.getCard(new CardWS(12, "blue")));
+
+        Assert.assertTrue(p.canPlayMahjongValue(10, FoldType.STRAIGHTBOMB, 3, 5));
+        Assert.assertFalse(p.canPlayMahjongValue(5, FoldType.STRAIGHTBOMB, 3, 5));
+        Assert.assertFalse(p.canPlayMahjongValue(13, FoldType.STRAIGHTBOMB, 3, 5));
+
+        p.giveCard(cp.getCard(new CardWS(12, "blue")));
+        p.addCard(cp.getCard(new CardWS(16, "white")));
+        Assert.assertFalse(p.canPlayMahjongValue(10, FoldType.STRAIGHTBOMB, 3, 5));
 
     }
 }

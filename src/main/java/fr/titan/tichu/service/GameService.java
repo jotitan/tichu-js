@@ -63,6 +63,11 @@ public class GameService {
             playerWS.setNbCard(p.getNbcard() > 0 ? p.isDistributeAllCards() ? 14 : 9 : 0);
             playerWS.setConnected(p.isConnected());
             context.addPlayer(playerWS);
+
+            if (p.equals(player.getGame().getCurrentPlayer())) {
+                context.setType(ResponseType.NEXT_PLAYER);
+                context.setCurrentPlayer(playerWS);
+            }
             /* Context for user */
             if (p.equals(player)) {
                 context.setPlayerUser(playerWS);
@@ -72,6 +77,14 @@ public class GameService {
                     for (Card card : cards) {
                         context.addCard(card.toCardWS());
                     }
+                    if (!player.isDistributeAllCards()) {
+                        context.setType(ResponseType.DISTRIBUTION_PART1);
+                    } else {
+                        if (context.getCurrentPlayer() == null && !player.getChangeCards().isComplete()) {
+                            context.setType(ResponseType.CHANGE_CARD_MODE);
+                        }
+                    }
+
                 }
             }
         }
@@ -245,7 +258,7 @@ public class GameService {
             player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
-        if (!game.verifyFold(fold,player)) {
+        if (!game.verifyFold(fold, player)) {
             player.getClient().send(ResponseType.BAD_FOLD, "");
             return;
         }
