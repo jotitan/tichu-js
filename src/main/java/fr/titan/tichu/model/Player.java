@@ -175,6 +175,28 @@ public class Player {
             nb = countCards(value);
             return nb >= 3 || (nb == 2 && phoenix);
         case FULLHOUSE:
+            nb = Math.min(3, countCards(value));
+            // Pas obligatoire d etre au dessus
+            int maxOther = getMaxCards(value,0);
+            switch(nb){
+                case 3 :
+                    if(value <= high){
+                        // VAlue is the Pair, have to find brelan
+                        maxOther = getMaxCards(value,high);
+                        return  maxOther>=3 || (maxOther == 2 && phoenix);
+                    }
+                    // Find PAIR
+                    return  maxOther>=2 || (maxOther == 1 && phoenix);
+                case 2 :
+                    // Find BRELAN or PAIR with phoenix
+                    return  maxOther>=3 || (maxOther == 2 && phoenix);
+                case 1 :
+                    // Find BRELAN
+                    if(!phoenix){
+                        return false;
+                    }
+                    return maxOther>=3;
+            }
             return false;
         case STRAIGHTPAIR:
             int previous = 0;
@@ -269,6 +291,25 @@ public class Player {
             nb += (card.getValue() == value) ? 1 : 0;
         }
         return nb;
+    }
+
+    private int getMaxCards(int exceptValue,int min){
+        int previous = 0;
+        int nb = 0;
+        int max = 0;
+        for(Card card : cards){
+            if(card.getValue()!=exceptValue & card.getValue() >=min){
+                if(previous == 0 || card.getValue() == previous){
+                    previous = card.getValue();
+                    nb++;
+                }else{
+                    max = Math.max(nb,max);
+                    previous = card.getValue();
+                    nb = 1;
+                }
+            }
+        }
+        return Math.max(nb,max);
     }
 
     public int getPointCards() {
