@@ -12,17 +12,21 @@ function Combinaison(type,high,nb,jokerValue){
 	this.jokerValue = jokerValue;
 	this.mahjongValue = null;
 	this.cards=[];
+
+    this.length = function(){
+        return this.cards.length;
+    }
 }
 
 var CombinaisonType = {
-	SINGLE:'Single',
-	PAIR:'Pair',
-	STRAIGHTPAIR:'Straight of Pair',
-	BRELAN:'Brelan',
-	FULLHOUSE:'Full',
-	STRAIGHT:'Straight',
-	STRAIGHTBOMB:'Straight Bomb of color',
-	SQUAREBOMB:'Square Bomb'	
+	SINGLE:'SINGLE',
+	PAIR:'PAIR',
+	STRAIGHTPAIR:'STRAIGHTPAIR',
+	BRELAN:'BRELAN',
+	FULLHOUSE:'FULLHOUSE',
+	STRAIGHT:'STRAIGHT',
+	STRAIGHTBOMB:'STRAIGHTBOMB',
+	SQUAREBOMB:'SQUAREBOMB'
 }
 
 var CombinaisonsValidator = {
@@ -45,6 +49,12 @@ var CombinaisonsValidator = {
 			if(this.previous.type != combinaison.type){
 				throw "Combinaison with different type, " + this.previous.type + " asked";
 			}
+            if(this.previous.high >= combinaison.high){
+                throw "Combinaison is to low";
+            }
+            if(this.previous.nb != combinaison.nb){
+                throw "Different number of card"
+            }
 			
 		}
 		cards.forEach(function(c){

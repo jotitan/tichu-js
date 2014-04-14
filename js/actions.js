@@ -43,6 +43,12 @@ var Actions = {
                 SenderManager.annonceGrandTichu();
             }
         },
+        tichu:{
+            name:"Tichu",
+            fct:function(){
+                SenderManager.annonceTichu();
+            }
+        },
         lastCards:{
             name:"Last cards",
             fct:function(){

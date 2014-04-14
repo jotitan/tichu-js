@@ -37,6 +37,10 @@ var Table = {
             }
 
         }
+        // Get the folds
+        data.folds.forEach(function(fold){
+           PlayerManager.playFold(fold);
+        });
         this._dispatchState(data);
     },
     _dispatchState:function(data){
@@ -168,6 +172,7 @@ var Table = {
             showChangedCards:function(fromLeft,fromPartner,fromRight){
                 this.boxes.forEach(function(b){
                     b.card.card.setStatus(STATUS_CARD.NO_STATUS_CARD);
+                    PlayerManager.getPlayerUser().playCard(b.card.card);
                 });
                 fromLeft.drawing.setDirectCoordinates(this.boxes[0].x+5,this.boxes[0].y+5);
                 fromPartner.drawing.setDirectCoordinates(this.boxes[1].x+5,this.boxes[1].y+5);

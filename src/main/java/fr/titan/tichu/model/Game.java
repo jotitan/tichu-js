@@ -1,9 +1,11 @@
 package fr.titan.tichu.model;
 
+import com.google.common.collect.Lists;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.GameWS;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -29,7 +31,8 @@ public class Game {
     /* Card requested after mahjong card */
     private Integer mahjongValue = null;
 
-    private Fold lastFold;
+
+    private LinkedList<Fold> folds = Lists.newLinkedList();
     private List<Card> cardOfFolds = new ArrayList<Card>();
     /* Wait this player to play */
     private Player currentPlayer = null;
@@ -67,7 +70,7 @@ public class Game {
         this.currentPlayer = this.lastPlayer;
         this.lastPlayer = null;
         this.cardOfFolds = new ArrayList<Card>();
-        this.lastFold = null;
+        this.folds = Lists.newLinkedList();
     }
 
     /* Init the game for the round */
@@ -198,7 +201,7 @@ public class Game {
     /* Change the return to explain problem */
     public boolean verifyFold(Fold fold, Player player) {
         // Verify if the mahjongValue contract is respected
-        if (this.lastFold == null) {
+        if (this.folds.isEmpty()) {
             if (this.mahjongValue == null) {
                 return true;
             }
@@ -208,25 +211,27 @@ public class Game {
                 return isMajhongPresent(fold);
             }
         } else {
+            Fold last = this.folds.getLast();
             if (this.mahjongValue != null
-                    && player.canPlayMahjongValue(this.mahjongValue, lastFold.getType(), lastFold.getCards().size(), lastFold.getHigh())
+                    && player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getCards().size(), last.getHigh())
                     && !isMajhongPresent(fold)) {
                 return false;
             }
-            return this.lastFold.getType().equals(fold.getType()) && this.lastFold.getHigh() < fold.getHigh();
+
+            return last.getType().equals(fold.getType()) && last.getHigh() < fold.getHigh() && last.getNb() == fold.getNb();
         }
     }
 
     public boolean verifyBomb(Fold bomb) {
-        if (this.lastFold == null || !this.lastFold.isBomb()) {
+        if (this.folds.isEmpty() || !this.folds.getLast().isBomb()) {
             return true;
         }
         /* Straight bomb higher than square bomb */
-        if (bomb.getType().equals(FoldType.STRAIGHTBOMB) && this.lastFold.getType().equals(FoldType.SQUAREBOMB)) {
+        if (bomb.getType().equals(FoldType.STRAIGHTBOMB) && this.folds.getLast().getType().equals(FoldType.SQUAREBOMB)) {
             return true;
         }
         /* Higher if bomb is same type and higher combinaison. Otherwise, if bomb is square and the last straight, not good */
-        return bomb.getType().equals(this.lastFold.getType()) && bomb.getHigh() > this.lastFold.getHigh();
+        return bomb.getType().equals(this.folds.getLast().getType()) && bomb.getHigh() > this.folds.getLast().getHigh();
     }
 
     /* Play the fold */
@@ -234,7 +239,8 @@ public class Game {
         this.lastPlayer = player;
         List<Card> cards = cardPackage.getCards(fold.getCards());
         this.cardOfFolds.addAll(cards);
-        this.lastFold = fold;
+        this.folds.addLast(fold);
+
         // Check if mahjong contract is ok
         if (this.mahjongValue != null) {
             if (isMajhongPresent(cards)) {
@@ -297,11 +303,7 @@ public class Game {
     }
 
     public Fold getLastFold() {
-        return lastFold;
-    }
-
-    public void setLastFold(Fold lastFold) {
-        this.lastFold = lastFold;
+        return folds.isEmpty() ? null : folds.getLast();
     }
 
     public List<Card> getCardOfFolds() {
@@ -339,5 +341,9 @@ public class Game {
             game.addPlayer(player.getPlayerWS());
         }
         return game;
+    }
+
+    public List<Fold> getFolds() {
+        return folds;
     }
 }

@@ -87,7 +87,8 @@ function Player(orientation,name,visible){
 		    if(fold.mahjongValue!=null){
 		        alert("Want a " + fold.mahjongValue);
 		    }
-			Plateau.playFold(fold.cards);
+            var cards = fold.cards.map(function(c){return CardManager.get(c.value, c.color)});
+			Plateau.playFold(cards,this);
 		}catch(impossible){
 			alert("Impossible combinaison");
 		}
@@ -232,5 +233,9 @@ var PlayerManager = {
     },
     winTurn:function(player){
         alert("Player " + player + " win the round first");
+    },
+    playFold:function(fold){
+        var player = this.getByOrientation(fold.player);
+        player.playFold(fold);
     }
 }

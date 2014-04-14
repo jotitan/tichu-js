@@ -58,30 +58,35 @@ public class TichuWebSocket implements TichuClientCommunication {
     }
 
     /**
-     * 
+     *
      * @param type
      *            Type of response (new player...)
      * @param object
      *            Object with data
      */
     public void send(ResponseType type, Object object) {
-        logger.info("Response " + type);
-        if (this.basic != null && player != null && player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
-            return;
-        }
-        ObjectMapper om = new ObjectMapper();
-        ByteArrayOutputStream tab = new ByteArrayOutputStream();
-        try {
-            om.writer().writeValue(tab, new ResponseWS(type, object));
-            this.basic.sendText(new String(tab.toByteArray()));
-        } catch (IOException ioex) {
-            System.out.println(ioex);
+        synchronized (this){
+            logger.info("Response " + type + "(" + this.player.getName() + ")");
+            if (this.basic != null && player != null && player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
+                return;
+            }
+
+            ObjectMapper om = new ObjectMapper();
+            ByteArrayOutputStream tab = new ByteArrayOutputStream();
+            try {
+                om.writer().writeValue(tab, new ResponseWS(type, object));
+                this.basic.sendText(new String(tab.toByteArray()));
+            } catch (IOException ioex) {
+                System.out.println(ioex);
+            }  catch(Exception e){
+                System.out.println(e);
+            }
         }
     }
 
     /**
      * Can receive annonce (tichu, grand tichu), fold
-     * 
+     *
      * @param message
      * @param session
      */
@@ -94,12 +99,14 @@ public class TichuWebSocket implements TichuClientCommunication {
     @OnClose
     public void close(Session session, CloseReason closeReason) {
         // Have to pause the game
-        logger.info("CLOSE");
-        this.basic = null;
-        if (this.player != null) {
-            this.player.setPlayerStatus(PlayerStatus.DISCONNECTED);
-            this.player.setClientCommunication(null);
-            messageService.playerDisconnect(this.player);
+        logger.info("CLOSE " + this.player.getName());
+        synchronized (this){
+            this.basic = null;
+            if (this.player != null) {
+                this.player.setPlayerStatus(PlayerStatus.DISCONNECTED);
+                this.player.setClientCommunication(null);
+                messageService.playerDisconnect(this.player);
+            }
         }
 
     }

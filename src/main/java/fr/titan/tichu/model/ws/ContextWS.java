@@ -14,6 +14,8 @@ public class ContextWS {
     private boolean gameBegin;
     private List<CardWS> cards = Lists.newArrayList();
 
+    private List<Fold> folds = Lists.newArrayList();
+
     private ResponseType type; // Dernier evenement ?
 
     public List<PlayerWS> getPlayers() {
@@ -70,5 +72,13 @@ public class ContextWS {
 
     public void setType(ResponseType type) {
         this.type = type;
+    }
+
+    public List<Fold> getFolds() {
+        return folds;
+    }
+
+    public void setFolds(List<Fold> folds) {
+        this.folds = folds;
     }
 }

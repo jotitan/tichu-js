@@ -58,6 +58,7 @@ public class GameService {
      */
     public ContextWS getContextGame(Player player) {
         ContextWS context = new ContextWS();
+        context.setFolds(player.getGame().getFolds());
         for (Player p : player.getGame().getPlayers()) {
             PlayerWS playerWS = p.getPlayerWS();
             playerWS.setNbCard(p.getNbcard() > 0 ? p.isDistributeAllCards() ? 14 : 9 : 0);

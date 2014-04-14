@@ -15,8 +15,10 @@ public class Fold {
     private List<CardWS> cards = new ArrayList<CardWS>();
     private FoldType type;
     private int high;
+    private int nb;
     // Value user want after mahjong
     private Integer mahjongValue;
+    private Integer jokerValue;
     private Player.Orientation player;
 
     public Fold() {
@@ -74,6 +76,22 @@ public class Fold {
 
     public void setMahjongValue(Integer mahjongValue) {
         this.mahjongValue = mahjongValue;
+    }
+
+    public int getNb() {
+        return nb;
+    }
+
+    public void setNb(int nb) {
+        this.nb = nb;
+    }
+
+    public Integer getJokerValue() {
+        return jokerValue;
+    }
+
+    public void setJokerValue(Integer jokerValue) {
+        this.jokerValue = jokerValue;
     }
 
     @Override

@@ -251,14 +251,17 @@ var Plateau = {
 	folds:[],	// List of folds on table
 	playFold:function(cards,player){
 		// If the brower player play, remove the cards of his hand, otherwise, remove hide cards
-		if(player.equals)
 		cards.forEach(function(c,i){
 			c.setStatus(STATUS_CARD.TABLE_CARD);
 			c.drawing.recto = false;
 			c.drawing.checked = false;
 			c.drawing.setOrientation("C",i,this.folds.length);
 			c.drawing.deep = this.folds.length;
-			player.playCard(c);
+            if(player.equals(PlayerManager.getPlayerUser())){
+			    player.playCard(c);
+            }   else{
+                player.removeEmptyCards(1);
+            }
 		},this);
 		
 		this.folds.push(cards);
