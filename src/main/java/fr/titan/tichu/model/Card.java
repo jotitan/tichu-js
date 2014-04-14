@@ -33,7 +33,11 @@ public abstract class Card {
     public abstract int getValue();
 
     public boolean isPhoenix() {
-        return false;
+        return cardType.equals(CardType.PHOENIX);
+    }
+
+    public boolean isDog() {
+        return cardType.equals(CardType.DOGS);
     }
 
 }

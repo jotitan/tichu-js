@@ -16,11 +16,6 @@ public class SpecialCard extends Card {
         this.code = code;
     }
 
-    public SpecialCard(CardType cardType, int code, int score, boolean isPhoenix) {
-        this(cardType, code, score);
-        this.isPhoenix = isPhoenix;
-    }
-
     public int getValue() {
         return code;
     }
@@ -32,7 +27,7 @@ public class SpecialCard extends Card {
     enum SpecialCardFactory {
         Phoenix {
             Card get() {
-                return new SpecialCard(CardType.PHOENIX, 16, -25, true);
+                return new SpecialCard(CardType.PHOENIX, 16, -25);
             }
         },
         Dogs {
@@ -52,11 +47,6 @@ public class SpecialCard extends Card {
         };
 
         abstract Card get();
-    }
-
-    @Override
-    public boolean isPhoenix() {
-        return isPhoenix;
     }
 
     @Override

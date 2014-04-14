@@ -31,9 +31,9 @@ public class Game {
     /* Card requested after mahjong card */
     private Integer mahjongValue = null;
 
-
     private LinkedList<Fold> folds = Lists.newLinkedList();
-    private List<Card> cardOfFolds = new ArrayList<Card>();
+    private List<Card> cardOfFolds = Lists.newArrayList();
+    private List<Card> lastFold = Lists.newArrayList();
     /* Wait this player to play */
     private Player currentPlayer = null;
 
@@ -69,7 +69,8 @@ public class Game {
         }
         this.currentPlayer = this.lastPlayer;
         this.lastPlayer = null;
-        this.cardOfFolds = new ArrayList<Card>();
+        this.cardOfFolds = Lists.newArrayList();
+        this.lastFold = Lists.newArrayList();
         this.folds = Lists.newLinkedList();
     }
 
@@ -181,8 +182,13 @@ public class Game {
         return true;
     }
 
-    private boolean isMajhongPresent(Fold fold) {
-        return isMajhongPresent(cardPackage.getCards(fold.getCards()));
+    private boolean isDogPresent(List<Card> cards) {
+        for (Card card : cards) {
+            if (card.isDog()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isMajhongPresent(List<Card> cards) {
@@ -208,13 +214,16 @@ public class Game {
             if (!player.hasCard(this.mahjongValue)) {
                 return true;
             } else {
-                return isMajhongPresent(fold);
+                return false; // no cards
             }
         } else {
+            List<Card> cards = cardPackage.getCards(fold.getCards());
+            if (isDogPresent(cards) && cards.size() != 1) {
+                return false;
+            }
             Fold last = this.folds.getLast();
-            if (this.mahjongValue != null
-                    && player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getCards().size(), last.getHigh())
-                    && !isMajhongPresent(fold)) {
+            if (this.mahjongValue != null && player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getCards().size(), last.getHigh())
+                    && !isMajhongPresent(cards)) {
                 return false;
             }
 
@@ -237,13 +246,14 @@ public class Game {
     /* Play the fold */
     public void playFold(Player player, Fold fold) {
         this.lastPlayer = player;
-        List<Card> cards = cardPackage.getCards(fold.getCards());
-        this.cardOfFolds.addAll(cards);
+        this.lastFold = cardPackage.getCards(fold.getCards());
+        this.cardOfFolds.addAll(lastFold);
+
         this.folds.addLast(fold);
 
         // Check if mahjong contract is ok
         if (this.mahjongValue != null) {
-            if (isMajhongPresent(cards)) {
+            if (isMajhongPresent(this.lastFold)) {
                 this.mahjongValue = null;
             }
         }
@@ -253,8 +263,15 @@ public class Game {
         return this.lastPlayer != null && this.lastPlayer.equals(this.currentPlayer);
     }
 
-    /* Define the next player */
     public void nextPlayer() throws Exception {
+        if (this.currentPlayer != null && isDogPresent(this.lastFold)) {
+            this.currentPlayer = this.players.get(this.currentPlayer.getOrientation().getLeft().getPos());
+        }
+        searchNextPlayer();
+    }
+
+    /* Define the next player */
+    private void searchNextPlayer() throws Exception {
         if (this.orderEndRound >= 2) {
             throw new Exception("End of game");
         }
@@ -265,7 +282,7 @@ public class Game {
             Player.Orientation or = this.currentPlayer.getOrientation().getNext();
             this.currentPlayer = this.players.get(or.getPos());
             if (this.currentPlayer.ended()) {
-                nextPlayer();
+                searchNextPlayer();
             }
         }
     }

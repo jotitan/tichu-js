@@ -9,11 +9,21 @@ var Chat = {
         this.div = $('#idChatDiv');
         $('#idMessage').bind('keydown',function(e){
             if(e.keyCode == 13){
-                Chat.send($(this).val());
-                Chat._showMessage({name:'Me'},$(this).val());
+                var message = $(this).val();
+                if(ActionParser.check(message)){
+                    Chat.send(message);
+                    Chat._showMessage({name:'Me'},message);
+                }  else{
+                    ActionParser.parse(message);
+                }
                 $(this).val('');
             }
-        })
+        });
+        $('#idMessage').bind('keyup',function(e){
+            if(ActionParser.checkAutocomplete($(this).val())){
+                console.log("open");
+            }
+        });
     },
     connect:function(token){
         this.token = token;
@@ -31,11 +41,27 @@ var Chat = {
             Chat.connect(Chat.token);
         }
     },
-    _showMessage:function(player,message){
-        Chat.div.append(player.name + " : " + message);
+    _showMessage:function(player,message,color){
+        color = color || 'black';
+        Chat.div.append('<span style="color:' + color + '">' + player.name + " : " + unescape(message) + '</span><br/>');
     },
     send:function(message){
         if(this.chatWS == null){return;}
-        this.chatWS.send(message);
+        this.chatWS.send(escape(message));
+    }
+}
+
+var ActionParser = {
+    call:new RegExp(/\/call$/),
+    checkAutocomplete:function(message){
+        return message.length == 1 && message == "/";
+    },
+    check:function(message){
+        return message.indexOf('/') == -1;
+    },
+    parse:function(message){
+        if(this.call.test(message)){
+            Chat._showMessage({name:'INFO'},'You call the game','blue');
+        }
     }
 }
