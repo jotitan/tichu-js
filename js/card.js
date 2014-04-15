@@ -82,7 +82,7 @@ function PhoenixCard(){
 	this.replaceValue == null;
 
 	this.getValue = function(){
-		return this.replaceValue || this.value;
+        return this.replaceValue || this.value;
 	}
 	this.isPhoenix = function(){
 		return true;

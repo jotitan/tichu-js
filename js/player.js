@@ -7,7 +7,7 @@ function Player(orientation,name,visible){
 	this.folds = [];	// List of cards wins
 	this.visible = visible || false;
 	this.name = name;
-    this.connect = false;   // Player connected
+    this.connected = false;   // Player connected
     this.select = false;    // Current player
     this.served = false;    // Player has all cards (14)
 
@@ -43,8 +43,9 @@ function Player(orientation,name,visible){
     }
 
     /* @param user : if true, the player go the south */
+    /* @param user : if true, the player go the south */
     this.connect = function(user){
-        this.connect = true;
+        this.connected = true;
         if(user){
             PlayerManager.updateOrientation(this);
         }
@@ -60,8 +61,8 @@ function Player(orientation,name,visible){
     /* @param fullSort : init also the orientation */
 	this.sortCards = function(fullSort){
 		this.cards.sort(function(c1,c2){
-			if(c1.value != c2.value){
-				return c1.value - c2.value;
+			if(c1.getValue() != c2.getValue()){
+				return c1.getValue() - c2.getValue();
 			}
 			return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
 		});
@@ -87,8 +88,14 @@ function Player(orientation,name,visible){
 		    if(fold.mahjongValue!=null){
 		        alert("Want a " + fold.mahjongValue);
 		    }
-            var cards = fold.cards.map(function(c){return CardManager.get(c.value, c.color)});
-			Plateau.playFold(cards,this);
+            var cards = fold.cards.map(function(c){
+                var card = CardManager.get(c.value, c.color);
+                if(card.isPhoenix){
+                    card.replaceValue = fold.jokerValue;
+                }
+                return card;
+            });
+            Plateau.playFold(cards,this);
 		}catch(impossible){
 			alert("Impossible combinaison");
 		}
