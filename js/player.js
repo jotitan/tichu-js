@@ -10,6 +10,7 @@ function Player(orientation,name,visible){
     this.connected = false;   // Player connected
     this.select = false;    // Current player
     this.served = false;    // Player has all cards (14)
+    this.bombs = [];    // List of available bomb
 
     this.equals = function(player){
         if(player == null){
@@ -43,7 +44,6 @@ function Player(orientation,name,visible){
     }
 
     /* @param user : if true, the player go the south */
-    /* @param user : if true, the player go the south */
     this.connect = function(user){
         this.connected = true;
         if(user){
@@ -57,15 +57,14 @@ function Player(orientation,name,visible){
         this.drawing.changeOrientation(orientationTable);
     }
 
+    this.detectBombs = function(){
+        this.bombs = BombDetector.detect(this.cards);
+    }
+
 	/* Sort by number and color */
     /* @param fullSort : init also the orientation */
 	this.sortCards = function(fullSort){
-		this.cards.sort(function(c1,c2){
-			if(c1.getValue() != c2.getValue()){
-				return c1.getValue() - c2.getValue();
-			}
-			return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
-		});
+		Sorter.cards(this.cards);
 		this.cards.forEach(function(c,i){
 			if(fullSort){
                 c.drawing.setOrientation(this.orientationTable,i);
@@ -244,5 +243,8 @@ var PlayerManager = {
     playFold:function(fold){
         var player = this.getByOrientation(fold.player);
         player.playFold(fold);
+    },
+    playBomb:function(bomb){
+        var player = this.getByOrientation(fold.player);
     }
 }

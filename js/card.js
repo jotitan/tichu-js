@@ -224,8 +224,8 @@ var CardManager = {
 			if(c1.drawing.deep!=c2.drawing.deep){
 				return c1.drawing.deep - c2.drawing.deep;
 			}
-			if(c1.value != c2.value){
-				return c1.value - c2.value;
+			if(c1.getValue() != c2.getValue()){
+				return c1.getValue() - c2.getValue();
 			}
 			return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
 		});
@@ -250,6 +250,13 @@ var Plateau = {
 	turn:0,		// Turn of game
 	folds:[],	// List of folds on table
 	playFold:function(cards,player){
+	    Sorter.cards(cards);
+	    cards.sort(function(c1,c2){
+            if(c1.getValue() != c2.getValue()){
+                return c1.getValue() - c2.getValue();
+            }
+            return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
+        });
 		// If the brower player play, remove the cards of his hand, otherwise, remove hide cards
 		cards.forEach(function(c,i){
 			c.setStatus(STATUS_CARD.TABLE_CARD);
@@ -273,5 +280,23 @@ var Plateau = {
 	checkCombinaison:function(cards){
 		
 	}
+}
 
+function Bomb(cards,type){
+    this.cards = cards;
+    this.type = type;
+    this.high = cards[0].value;
+    this.nb = cards.length;
+}
+
+
+var Sorter = {
+    cards:function(cards){
+        cards.sort(function(c1,c2){
+            if(c1.getValue() != c2.getValue()){
+                return c1.getValue() - c2.getValue();
+            }
+            return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
+        });
+    }
 }

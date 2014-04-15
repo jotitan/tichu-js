@@ -5,6 +5,9 @@ var Actions = {
 	init:function(){
 	    this.div = $('#actions');
 	},
+	createBombAction:function(bomb){
+	    var title = "Bomb " + bomb.type;
+	},
 	build:function(){
 	  var actions = [];
         for(var i in arguments){

@@ -226,3 +226,58 @@ var CombinaisonsValidator = {
 	}
 
 }
+
+var BombDetector = {
+    /** @return : list of bomb */
+    detect:function(cards){
+        var bombs = this._detectStraight(cards);
+        this._detectSquares(cards).forEach(function(bomb){
+           bombs.push(bomb);
+        });
+        return bombs;
+    },
+    _detectStraight:function(cards){
+        var bombs = [];
+        var color = cards[0].color;
+        var value = cards[0].value;
+        var tempCards = [];
+        var nb = 1;
+        for(var i = 1 ; i < cards.length ; i++){
+            if(color!=cards[i].color || value = cards[i].value){
+                if(nb>=5){  // Got a bomb
+                    bombs.push(new Bomb(tempCards,CombinaisonType.STRAIGHTBOMB));
+                }
+                nb = 0;
+                tempCards = [];
+            }
+            color = cards[i].color;
+            value = cards[i].value;
+            tempCards.push(cards[i]);
+            nb++;
+        }
+        if(nb>=5){  // Got a bomb
+            bombs.push(new Bomb(tempCards,CombinaisonType.STRAIGHTBOMB));
+        }
+        return bombs;
+    },
+    _detectSquares:function(cards){
+        var bombs = [];
+        var tempCards = [];
+        var previous = null;
+        var nb = 0;
+        cards.forEach(function(card){
+            if(previous == null || card.value == previous){
+                nb++;
+                tempCards.push(card);
+            }else{
+                nb = 0;
+                tempCards = [];
+            }
+            previous = card.value;
+            if(nb == 4){
+                bombs.push(new Bomb(tempCards,CombinaisonType.SQUAREBOMB));
+            }
+        });
+        return bombs;
+    }
+}

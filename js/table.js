@@ -69,6 +69,7 @@ var Table = {
         PlayerManager.getPlayerUser().giveCard(cp);
         PlayerManager.getPlayerUser().giveCard(cr);
         this.behaviours.changeMode.showChangedCards(cl,cp,cr);
+        PlayerManager.getPlayerUser().detectBombs();
         this.resetTurn();
     },
     notifyPlayerSeeCards:function(player){
@@ -287,6 +288,12 @@ var Table = {
                     Actions.build('call');
                 }
             },
+            playBomb:function(bomb){
+                var bombCombinaison = new Combinaison(bomb.type,bomb.high,bomb.nb);
+                bombCombinaison.cards = bomb.cards;
+
+                SenderManager.playBomb(bombCombinaison);
+            }
             playFold:function(){
                 var cards = this.cards.map(function(c){return c.card;});
 

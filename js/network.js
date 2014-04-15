@@ -105,6 +105,9 @@ var SenderManager = {
     sendCards:function(fold){
         this._send('FOLD',fold);
     },
+    playBomb:function(fold){
+        this._send('BOMB',fold);
+    },
     callGame:function(){
         this._send('CALL','')
     },
@@ -138,6 +141,7 @@ var SenderManager = {
             case "GAME_MODE":break;
             case "NOT_YOUR_TURN":alert("Not your turn, stop it");break;
             case "FOLD_PLAYED":PlayerManager.playFold(data.object);break;
+            case "BOMB_PLAYED":PlayerManager.playBomb(data.object);break;
             case "CALL_PLAYED":console.log("CALL");break;
             case "NO_CALL_WHEN_FIRST":alert("Have to play a card");break;
             case "BAD_FOLD":alert("Bad fold");Table.cancelLastFold();break;
@@ -154,6 +158,4 @@ var SenderManager = {
 
 BOMB_PLAYED
 
-
-GAME_WIN
 */
