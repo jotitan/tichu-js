@@ -31,17 +31,28 @@ var CombinaisonType = {
 
 var CombinaisonsValidator = {
 	previous:null,
+    combinaisons:[],
 	resetTurn:function(){
 		this.previous = null;
+        this.combinaisons = [];
 	},
 	addFold:function(fold){
+        this.combinaisons.push(fold);
 	    this.previous = fold;
 	},
 	removeLast:function(){
-
+        if(this.combinaisons.length == 0){return;}
+        this.combinaisons.splice(this.combinaisons.length-1,1);
+        if(this.combinaisons.length>0){
+            this.previous = this.combinaisons[this.combinaisons.length-1];
+        }
+        else{
+            this.previous = null;
+        }
 	},
 	check:function(cards){
 		var combinaison = this.detect(cards);
+        console.log(combinaison)
 		if(combinaison == null){
 			throw "Unknown combinaison";
 		}
@@ -50,7 +61,7 @@ var CombinaisonsValidator = {
 				throw "Combinaison with different type, " + this.previous.type + " asked";
 			}
             if(this.previous.high >= combinaison.high){
-                throw "Combinaison is to low";
+                throw "Combinaison is too low";
             }
             if(this.previous.nb != combinaison.nb){
                 throw "Different number of card"
@@ -60,7 +71,8 @@ var CombinaisonsValidator = {
 		cards.forEach(function(c){
 		   combinaison.cards.push({value:c.value,color:c.color});
 		});
-		this.previous = combinaison;
+		//this.previous = combinaison;
+        //this.combinaisons.push(combinaison);
 		return combinaison;
 	},
 	detect:function(cards){
@@ -79,9 +91,9 @@ var CombinaisonsValidator = {
 		if(cards.length == 1){
 			var value = cards[0].getValue();
 			if(cards[0].isPhoenix()){
-				value = this.previous != null && this.previous.high!=17 ? this.previous.high + 0.5 : 1.5;				
+				value = this.previous != null && this.previous.high!=17 ? this.previous.high + 0.5 : 1.5;
 			}
-			return new Combinaison(CombinaisonType.SINGLE,value);
+			return new Combinaison(CombinaisonType.SINGLE,value,1,value);
 		}
 		if(cards.length == 2){
 			return this._checkSame(cards,CombinaisonType.PAIR,ctx);
@@ -243,7 +255,7 @@ var BombDetector = {
         var tempCards = [];
         var nb = 1;
         for(var i = 1 ; i < cards.length ; i++){
-            if(color!=cards[i].color || value = cards[i].value){
+            if(color!=cards[i].color || value == cards[i].value){
                 if(nb>=5){  // Got a bomb
                     bombs.push(new Bomb(tempCards,CombinaisonType.STRAIGHTBOMB));
                 }
@@ -267,12 +279,13 @@ var BombDetector = {
         var nb = 0;
         cards.forEach(function(card){
             if(previous == null || card.value == previous){
-                nb++;
-                tempCards.push(card);
+
             }else{
                 nb = 0;
                 tempCards = [];
             }
+            nb++;
+            tempCards.push(card);
             previous = card.value;
             if(nb == 4){
                 bombs.push(new Bomb(tempCards,CombinaisonType.SQUAREBOMB));

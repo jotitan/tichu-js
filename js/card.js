@@ -146,10 +146,10 @@ function DrawingCard(x,y,card){
 		this.orientation = orientation;
 		switch(orientation){
 			case "C" : this.x = 150 + nb*5;this.y = 80 + nb*15;break;
-			case "N" : this.x = ComponentManager.variables.width-140;this.y = 80;break;
-			case "S" : this.x = 140;this.y = ComponentManager.variables.height-80;break;
-			case "O" : this.x = 80;this.y = 140;break;
-			case "E" : this.x = ComponentManager.variables.width-80;this.y = ComponentManager.variables.height-140;break;
+			case "N" : this.x = ComponentManager.variables.width-140;this.y = this.height+10;break;
+			case "S" : this.x = 140;this.y = ComponentManager.variables.height-this.height-10;break;
+			case "O" : this.x = this.height+10;this.y = 140;break;
+			case "E" : this.x = ComponentManager.variables.width-this.height-10;this.y = ComponentManager.variables.height-140;break;
 		}
 		this.setPosition(pos);
 	}
@@ -248,7 +248,7 @@ var CardManager = {
 /* Manage cards actually played */
 var Plateau = {
 	turn:0,		// Turn of game
-	folds:[],	// List of folds on table
+	folds:[],	// List of folds on table, fold contains many cards
 	playFold:function(cards,player){
 	    Sorter.cards(cards);
 	    cards.sort(function(c1,c2){
@@ -270,12 +270,20 @@ var Plateau = {
                 player.removeEmptyCards(1);
             }
 		},this);
-		
+
 		this.folds.push(cards);
 		// Reorganize cards
 		player.sortCards();
 		CardManager.sortCards();
 	},
+    resetTurn:function(){
+        this.folds.forEach(function(fold){
+            fold.forEach(function(card){
+                card.setStatus(STATUS_CARD.PLAYED_CARD);
+            });
+        });
+        this.folds = [];
+    },
 	/* Check that combinaison is correct */
 	checkCombinaison:function(cards){
 		

@@ -31,8 +31,11 @@ public class Game {
     /* Card requested after mahjong card */
     private Integer mahjongValue = null;
 
+    /* List of fold on the table (composing a round) */
     private LinkedList<Fold> folds = Lists.newLinkedList();
+    /* Cards on table */
     private List<Card> cardOfFolds = Lists.newArrayList();
+    /* Previous played fold on table */
     private List<Card> lastFold = Lists.newArrayList();
     /* Wait this player to play */
     private Player currentPlayer = null;
@@ -182,6 +185,10 @@ public class Game {
         return true;
     }
 
+    public boolean isLastIsDog(){
+        return isDogPresent(this.lastFold);
+    }
+
     private boolean isDogPresent(List<Card> cards) {
         for (Card card : cards) {
             if (card.isDog()) {
@@ -207,9 +214,13 @@ public class Game {
     /* Change the return to explain problem */
     public boolean verifyFold(Fold fold, Player player) {
         // Verify if the mahjongValue contract is respected
+        List<Card> cards = cardPackage.getCards(fold.getCards());
         if (this.folds.isEmpty()) {
             if (this.mahjongValue == null) {
                 return true;
+            }
+            if (isDogPresent(cards) && (cards.size() != 1)) {
+                return false;
             }
             if (!player.hasCard(this.mahjongValue)) {
                 return true;
@@ -217,8 +228,8 @@ public class Game {
                 return false; // no cards
             }
         } else {
-            List<Card> cards = cardPackage.getCards(fold.getCards());
-            if (isDogPresent(cards) && cards.size() != 1) {
+            // Can't play dogs when fold are on table
+            if (isDogPresent(cards)) {
                 return false;
             }
             Fold last = this.folds.getLast();
@@ -256,6 +267,9 @@ public class Game {
             if (isMajhongPresent(this.lastFold)) {
                 this.mahjongValue = null;
             }
+        }
+        if(fold.getMahjongValue()!=null){
+            this.mahjongValue = fold.getMahjongValue();
         }
     }
 

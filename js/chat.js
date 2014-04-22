@@ -41,9 +41,14 @@ var Chat = {
             Chat.connect(Chat.token);
         }
     },
+    info:function(message){
+        this._showMessage({name:"INFO"},message,"green");
+    },
     _showMessage:function(player,message,color){
         color = color || 'black';
-        Chat.div.append('<span style="color:' + color + '">' + player.name + " : " + unescape(message) + '</span><br/>');
+        if(this.div){
+            this.div.append('<span style="color:' + color + '">' + player.name + " : " + unescape(message) + '</span><br/>');
+        }
     },
     send:function(message){
         if(this.chatWS == null){return;}

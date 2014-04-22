@@ -144,7 +144,7 @@ var SenderManager = {
             case "BOMB_PLAYED":PlayerManager.playBomb(data.object);break;
             case "CALL_PLAYED":console.log("CALL");break;
             case "NO_CALL_WHEN_FIRST":alert("Have to play a card");break;
-            case "BAD_FOLD":alert("Bad fold");Table.cancelLastFold();break;
+            case "BAD_FOLD":alert("Bad fold");/*Table.cancelLastFold();*/break;
             case "TURN_WIN":PlayerManager.winTurn(data.object);break;
             case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break
             case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break

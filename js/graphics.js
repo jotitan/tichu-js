@@ -131,7 +131,8 @@ function TitleBox(name,orientation){
         canvas.strokeStyle=this.color;
         canvas.lineWidth = this.select ? 5 : 1;
         canvas.strokeRect(0,0,100,50);
-        canvas.font = "14px Arial";
+        canvas.font = (this.select ? "small-caps bold ":"") +  "14px Arial";
+        canvas.fillStyle = this.color;
         var name = this.name + ((this.annonce!=null)?' - ' + this.annonce:'');
         canvas.fillText(name,50 - canvas.measureText(name).width/2,20);
         canvas.restore();

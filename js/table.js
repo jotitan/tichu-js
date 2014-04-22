@@ -31,6 +31,7 @@ var Table = {
                PlayerManager.getPlayerUser().giveCard(CardManager.get(c.value,c.color));
             });
             PlayerManager.getPlayerUser().sortCards();
+            PlayerManager.getPlayerUser().detectBombs();
             if(data.type == "NEXT_PLAYER"){
                 // Player served, reconnect, he can see all his cards
                 PlayerManager.getPlayerUser().served = true;
@@ -105,6 +106,7 @@ var Table = {
     /* Call only for the player who play a bad fold */
     cancelLastFold:function(){
         this.folds.splice(this.folds.length -1,1);
+        CombinaisonsValidator.removeLast();
     },
     /* First part of card (can make grand tichu) */
     distributeFirstPart:function(cards){
@@ -263,6 +265,8 @@ var Table = {
             },
             disable:function(){
                 $('#canvas').unbind('mousedown.play');
+                Actions.empty();
+                this.cards = [];
             },
             _down:function(e){
                 var coords = EventHelper.getPosition(e);
@@ -293,7 +297,7 @@ var Table = {
                 bombCombinaison.cards = bomb.cards;
 
                 SenderManager.playBomb(bombCombinaison);
-            }
+            },
             playFold:function(){
                 var cards = this.cards.map(function(c){return c.card;});
 

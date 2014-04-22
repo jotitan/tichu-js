@@ -289,6 +289,9 @@ public class GameService {
             player.playFold(getCardsFromFold(game, fold));
             if (player.ended()) {
                 player.setEndPosition(game.getAndIncreaseEndPosition());
+                if(game.isLastIsDog()){
+                    broadCast(game, ResponseType.TURN_WIN, null);
+                }
                 if (player.win()) {
                     broadCast(game, ResponseType.TURN_WIN, player.getPlayerWS());
                 } else {

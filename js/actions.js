@@ -5,8 +5,16 @@ var Actions = {
 	init:function(){
 	    this.div = $('#actions');
 	},
-	createBombAction:function(bomb){
-	    var title = "Bomb " + bomb.type;
+	addBombAction:function(bomb){
+	    var title = "Bomb " + bomb.type.substr(0,2);
+        if(bomb.type == CombinaisonType.SQUAREBOMB){
+            title+= " " + bomb.high;
+        }else{
+            title+= " " + bomb.cards[0].value + " - " + bomb.cards[bomb.cards.length -1].value;
+        }
+        var btn = {name:title,fct:function(){
+            alert("click");
+        }};
 	},
 	build:function(){
 	  var actions = [];

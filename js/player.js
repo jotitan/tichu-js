@@ -85,7 +85,7 @@ function Player(orientation,name,visible){
 	this.playFold = function(fold){
 		try{
 		    if(fold.mahjongValue!=null){
-		        alert("Want a " + fold.mahjongValue);
+                Chat.info("A " + fold.mahjongValue + " is needed !")
 		    }
             var cards = fold.cards.map(function(c){
                 var card = CardManager.get(c.value, c.color);
@@ -238,11 +238,16 @@ var PlayerManager = {
         return CardManager.mahjongCard.player;
     },
     winTurn:function(player){
-        alert("Player " + player + " win the round first");
+        if(player){
+            Chat.info("Player " + player.name + " win the turn");
+        }
+        Table.resetTurn();
+        Plateau.resetTurn();
     },
     playFold:function(fold){
         var player = this.getByOrientation(fold.player);
         player.playFold(fold);
+        CombinaisonsValidator.addFold(fold);
     },
     playBomb:function(bomb){
         var player = this.getByOrientation(fold.player);
