@@ -142,10 +142,22 @@ function DrawingCard(x,y,card){
 		default : this.value = card.value;
 	}
 
-	this.setOrientation = function(orientation,pos,nb){		
+/* @param player : When card is played, place card near the player */
+/* @param foldLength : length of a fold to calculate final place */
+	this.setOrientation = function(orientation,pos,player,foldLength){
 		this.orientation = orientation;
 		switch(orientation){
-			case "C" : this.x = 150 + nb*5;this.y = 80 + nb*15;break;
+			case "C" :
+			    // Special case, display near the player
+			    switch(player.orientationTable){
+			        case "N" : this.x = 160;this.y=100;break;
+			        case "S" : this.x = 160;this.y=ComponentManager.variables.height-100;break;
+			        case "O" : this.x = 100;this.y=ComponentManager.variables.height/2;break;
+			        case "E" : this.x = ComponentManager.variables.width-120 - foldLength*5;this.y=ComponentManager.variables.height/2;break;
+			    }
+			    this.x+=5*player.playFoldOnTurn;
+			    this.y+=15*player.playFoldOnTurn;
+                break;
 			case "N" : this.x = ComponentManager.variables.width-140;this.y = this.height+10;break;
 			case "S" : this.x = 140;this.y = ComponentManager.variables.height-this.height-10;break;
 			case "O" : this.x = this.height+10;this.y = 140;break;
@@ -262,7 +274,7 @@ var Plateau = {
 			c.setStatus(STATUS_CARD.TABLE_CARD);
 			c.drawing.recto = false;
 			c.drawing.checked = false;
-			c.drawing.setOrientation("C",i,this.folds.length);
+			c.drawing.setOrientation("C",i,player,cards.length);
 			c.drawing.deep = this.folds.length;
             if(player.equals(PlayerManager.getPlayerUser())){
 			    player.playCard(c);

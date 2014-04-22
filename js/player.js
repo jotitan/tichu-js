@@ -5,6 +5,7 @@ function Player(orientation,name,visible){
 	this.orientationTable = orientation;    // Orientation on the table, user always on the bottom
 	this.cards = [];	// List of cards, sorted
 	this.folds = [];	// List of cards wins
+	this.playFoldOnTurn = 0; // Number of fold played on this turn
 	this.visible = visible || false;
 	this.name = name;
     this.connected = false;   // Player connected
@@ -95,6 +96,7 @@ function Player(orientation,name,visible){
                 return card;
             });
             Plateau.playFold(cards,this);
+            this.playFoldOnTurn++;
 		}catch(impossible){
 			alert("Impossible combinaison");
 		}
@@ -201,11 +203,12 @@ var PlayerManager = {
         }
         this.currentPlayer = this.getByOrientation(player.orientation);
         this.currentPlayer.setSelected(true);
+        if(!this.currentPlayer.served){
+            return;
+        }
         if(this.currentPlayer.equals(this.playerUser)){
             // Show option only if all cards are received
-            if(this.currentPlayer.served){
-                Table.behaviours.gameMode.enable();
-            }
+            Table.behaviours.gameMode.enable();
         }
         else{
             Table.behaviours.gameMode.disable();
@@ -243,6 +246,10 @@ var PlayerManager = {
         }
         Table.resetTurn();
         Plateau.resetTurn();
+        CombinaisonsValidator.resetTurn();
+        this.players.forEach(function(p){
+            p.playFoldOnTurn = 0;
+        })
     },
     playFold:function(fold){
         var player = this.getByOrientation(fold.player);
