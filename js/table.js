@@ -11,6 +11,35 @@ var EventHelper = {
 
 var Table = {
     folds:[],
+    cardFolds:[],
+    turn:0,		// Turn of game
+    doPlayFold:function(cards,player){
+        Sorter.cards(cards);
+        cards.sort(function(c1,c2){
+            if(c1.getValue() != c2.getValue()){
+                return c1.getValue() - c2.getValue();
+            }
+            return c1.color > c2.color ? 1 : c1.color < c2.color ? -1 : 0;
+        });
+        // If the brower player play, remove the cards of his hand, otherwise, remove hide cards
+        cards.forEach(function(c,i){
+            c.setStatus(STATUS_CARD.TABLE_CARD);
+            c.drawing.recto = false;
+            c.drawing.checked = false;
+            c.drawing.setOrientation("C",i,player,cards.length);
+            c.drawing.deep = this.cardFolds.length;
+            if(player.equals(PlayerManager.getPlayerUser())){
+                player.playCard(c);
+            }   else{
+                player.removeEmptyCards(1);
+            }
+        },this);
+
+        this.cardFolds.push(cards);
+        // Reorganize cards
+        player.sortCards();
+        CardManager.sortCards();
+    },
     /* Display the context */
     display:function(data){
         data.players.forEach(function(p){
@@ -82,6 +111,12 @@ var Table = {
     resetTurn:function(){
         CombinaisonsValidator.resetTurn();
         this.folds = [];
+        this.cardFolds.forEach(function(fold){
+            fold.forEach(function(card){
+                card.setStatus(STATUS_CARD.PLAYED_CARD);
+            });
+        });
+        this.cardFolds = [];
     },
     playFold:function(fold){
         var player = PlayerManager.getByOrientation(fold.player);

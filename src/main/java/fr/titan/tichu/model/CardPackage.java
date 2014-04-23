@@ -1,12 +1,10 @@
 package fr.titan.tichu.model;
 
+import com.google.common.collect.Lists;
 import fr.titan.tichu.model.ws.CardWS;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represent un paquet de carte
@@ -75,6 +73,10 @@ public class CardPackage {
             cards.add(getCard(card));
         }
         return cards;
+    }
+
+    public List<Card> getCards(CardWS... cardsWS) {
+        return getCards(Arrays.asList(cardsWS));
     }
 
     public Card getMahjongCard() {

@@ -1,8 +1,10 @@
 /* Manage chez chat between user */
 
+var CHAT_URL = 'ws://localhost:8081/tichu-server/chat';
+
 var Chat = {
     chatWS:null,
-    url:'ws://localhost:8081/tichu-server/chat',
+    url:CHAT_URL,
     token:null,
     div:null,
     init:function(){
@@ -48,6 +50,8 @@ var Chat = {
         color = color || 'black';
         if(this.div){
             this.div.append('<span style="color:' + color + '">' + player.name + " : " + unescape(message) + '</span><br/>');
+        }else{
+            console.log(player.name,unescape(message));
         }
     },
     send:function(message){

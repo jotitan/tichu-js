@@ -95,7 +95,7 @@ function Player(orientation,name,visible){
                 }
                 return card;
             });
-            Plateau.playFold(cards,this);
+            Table.doPlayFold(cards,this);
             this.playFoldOnTurn++;
 		}catch(impossible){
 			alert("Impossible combinaison");
@@ -244,12 +244,14 @@ var PlayerManager = {
         if(player){
             Chat.info("Player " + player.name + " win the turn");
         }
+        this.resetTurn();
+    },
+    resetTurn:function(){
         Table.resetTurn();
-        Plateau.resetTurn();
         CombinaisonsValidator.resetTurn();
         this.players.forEach(function(p){
             p.playFoldOnTurn = 0;
-        })
+        });
     },
     playFold:function(fold){
         var player = this.getByOrientation(fold.player);

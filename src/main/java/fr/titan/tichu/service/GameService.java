@@ -194,6 +194,11 @@ public class GameService {
      */
     private void sendSwapCards(Game game) {
         for (Player player : game.getPlayers()) {
+            ChangeCards cc = player.getChangeCards();
+            List<Card> cards = game.getCardPackage().getCards(cc.getToLeft(), cc.getToPartner(), cc.getToRight());
+            for (Card card : cards) {
+                player.addCard(card);
+            }
             player.getClient().send(ResponseType.NEW_CARDS, player.getChangeCards());
         }
     }
@@ -211,7 +216,6 @@ public class GameService {
         Card card = playerFrom.getGame().getCardPackage().getCard(cardWS);
         Player playerTo = playerFrom.getGame().getPlayer(to);
         playerFrom.giveCard(card);
-        playerTo.addCard(card);
         switch (position) {
         case LEFT:
             playerTo.getChangeCards().setToLeft(cardWS);
@@ -223,14 +227,6 @@ public class GameService {
             playerTo.getChangeCards().setToRight(cardWS);
             break;
         }
-    }
-
-    private List<Card> getCardsFromFold(Game game, Fold fold) {
-        List<Card> cards = new ArrayList<Card>();
-        for (CardWS card : fold.getCards()) {
-            cards.add(game.getCardPackage().getCard(card));
-        }
-        return cards;
     }
 
     /** Play a bomb */
@@ -286,21 +282,22 @@ public class GameService {
 
     private void afterFold(Game game, Player player, Fold fold) {
         if (fold != null) {
-            player.playFold(getCardsFromFold(game, fold));
+            player.playFold(game.getCardPackage().getCards(fold.getCards()));
             if (player.ended()) {
                 player.setEndPosition(game.getAndIncreaseEndPosition());
-                if(game.isLastIsDog()){
-                    broadCast(game, ResponseType.TURN_WIN, null);
-                }
                 if (player.win()) {
-                    broadCast(game, ResponseType.TURN_WIN, player.getPlayerWS());
+                    broadCast(game, ResponseType.ROUND_WIN, player.getPlayerWS());
                 } else {
                     broadCast(game, ResponseType.PLAYER_END_ROUND, player.getPlayerWS());
                 }
             }
+
             if (game.isRoundEnded()) {
                 endRound(game);
                 return;
+            }
+            if (game.isLastIsDog()) {
+                broadCast(game, ResponseType.TURN_WIN, null);
             }
         }
         nextPlayer(game);
