@@ -1,13 +1,15 @@
 package fr.titan.tichu.model;
 
-import com.google.common.collect.Lists;
-import fr.titan.tichu.exception.CheatException;
-import fr.titan.tichu.model.ws.Fold;
-import fr.titan.tichu.model.ws.GameWS;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
+import fr.titan.tichu.Orientation;
+import fr.titan.tichu.exception.CheatException;
+import fr.titan.tichu.model.ws.Fold;
+import fr.titan.tichu.model.ws.GameWS;
 
 /**
  * Respresent a game
@@ -45,7 +47,7 @@ public class Game {
     private Player lastPlayer = null;
 
     public Game() {
-        for (Player.Orientation or : Player.Orientation.values()) {
+        for (Orientation or : Orientation.values()) {
             this.players.add(or.getPos(), new Player(this, or));
         }
         team1 = new Team(this.players.get(0), this.players.get(2));
@@ -314,7 +316,7 @@ public class Game {
             /* First round */
             this.currentPlayer = this.getCardPackage().getMahjongCard().getOwner();
         } else {
-            Player.Orientation or = this.currentPlayer.getOrientation().getNext();
+            Orientation or = this.currentPlayer.getOrientation().getNext();
             this.currentPlayer = this.players.get(or.getPos());
             if (this.currentPlayer.ended()) {
                 searchNextPlayer();
@@ -326,7 +328,7 @@ public class Game {
         return this.players.get(player.getOrientation().getFace().getPos());
     }
 
-    public Player getPlayer(Player.Orientation orientation) {
+    public Player getPlayer(Orientation orientation) {
         return this.players.get(orientation.getPos());
     }
 

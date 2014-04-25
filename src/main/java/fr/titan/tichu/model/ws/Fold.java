@@ -1,12 +1,11 @@
 package fr.titan.tichu.model.ws;
 
-import fr.titan.tichu.model.FoldType;
-import fr.titan.tichu.model.Player;
-import fr.titan.tichu.model.ws.CardWS;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import fr.titan.tichu.Orientation;
+import fr.titan.tichu.model.FoldType;
 
 /**
  * Represent a fold of a player
@@ -19,7 +18,7 @@ public class Fold {
     // Value user want after mahjong
     private Integer mahjongValue;
     private Integer jokerValue;
-    private Player.Orientation player;
+    private Orientation player;
 
     public Fold() {
     }
@@ -62,11 +61,11 @@ public class Fold {
         this.high = high;
     }
 
-    public Player.Orientation getPlayer() {
+    public Orientation getPlayer() {
         return player;
     }
 
-    public void setPlayer(Player.Orientation player) {
+    public void setPlayer(Orientation player) {
         this.player = player;
     }
 

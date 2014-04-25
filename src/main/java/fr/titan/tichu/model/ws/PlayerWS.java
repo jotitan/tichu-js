@@ -1,8 +1,9 @@
 package fr.titan.tichu.model.ws;
 
-import fr.titan.tichu.model.AnnonceType;
-import fr.titan.tichu.model.Player;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import fr.titan.tichu.Orientation;
+import fr.titan.tichu.model.AnnonceType;
 
 /**
  * Simple info about player
@@ -10,7 +11,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class PlayerWS {
     private String name;
-    private Player.Orientation orientation;
+    private Orientation orientation;
     private String token;
     private int nbCard;
     private boolean connected;
@@ -20,12 +21,12 @@ public class PlayerWS {
     public PlayerWS() {
     }
 
-    public PlayerWS(String name, Player.Orientation orientation) {
+    public PlayerWS(String name, Orientation orientation) {
         this.name = name;
         this.orientation = orientation;
     }
 
-    public PlayerWS(String name, Player.Orientation orientation, int orderEnd) {
+    public PlayerWS(String name, Orientation orientation, int orderEnd) {
         this(name, orientation);
         this.orderEnd = orderEnd;
     }
@@ -38,11 +39,11 @@ public class PlayerWS {
         this.name = name;
     }
 
-    public Player.Orientation getOrientation() {
+    public Orientation getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(Player.Orientation orientation) {
+    public void setOrientation(Orientation orientation) {
         this.orientation = orientation;
     }
 

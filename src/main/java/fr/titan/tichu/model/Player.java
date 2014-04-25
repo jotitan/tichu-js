@@ -1,17 +1,17 @@
 package fr.titan.tichu.model;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import fr.titan.tichu.TichuClientCommunication;
-import fr.titan.tichu.model.ws.ChangeCards;
-import fr.titan.tichu.model.ws.Fold;
-import fr.titan.tichu.model.ws.PlayerWS;
-import fr.titan.tichu.ws.ChatWebSocket;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.*;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import fr.titan.tichu.Orientation;
+import fr.titan.tichu.TichuClientCommunication;
+import fr.titan.tichu.model.ws.ChangeCards;
+import fr.titan.tichu.model.ws.PlayerWS;
+import fr.titan.tichu.ws.ChatWebSocket;
 
 /**
  * User: Titan Date: 29/03/14 Time: 11:47
@@ -27,6 +27,7 @@ public class Player {
     private Player partner;
     private Game game;
     private AnnonceType annonce = null;
+
     /* Order of position when end the round */
     private int endPosition = -1;
     private boolean distributeAllCards = false;
@@ -37,57 +38,6 @@ public class Player {
     private ChatWebSocket chatClient;
 
     private boolean reconnect = false;
-
-    public enum Orientation {
-        O(0), N(1), E(2), S(3);
-
-        private Orientation(int pos) {
-            this.pos = pos;
-        }
-
-        private Orientation right;
-        private Orientation left;
-        private Orientation face;
-        private int pos;
-
-        public Orientation getNext() {
-            return getLeft();
-        }
-
-        public Orientation getLeft() {
-            if (left == null) {
-                left = getByIndex((this.getPos() + 1) % 4);
-            }
-            return this.left;
-        }
-
-        public Orientation getRight() {
-            if (right == null) {
-                right = getByIndex((this.getPos() + 3) % 4);
-            }
-            return this.right;
-        }
-
-        public Orientation getFace() {
-            if (face == null) {
-                face = getByIndex((this.getPos() + 2) % 4);
-            }
-            return this.face;
-        }
-
-        private Orientation getByIndex(int index) {
-            for (Orientation or : values()) {
-                if (or.getPos() == index) {
-                    return or;
-                }
-            }
-            return null;
-        }
-
-        public int getPos() {
-            return pos;
-        }
-    }
 
     private void sortCards() {
         Collections.sort(this.cards, new Comparator<Card>() {
@@ -158,6 +108,7 @@ public class Player {
         if (high != null && value <= high && (type.equals(FoldType.SINGLE) || type.equals(FoldType.PAIR) || type.equals(FoldType.BRELAN))) {
             return false;
         }
+        // TODO : bomb case, play when y want
         boolean phoenix = hasPhoenix();
         switch (type) {
         case SINGLE:

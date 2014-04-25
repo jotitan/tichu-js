@@ -1,13 +1,14 @@
 package fr.titan.tichu.service;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
+
+import fr.titan.tichu.Orientation;
 import fr.titan.tichu.exception.CheatException;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ORDER : fold < turn < round < game une main (fold) dans un tour de jeu (turn) au sein d'une partie (round) d'une manche (game) en 1000 points
@@ -213,7 +214,7 @@ public class GameService {
         return true;
     }
 
-    private void giveCardToPlayer(CardWS cardWS, Player playerFrom, Player.Orientation to, Position position) {
+    private void giveCardToPlayer(CardWS cardWS, Player playerFrom, Orientation to, Position position) {
         Card card = playerFrom.getGame().getCardPackage().getCard(cardWS);
         Player playerTo = playerFrom.getGame().getPlayer(to);
         playerFrom.giveCard(card);
@@ -275,6 +276,7 @@ public class GameService {
         // Verifie mahjong
         if (!game.verifyCall(player)) {
             player.getClient().send(ResponseType.BAD_FOLD, "");
+            return;
         }
 
         if (!player.equals(game.getCurrentPlayer())) {
