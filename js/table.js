@@ -295,10 +295,12 @@ var Table = {
         gameMode:{
             cards:[],
             enable:function(){
+                console.log("enable");
                 $('#canvas').bind('mousedown.play',function(e){Table.behaviours.gameMode._down(e);});
-                 Actions.build('call');
+                Actions.build('call');
             },
             disable:function(){
+                console.log("disable");
                 $('#canvas').unbind('mousedown.play');
                 Actions.empty();
                 this.cards = [];

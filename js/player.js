@@ -203,7 +203,7 @@ var PlayerManager = {
         }
         this.currentPlayer = this.getByOrientation(player.orientation);
         this.currentPlayer.setSelected(true);
-        if(!this.currentPlayer.served){
+        if(!this.playerUser.served){
             return;
         }
         if(this.currentPlayer.equals(this.playerUser)){

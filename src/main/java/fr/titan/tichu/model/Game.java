@@ -1,6 +1,7 @@
 package fr.titan.tichu.model;
 
 import com.google.common.collect.Lists;
+import fr.titan.tichu.exception.CheatException;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.GameWS;
 
@@ -185,7 +186,7 @@ public class Game {
         return true;
     }
 
-    public boolean isLastIsDog(){
+    public boolean isLastIsDog() {
         return isDogPresent(this.lastFold);
     }
 
@@ -212,22 +213,28 @@ public class Game {
 
     /* Verify if fold can be play */
     /* Change the return to explain problem */
-    public boolean verifyFold(Fold fold, Player player) {
+    public boolean verifyFold(Fold fold, Player player) throws CheatException {
         // Verify if the mahjongValue contract is respected
         List<Card> cards = cardPackage.getCards(fold.getCards());
         if (this.folds.isEmpty()) {
-            if (this.mahjongValue == null) {
-                return true;
-            }
             if (isDogPresent(cards) && (cards.size() != 1)) {
                 return false;
+            }
+            if (this.mahjongValue == null) {
+                return true;
             }
             if (!player.hasCard(this.mahjongValue)) {
                 return true;
             } else {
-                return false; // no cards
+                return false; // can play mahjong card
             }
         } else {
+            // Verify that card belongs to player
+            for (Card card : cards) {
+                if (card.getOwner() == null || !card.getOwner().equals(player)) {
+                    throw new CheatException("Card " + card.getValue() + " not belong to user");
+                }
+            }
             // Can't play dogs when fold are on table
             if (isDogPresent(cards)) {
                 return false;
@@ -240,6 +247,20 @@ public class Game {
 
             return last.getType().equals(fold.getType()) && last.getHigh() < fold.getHigh() && last.getNb() == fold.getNb();
         }
+    }
+
+    public boolean verifyCall(Player player) {
+        if (this.mahjongValue == null) {
+            return true;
+        }
+
+        if (this.folds.isEmpty()) {
+            // Impossible to call when first
+        } else {
+            Fold last = this.folds.getLast();
+            return !player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getCards().size(), last.getHigh());
+        }
+        return true;
     }
 
     public boolean verifyBomb(Fold bomb) {
@@ -268,7 +289,7 @@ public class Game {
                 this.mahjongValue = null;
             }
         }
-        if(fold.getMahjongValue()!=null){
+        if (fold.getMahjongValue() != null) {
             this.mahjongValue = fold.getMahjongValue();
         }
     }

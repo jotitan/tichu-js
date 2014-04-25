@@ -69,6 +69,9 @@ public class CardPackage {
 
     public List<Card> getCards(List<CardWS> cardsWS) {
         List<Card> cards = new ArrayList<Card>();
+        if (cardsWS == null) {
+            return cards;
+        }
         for (CardWS card : cardsWS) {
             cards.add(getCard(card));
         }

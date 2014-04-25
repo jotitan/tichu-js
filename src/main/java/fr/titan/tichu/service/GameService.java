@@ -1,6 +1,7 @@
 package fr.titan.tichu.service;
 
 import com.google.common.collect.Lists;
+import fr.titan.tichu.exception.CheatException;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.*;
@@ -255,9 +256,13 @@ public class GameService {
             player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
-        if (!game.verifyFold(fold, player)) {
-            player.getClient().send(ResponseType.BAD_FOLD, "");
-            return;
+        try {
+            if (!game.verifyFold(fold, player)) {
+                player.getClient().send(ResponseType.BAD_FOLD, "");
+                return;
+            }
+        } catch (CheatException cheatEx) {
+            broadCast(player.getGame(), ResponseType.CHEATER, player.getPlayerWS());
         }
         game.playFold(player, fold);
         broadCast(game, ResponseType.FOLD_PLAYED, fold);
@@ -267,6 +272,11 @@ public class GameService {
     /* Player doesn't play a fold */
     public void callTurn(Player player) {
         Game game = player.getGame();
+        // Verifie mahjong
+        if (!game.verifyCall(player)) {
+            player.getClient().send(ResponseType.BAD_FOLD, "");
+        }
+
         if (!player.equals(game.getCurrentPlayer())) {
             player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;

@@ -9,6 +9,9 @@ function Combinaison(type,high,nb,jokerValue){
 	this.type = type;
 	this.high = high;
 	this.nb = nb;
+	if(nb == null){
+	    throw "NB can't be null";
+	}
 	this.jokerValue = jokerValue;
 	this.mahjongValue = null;
 	this.cards=[];
@@ -137,7 +140,7 @@ var CombinaisonsValidator = {
 		return cards.every(function(c){
 			if(c.value == value){return true;}
 			if(ctx.joker){ctx.joker = false;ctx.card.replaceValue=value;return true;}
-		}) ? new Combinaison(type,value,null,ctx.card!=null?ctx.card.replaceValue:null) : null;		
+		}) ? new Combinaison(type,value,cards.length,ctx.card!=null?ctx.card.replaceValue:null) : null;
 	},
 	_checkBombs:function(cards){
 		if(cards.length == 4){
@@ -205,7 +208,7 @@ var CombinaisonsValidator = {
 					case 3 : ctx.card.replaceValue = values[1].value;high = values[0].value;break;
 				}
 			}
-			return new Combinaison(CombinaisonType.FULLHOUSE,high,null,ctx.card!=null?ctx.card.replaceValue:null) ;
+			return new Combinaison(CombinaisonType.FULLHOUSE,high,5,ctx.card!=null?ctx.card.replaceValue:null) ;
 		}
 		return null;
 	},
