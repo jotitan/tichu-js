@@ -13,10 +13,16 @@ import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.PlayerWS;
 import fr.titan.tichu.ws.ChatWebSocket;
 
+import java.beans.Transient;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.util.*;
+
 /**
  * User: Titan Date: 29/03/14 Time: 11:47
  */
-public class Player {
+public class Player implements Serializable{
     private String name;
     private String token; // To verify identity
     private Orientation orientation;
@@ -25,6 +31,7 @@ public class Player {
     private ChangeCards changeCards = new ChangeCards();
     private PlayerStatus playerStatus = PlayerStatus.FREE_CHAIR;
     private Player partner;
+
     private Game game;
     private AnnonceType annonce = null;
 

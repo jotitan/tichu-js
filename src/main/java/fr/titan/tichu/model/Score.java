@@ -1,9 +1,11 @@
 package fr.titan.tichu.model;
 
+import java.io.Serializable;
+
 /**
  * Historic of score
  */
-public class Score {
+public class Score implements Serializable {
     private AnnonceType annonce;
     private boolean win;
     private boolean capot;

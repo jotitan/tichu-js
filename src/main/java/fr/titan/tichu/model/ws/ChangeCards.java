@@ -2,10 +2,12 @@ package fr.titan.tichu.model.ws;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import java.io.Serializable;
+
 /**
 *
  */
-public class ChangeCards {
+public class ChangeCards implements Serializable{
     private CardWS toLeft;
     private CardWS toRight;
     private CardWS toPartner;

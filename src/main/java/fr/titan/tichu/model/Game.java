@@ -1,5 +1,10 @@
 package fr.titan.tichu.model;
 
+import com.google.common.collect.Lists;
+import fr.titan.tichu.model.ws.Fold;
+import fr.titan.tichu.model.ws.GameWS;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +20,7 @@ import fr.titan.tichu.model.ws.GameWS;
  * Respresent a game
  */
 
-public class Game {
+public class Game implements Serializable {
     /* Name of the game */
     private String game;
     /* Password to access the game */

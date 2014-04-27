@@ -4,12 +4,13 @@ import com.google.common.collect.Lists;
 import fr.titan.tichu.model.ws.CardWS;
 
 import javax.swing.*;
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Represent un paquet de carte
  */
-public class CardPackage {
+public class CardPackage implements Serializable{
     private List<Card> cards;
     private Map<String, Card> indexCards = new HashMap<String, Card>();
     private Card mahjongCard;

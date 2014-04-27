@@ -2,12 +2,13 @@ package fr.titan.tichu.model;
 
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  */
-public class Team {
+public class Team implements Serializable {
     private int score;
     private Player player1;
     private Player player2;

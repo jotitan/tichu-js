@@ -2,10 +2,12 @@ package fr.titan.tichu.model;
 
 import fr.titan.tichu.model.ws.CardWS;
 
+import java.io.Serializable;
+
 /**
  * User: Titan Date: 29/03/14 Time: 16:42
  */
-public abstract class Card {
+public abstract class Card implements Serializable{
 
     private CardType cardType;
     private Player owner;
