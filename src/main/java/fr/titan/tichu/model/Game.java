@@ -247,7 +247,7 @@ public class Game implements Serializable {
                 return false;
             }
             Fold last = this.folds.getLast();
-            if (this.mahjongValue != null && player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getCards().size(), last.getHigh())
+            if (this.mahjongValue != null && player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size())
                     && !isMajhongPresent(cards)) {
                 return false;
             }
@@ -265,7 +265,7 @@ public class Game implements Serializable {
             // Impossible to call when first
         } else {
             Fold last = this.folds.getLast();
-            return !player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getCards().size(), last.getHigh());
+            return !player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(),last.getCards().size());
         }
         return true;
     }

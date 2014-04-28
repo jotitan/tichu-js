@@ -12,8 +12,6 @@ import java.util.List;
  */
 public class Games {
 
-    private List<Game> runningGames = new ArrayList<Game>();
-
     /* Used to get game context by token player */
     private HashMap<String,Player> playersByToken = new HashMap<String, Player>();
 
@@ -23,7 +21,6 @@ public class Games {
         if(gameByNames.containsKey(game.getGame())){
             throw new Exception("Game with name " + game.getGame() + " already exists");
         }
-        runningGames.add(game);
         gameByNames.put(game.getGame(),game);
     }
 

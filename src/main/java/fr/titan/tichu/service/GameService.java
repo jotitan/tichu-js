@@ -9,18 +9,23 @@ import fr.titan.tichu.exception.CheatException;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.*;
+import fr.titan.tichu.service.cache.CacheService;
+import fr.titan.tichu.service.cache.GameCache;
 
 /**
  * ORDER : fold < turn < round < game une main (fold) dans un tour de jeu (turn) au sein d'une partie (round) d'une manche (game) en 1000 points
  */
 public class GameService {
-    public static Games games = new Games();
+    //public static Games games = new Games();
+
+    public GameCache cacheService;
 
     public GameService() {
+        cacheService = CacheService.getCache("192.168.0.20",49154);
     }
 
     public GameWS getGame(String name) {
-        Game game = games.getGame(name);
+        Game game = cacheService.getGame(name);
         return game != null ? game.toGameWS() : null;
     }
 
@@ -30,12 +35,12 @@ public class GameService {
         game.getPlayers().get(1).setName(gameRequest.getPlayerN());
         game.getPlayers().get(2).setName(gameRequest.getPlayerE());
         game.getPlayers().get(3).setName(gameRequest.getPlayerS());
-        games.addGame(game);
+        cacheService.addGame(game);
         return game;
     }
 
     public Player joinGame(String gameName, String name, String password) throws Exception {
-        Game game = games.getGame(gameName);
+        Game game = cacheService.getGame(gameName);
         if (game == null) {
             throw new Exception("Game " + gameName + " doesn't exist");
         }
@@ -45,7 +50,7 @@ public class GameService {
                     player.setReconnect(player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED));
                     player.setPlayerStatus(PlayerStatus.AUTHENTICATE);
                     player.createToken(gameName);
-                    games.addPlayerByToken(player);
+                    cacheService.addPlayer(player);
                     return player;
                 } else {
                     throw new Exception("The chair is not free anymore");
@@ -100,7 +105,7 @@ public class GameService {
      * @return
      */
     public Player connectGame(String token) {
-        Player player = games.getPlayerByToken(token);
+        Player player = getPlayerByToken(token);
         if (player != null) {
             player.setPlayerStatus(PlayerStatus.CONNECTED);
             broadCast(player.getGame(), ResponseType.PLAYER_SEATED, player.getPlayerWS());
@@ -109,7 +114,7 @@ public class GameService {
     }
 
     public Player getPlayerByToken(String token) {
-        return games.getPlayerByToken(token);
+        return cacheService.getPlayer(token);
     }
 
     /* Show to the player the last 5 cards */
