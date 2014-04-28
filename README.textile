@@ -2,3 +2,7 @@ tichu-js
 ========
 
 Tichu JS
+
+Communication with WebSocket (TODO, test with atmosphere)
+Deploy on tomcat 7 (test with maven plugin)
+Use Redis to stock game context and save message

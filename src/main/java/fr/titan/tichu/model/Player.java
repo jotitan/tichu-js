@@ -1,5 +1,6 @@
 package fr.titan.tichu.model;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.*;
@@ -13,16 +14,10 @@ import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.PlayerWS;
 import fr.titan.tichu.ws.ChatWebSocket;
 
-import java.beans.Transient;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.util.*;
-
 /**
- * User: Titan Date: 29/03/14 Time: 11:47
+ *
  */
-public class Player implements Serializable{
+public class Player implements Serializable {
     private String name;
     private String token; // To verify identity
     private Orientation orientation;
@@ -414,14 +409,6 @@ public class Player implements Serializable{
         return token;
     }
 
-    public TichuClientCommunication getClient() {
-        return client;
-    }
-
-    public void setClientCommunication(TichuClientCommunication client) {
-        this.client = client;
-    }
-
     public Game getGame() {
         return game;
     }
@@ -490,5 +477,32 @@ public class Player implements Serializable{
 
     public void setReconnect(boolean reconnect) {
         this.reconnect = reconnect;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Player player = (Player) o;
+
+        if (name != null ? !name.equals(player.name) : player.name != null)
+            return false;
+        if (orientation != player.orientation)
+            return false;
+        if (token != null ? !token.equals(player.token) : player.token != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (token != null ? token.hashCode() : 0);
+        result = 31 * result + (orientation != null ? orientation.hashCode() : 0);
+        return result;
     }
 }

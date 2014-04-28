@@ -15,6 +15,11 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
 
+        <repository>
+            <id>clojars.org</id>
+            <url>http://clojars.org/repo</url>
+        </repository>
+
     </repositories>
 
 
@@ -24,6 +29,12 @@
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>redis.embedded</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.2</version>
         </dependency>
 
         <dependency>

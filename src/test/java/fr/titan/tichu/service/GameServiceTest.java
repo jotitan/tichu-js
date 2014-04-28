@@ -9,6 +9,9 @@ import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.service.cache.CacheFactory;
+import fr.titan.tichu.service.cache.MessageCache;
+import fr.titan.tichu.service.mock.TichuWebSocketMock;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,20 +45,6 @@ public class GameServiceTest {
 
     }
 
-    class TichuWebSocketMock implements TichuClientCommunication {
-        private String player;
-
-        public TichuWebSocketMock(String player) {
-            this.player = player;
-        }
-
-        @Override
-        public void send(ResponseType type, Object object) {
-            System.out.println("MOCK " + this.player + " " + type);
-            responses.add(type);
-        }
-    }
-
     @Before
     public void init() {
         gameService = new MockGameService();
@@ -64,9 +53,10 @@ public class GameServiceTest {
     @Test
     public void testGame() throws Exception {
         Game game = gameService.createGame(new GameRequest("game1", "joueur1", "joueur2", "joueur3", "joueur4"));
+        MessageCache messageCache = CacheFactory.getMessageCache(null, 0);
 
         Player player2 = gameService.joinGame(game.getGame(), "joueur2", null);
-        player2.setClientCommunication(new TichuWebSocketMock(player2.getName()));
+        messageCache.register(player2, new TichuWebSocketMock(player2.getName(), responses));
         Assert.assertEquals(PlayerStatus.AUTHENTICATE, player2.getPlayerStatus());
         gameService.connectGame(player2.getToken());
 
@@ -76,16 +66,18 @@ public class GameServiceTest {
         Assert.assertFalse(game.canPlay());
 
         Player player1 = gameService.joinGame(game.getGame(), "joueur1", null);
-        player1.setClientCommunication(new TichuWebSocketMock(player1.getName()));
+        messageCache.register(player1, new TichuWebSocketMock(player1.getName(), responses));
         gameService.connectGame(player1.getToken());
 
         Player player3 = gameService.joinGame(game.getGame(), "joueur3", null);
-        player3.setClientCommunication(new TichuWebSocketMock(player3.getName()));
+        messageCache.register(player3, new TichuWebSocketMock(player3.getName(), responses));
         gameService.connectGame(player3.getToken());
 
         Player player4 = gameService.joinGame(game.getGame(), "joueur4", null);
-        player4.setClientCommunication(new TichuWebSocketMock(player4.getName()));
+        messageCache.register(player4, new TichuWebSocketMock(player4.getName(), responses));
         gameService.connectGame(player4.getToken());
+
+        gameService.checkTableComplete(player4);
 
         Assert.assertTrue(game.canPlay());
 

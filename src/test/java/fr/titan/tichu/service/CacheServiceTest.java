@@ -1,7 +1,7 @@
 package fr.titan.tichu.service;
 
 import fr.titan.tichu.model.Game;
-import fr.titan.tichu.service.cache.CacheService;
+import fr.titan.tichu.service.cache.CacheFactory;
 import fr.titan.tichu.service.cache.GameCache;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class CacheServiceTest {
 
     @Test
     public void testConnection(){
-        GameCache cs = CacheService.getCache("192.168.0.20",49154);
+        GameCache cs = CacheFactory.getCache("192.168.0.20", 49154);
         //Assert.assertTrue(cs.isConnected());
         cs.close();
     }
@@ -23,7 +23,7 @@ public class CacheServiceTest {
     @Test
     public void testInsert(){
 
-        GameCache cs = CacheService.getCache("192.168.0.20",49154);
+        GameCache cs = CacheFactory.getCache("192.168.0.20", 49154);
         long begin = System.currentTimeMillis();
 
         for(int i = 0 ; i < 10 ; i++){

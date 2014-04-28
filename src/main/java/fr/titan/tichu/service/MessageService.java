@@ -47,7 +47,7 @@ public class MessageService {
     }
 
     public void playerDisconnect(Player player) {
-        gameService.broadCast(player.getGame(), ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
+        gameService.broadCast(player, ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
     }
 
     private Object readObject(String value, Class c) throws Exception {
