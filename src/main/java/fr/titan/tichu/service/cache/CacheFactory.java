@@ -1,6 +1,11 @@
 package fr.titan.tichu.service.cache;
 
 import fr.titan.tichu.model.Game;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Manage Redis cache to save game information
@@ -10,14 +15,32 @@ public class CacheFactory {
 
     private static MessageCache messageCache;
 
+    final static private Logger logger = LoggerFactory.getLogger(RedisMessageCache.class);
+
+    private static String host;
+    private static int port;
+
+    static {
+        Properties p = new Properties();
+        try{
+            p.load(CacheFactory.class.getResourceAsStream("/tichu"));
+            host = p.getProperty("redis.host");
+            port = Integer.valueOf(p.getProperty("redis.port"));
+        }   catch(IOException ioex){
+            logger.error("Error when loading redis properties, default configuration");
+        }catch(Exception e){}
+    }
+
+
+    public static GameCache getCache() {
+       return getCache(host,port);
+    }
     /**
      * Return the correct cache manager.
      * 
-     * @param host
-     * @param port
      * @return If redis up, return redis implementation, otherwise return memory implementation
      */
-    public static GameCache getCache(String host, int port) {
+    public static GameCache getCache(String host, Integer port) {
         if (gameCache != null) {
             return gameCache;
         }
@@ -29,7 +52,11 @@ public class CacheFactory {
         return gameCache;
     }
 
-    public static MessageCache getMessageCache(String host, int port) {
+    public static MessageCache getMessageCache() {
+        return getMessageCache(host,port);
+    }
+
+    public static MessageCache getMessageCache(String host, Integer port) {
         if (messageCache != null) {
             return messageCache;
         }

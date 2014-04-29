@@ -84,7 +84,7 @@
     </dependencies>
 
     <build>
-        <finalName>RESTfulExample</finalName>
+        <finalName>Tichu</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

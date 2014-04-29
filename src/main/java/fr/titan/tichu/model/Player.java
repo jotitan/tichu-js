@@ -190,9 +190,23 @@ public class Player implements Serializable {
                         if (value <= previousValue && value >= previousValue - nbPair) {
                             nbPairs.add(nbPair);
                         }
-                        nbPair = 0;
-                        previousValue = 0;
-                        jokerNotUsed = phoenix;
+                        if(values.get(valueCard)>=2){
+                            nbPair=1;
+                            previousValue = valueCard;
+                            jokerNotUsed = phoenix;
+                        }else{
+                            if(phoenix){
+                                nbPair=1;
+                                previousValue = valueCard;
+                                jokerNotUsed = true;
+                            }
+                            else{
+                                nbPair = 0;
+                                previousValue = 0;
+                                jokerNotUsed = phoenix;
+                            }
+                        }
+
                     }
                 }
             }

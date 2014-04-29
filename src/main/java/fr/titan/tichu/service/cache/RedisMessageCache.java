@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -68,7 +69,12 @@ public class RedisMessageCache implements MessageCache {
             public void run() {
                 String key = "message:player:" + player.getToken();
                 String keyGame = "message:game:" + player.getGame().getGame();
-                jedisPool.getResource().subscribe(jedisPubSub, key, keyGame);
+                try{
+                    jedisPool.getResource().subscribe(jedisPubSub, key, keyGame);
+                }catch(JedisConnectionException jex){
+                    // Connexion reset
+                    logger.info("Connection end " + player.getName());
+                }
             }
         }).start();
     }
@@ -76,6 +82,7 @@ public class RedisMessageCache implements MessageCache {
     @Override
     public void unregister(Player player) {
         // jedis
+
 
     }
 

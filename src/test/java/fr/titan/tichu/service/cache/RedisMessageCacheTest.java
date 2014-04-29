@@ -46,6 +46,7 @@ public class RedisMessageCacheTest {
         }
 
         messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
+        messageCache.unregister(player);
 
     }
 

@@ -21,8 +21,8 @@ public class GameService {
     public MessageCache messageCache;
 
     public GameService() {
-        cacheService = CacheFactory.getCache("192.168.0.20", 49154);
-        messageCache = CacheFactory.getMessageCache("192.168.0.20", 49154);
+        cacheService = CacheFactory.getCache();
+        messageCache = CacheFactory.getMessageCache();
     }
 
     public GameWS getGame(String name) {

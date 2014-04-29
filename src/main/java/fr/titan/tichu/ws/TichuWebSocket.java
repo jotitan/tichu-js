@@ -40,7 +40,7 @@ public class TichuWebSocket implements TichuClientCommunication {
         logger.info("INIT WEB");
         messageService = new MessageService();
         gameService = new GameService();
-        messageCache = CacheFactory.getMessageCache("localhost", 6379);
+        messageCache = CacheFactory.getMessageCache();
     }
 
     @OnOpen
