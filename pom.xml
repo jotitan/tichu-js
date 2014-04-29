@@ -84,7 +84,7 @@
     </dependencies>
 
     <build>
-        <finalName>Tichu</finalName>
+        <finalName>tichu</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
