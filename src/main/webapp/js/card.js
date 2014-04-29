@@ -101,7 +101,7 @@ function DragonCard(){
 function ImgCard(x,y,img,card){
 	DrawingCard.call(this,x,y,card);
 	this.img = new Image();
-	this.img.src = img;
+	this.img.src = "/tichu-server/" + img;
 	
 	this._drawCard = function(canvas){
 		drawCard(canvas,this.x,this.y,this.pos,this.checked,this.width,this.height,null,this.img,this.orientation);
@@ -130,7 +130,7 @@ function DrawingCard(x,y,card){
 	this.color = card.color;
 	this.recto = false;
 	this.imgRecto = new Image();
-	this.imgRecto.src='img/recto.png';
+	this.imgRecto.src='/tichu-server/img/recto.png';
 	this.checked = false;
 	this.deep = 0;
 	

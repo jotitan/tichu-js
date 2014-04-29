@@ -1,9 +1,5 @@
 package fr.titan.tichu.model;
 
-import com.google.common.collect.Lists;
-import fr.titan.tichu.model.ws.Fold;
-import fr.titan.tichu.model.ws.GameWS;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -126,6 +122,15 @@ public class Game implements Serializable {
         game.setScore1(team1.buildScore(team2.isCapot()));
         game.setScore2(team2.buildScore(team1.isCapot()));
         return game;
+    }
+
+    public Player getPlayerByToken(String token) {
+        for (Player player : players) {
+            if (player.getToken() != null && player.getToken().equals(token)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public boolean isRoundEnded() {
@@ -265,7 +270,7 @@ public class Game implements Serializable {
             // Impossible to call when first
         } else {
             Fold last = this.folds.getLast();
-            return !player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(),last.getCards().size());
+            return !player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size());
         }
         return true;
     }

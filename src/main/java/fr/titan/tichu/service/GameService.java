@@ -36,7 +36,7 @@ public class GameService {
         game.getPlayers().get(1).setName(gameRequest.getPlayerN());
         game.getPlayers().get(2).setName(gameRequest.getPlayerE());
         game.getPlayers().get(3).setName(gameRequest.getPlayerS());
-        cacheService.addGame(game);
+        cacheService.saveGame(game);
         return game;
     }
 
@@ -47,11 +47,13 @@ public class GameService {
         }
         for (Player player : game.getPlayers()) {
             if (player.getName().equals(name)) {
-                if (player.getPlayerStatus().equals(PlayerStatus.FREE_CHAIR) || player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
+                if (player.getPlayerStatus().equals(PlayerStatus.FREE_CHAIR) || player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)
+                        || (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && canForceReconnect(player))) {
                     player.setReconnect(player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED));
                     player.setPlayerStatus(PlayerStatus.AUTHENTICATE);
                     player.createToken(gameName);
                     cacheService.addPlayer(player, game);
+                    cacheService.saveGame(game);
                     return player;
                 } else {
                     throw new Exception("The chair is not free anymore");
@@ -59,6 +61,17 @@ public class GameService {
             }
         }
         throw new Exception("No player with this name");
+    }
+
+    /**
+     * Check the heartbeat. If heartbeat exist and greater than 1000ms, permet reconnect
+     * 
+     * @param player
+     * @return
+     */
+    private boolean canForceReconnect(Player player) {
+        Long time = cacheService.lastHeartbeat(player);
+        return time != null && (System.currentTimeMillis() - time > 1000);
     }
 
     /*
@@ -107,9 +120,10 @@ public class GameService {
      */
     public Player connectGame(String token) {
         Game game = cacheService.getGameByTokenPlayer(token);
-        Player player = getPlayerByToken(token);
+        Player player = game.getPlayerByToken(token);
         if (player != null) {
             player.setPlayerStatus(PlayerStatus.CONNECTED);
+            cacheService.saveGame(game);
             broadCast(game, ResponseType.PLAYER_SEATED, player.getPlayerWS());
         }
         return player;
@@ -127,10 +141,9 @@ public class GameService {
             cardsWS.add(card.toCardWS());
         }
         messageCache.sendMessage(game, player, ResponseType.DISTRIBUTION_PART2, cardsWS);
-        // player.getClient().send(ResponseType.DISTRIBUTION_PART2, cardsWS);
         messageCache.sendMessage(game, player, ResponseType.CHANGE_CARD_MODE, null);
-        // player.getClient().send(ResponseType.CHANGE_CARD_MODE, null);
         player.setDistributeAllCards(true);
+        cacheService.saveGame(game);
         broadCast(game, ResponseType.SEE_ALL_CARDS, player.getPlayerWS());
     }
 
@@ -141,19 +154,18 @@ public class GameService {
         case TICHU:
             if (!player.canTichu()) {
                 messageCache.sendMessage(game, player, ResponseType.ANNONCE_FORBIDDEN, annonce);
-                // player.getClient().send(ResponseType.ANNONCE_FORBIDDEN, annonce);
                 return;
             }
             break;
         case GRAND_TICHU:
             if (player.isDistributeAllCards() || !player.canTichu()) {
                 messageCache.sendMessage(game, player, ResponseType.ANNONCE_FORBIDDEN, annonce);
-                // player.getClient().send(ResponseType.ANNONCE_FORBIDDEN, annonce);
                 return;
             }
             break;
         }
         player.setAnnonce(annonce);
+        cacheService.saveGame(game);
         broadCast(game, ResponseType.PLAYER_ANNONCE, player.getPlayerWS());
     }
 
@@ -164,11 +176,6 @@ public class GameService {
 
     protected void broadCast(Game game, ResponseType type, Object object) {
         messageCache.sendMessageToAll(game, type, object);
-        // for (Player player : game.getPlayers()) {
-        // if (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && player.getClient() != null) {
-        // player.getClient().send(type, object);
-        // }
-        // }
     }
 
     public void checkTableComplete(Player player) {
@@ -176,6 +183,7 @@ public class GameService {
         if (game.canPlay()) {
             broadCast(game, ResponseType.GAME_MODE, "");
             distribute(game);
+            cacheService.saveGame(game);
         }
     }
 
@@ -187,7 +195,6 @@ public class GameService {
                 cardsWS.add(card.toCardWS());
             }
             messageCache.sendMessage(game, player, ResponseType.DISTRIBUTION_PART1, cardsWS);
-            // player.getClient().send(ResponseType.DISTRIBUTION_PART1, cardsWS);
             player.setDistributeAllCards(false);
         }
     }
@@ -203,12 +210,12 @@ public class GameService {
         giveCardToPlayer(cards.getToRight(), player, player.getOrientation().getRight(), Position.LEFT);
 
         messageCache.sendMessage(game, player, ResponseType.CARDS_CHANGED, null);
-        // player.getClient().send(ResponseType.CARDS_CHANGED, null);
 
         if (checkPlayersChangeCards(game)) {
             sendSwapCards(game);
             nextPlayer(game);
         }
+        cacheService.saveGame(game);
     }
 
     /**
@@ -224,7 +231,6 @@ public class GameService {
                 player.addCard(card);
             }
             messageCache.sendMessage(game, player, ResponseType.NEW_CARDS, player.getChangeCards());
-            // player.getClient().send(ResponseType.NEW_CARDS, player.getChangeCards());
         }
     }
 
@@ -267,12 +273,11 @@ public class GameService {
                 afterFold(game, player, fold);
             } else {
                 messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, fold);
-                // player.getClient().send(ResponseType.BAD_FOLD, fold);
             }
         } else {
             messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, fold);
-            // player.getClient().send(ResponseType.BAD_FOLD, fold);
         }
+        cacheService.saveGame(game);
     }
 
     /** Play a classic fold */
@@ -281,13 +286,11 @@ public class GameService {
         Game game = cacheService.getGameByTokenPlayer(player.getToken());
         if (!player.equals(game.getCurrentPlayer())) {
             messageCache.sendMessage(game, player, ResponseType.NOT_YOUR_TURN, "");
-            // player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
         try {
             if (!game.verifyFold(fold, player)) {
                 messageCache.sendMessage(game, player, ResponseType.NOT_YOUR_TURN, "");
-                // player.getClient().send(ResponseType.BAD_FOLD, "");
                 return;
             }
         } catch (CheatException cheatEx) {
@@ -296,6 +299,7 @@ public class GameService {
         game.playFold(player, fold);
         broadCast(game, ResponseType.FOLD_PLAYED, fold);
         afterFold(game, player, fold);
+        cacheService.saveGame(game);
     }
 
     /* Player doesn't play a fold */
@@ -304,23 +308,21 @@ public class GameService {
         // Verifie mahjong
         if (!game.verifyCall(player)) {
             messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
-            // player.getClient().send(ResponseType.BAD_FOLD, "");
             return;
         }
 
         if (!player.equals(game.getCurrentPlayer())) {
             messageCache.sendMessage(game, player, ResponseType.NOT_YOUR_TURN, "");
-            // player.getClient().send(ResponseType.NOT_YOUR_TURN, "");
             return;
         }
         /* Impossible de call when first */
         if (game.getLastPlayer() == null) {
             messageCache.sendMessage(game, player, ResponseType.NO_CALL_WHEN_FIRST, "");
-            // player.getClient().send(ResponseType.NO_CALL_WHEN_FIRST, "");
             return;
         }
         broadCast(game, ResponseType.CALL_PLAYED, player.getPlayerWS());
         afterFold(game, player, null);
+        cacheService.saveGame(game);
     }
 
     private void afterFold(Game game, Player player, Fold fold) {

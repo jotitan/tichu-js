@@ -1,11 +1,10 @@
 package fr.titan.tichu.service.cache;
 
-import fr.titan.tichu.model.Game;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manage Redis cache to save game information
@@ -22,19 +21,20 @@ public class CacheFactory {
 
     static {
         Properties p = new Properties();
-        try{
-            p.load(CacheFactory.class.getResourceAsStream("/tichu"));
+        try {
+            p.load(CacheFactory.class.getResourceAsStream("/tichu.properties"));
             host = p.getProperty("redis.host");
             port = Integer.valueOf(p.getProperty("redis.port"));
-        }   catch(IOException ioex){
+        } catch (IOException ioex) {
             logger.error("Error when loading redis properties, default configuration");
-        }catch(Exception e){}
+        } catch (Exception e) {
+        }
     }
-
 
     public static GameCache getCache() {
-       return getCache(host,port);
+        return getCache(host, port);
     }
+
     /**
      * Return the correct cache manager.
      * 
@@ -47,13 +47,14 @@ public class CacheFactory {
         try {
             gameCache = new RedisGameCache(host, port);
         } catch (Exception e) {
+            logger.info("No Redis found, use memory cache instead");
             gameCache = new MemoryGameCache();
         }
         return gameCache;
     }
 
     public static MessageCache getMessageCache() {
-        return getMessageCache(host,port);
+        return getMessageCache(host, port);
     }
 
     public static MessageCache getMessageCache(String host, Integer port) {
@@ -63,8 +64,14 @@ public class CacheFactory {
         try {
             messageCache = new RedisMessageCache(host, port);
         } catch (Exception e) {
+            logger.info("No Redis found, use memory message cache instead");
             messageCache = new MemoryMessageCache();
         }
         return messageCache;
+    }
+
+    protected static void resetCaches() {
+        messageCache = null;
+        gameCache = null;
     }
 }

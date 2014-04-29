@@ -1,5 +1,5 @@
 /* Manage messages between server and clients */
-
+var BASE_URL = document.location.host + "/tichu-server";
 var Logger = {
     threshold:2,
     info:function(message){
@@ -15,7 +15,7 @@ var Logger = {
 
 
 var	GameConnection = {
-    baseUrl:'http://localhost:8081/tichu-server/rest',
+    baseUrl:'/tichu-server/rest',
     loadGame:function(name){
         $.ajax({
             url:this.baseUrl + '/game/info/' + name,
@@ -50,7 +50,7 @@ var WebSocketManager = {
     token:null,	// token give by server to communicate
     player:null,
     ws:null,
-    url:"ws://localhost:8081/tichu-server/chat4",
+    url:"ws://" + BASE_URL + "/chat4",
     init:function(token,player){
         if(token == null){
           Logger.error("No token defined");
@@ -66,8 +66,33 @@ var WebSocketManager = {
         this.ws.onopen = function(message){
             Logger.info("Open connexion");
             Chat.connect(WebSocketManager.token);
+            WebSocketManager.heartbeat.start();
+        },
+        this.ws.onclose = function(){
+            Logger.error("Error, connection closed");
+            WebSocketManager.heartbeat.stop();
         }
     },
+    heartbeat:{
+      process:null,
+      start:function(){
+        this.process = setInterval(function(){
+            WebSocketManager.sendMessage("{\"type\":\"HEARTBEAT\"}");
+        },500);
+      },
+      stop:function(){
+        clearInterval(this.process);
+        this.process = null;
+      }
+    },
+    stopHeartBeat:function(){
+        clearInterval(this.heartbeatProcess);
+        this.heartbeatProcess = null;
+    },
+    sendHeartBeat:function(){
+        this.ws.send()
+    },
+
     readMessage:function(message){
         try{
             var data = JSON.parse(message);

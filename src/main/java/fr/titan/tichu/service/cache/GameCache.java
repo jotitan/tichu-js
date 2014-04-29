@@ -8,7 +8,7 @@ import fr.titan.tichu.model.ws.ResponseType;
  *
  */
 public interface GameCache {
-    boolean addGame(Game game);
+    boolean saveGame(Game game);
 
     Game getGame(String name);
 
@@ -22,5 +22,13 @@ public interface GameCache {
 
     Player getPlayer(String token);
 
+    /**
+     * Player say frequently he's here with a HB let the player reconnect at non empty chair when server crash
+     * 
+     * @param player
+     */
+    void heartbeat(Player player);
+
+    Long lastHeartbeat(Player player);
 
 }

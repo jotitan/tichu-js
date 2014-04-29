@@ -1,6 +1,5 @@
 package fr.titan.tichu.service.cache;
 
-import com.google.common.collect.Lists;
 import fr.titan.tichu.Orientation;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
@@ -39,11 +38,6 @@ public class RedisMessageCacheTest {
         TichuWebSocketMock wsMock = new TichuWebSocketMock(player.getName(), new ArrayList<ResponseType>());
 
         messageCache.register(player, wsMock);
-
-        try {
-            Thread.sleep(500);
-        } catch (Exception e) {
-        }
 
         messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
         messageCache.unregister(player);

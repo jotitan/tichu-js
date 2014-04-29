@@ -1,17 +1,9 @@
 package fr.titan.tichu.service.cache;
 
+import redis.clients.jedis.Jedis;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
-import fr.titan.tichu.model.PlayerStatus;
-import fr.titan.tichu.model.ws.ResponseType;
-import fr.titan.tichu.model.ws.ResponseWS;
 import fr.titan.tichu.service.ObjectHelper;
-import org.codehaus.jackson.map.ObjectMapper;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPubSub;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  *
@@ -30,9 +22,12 @@ public class RedisGameCache implements GameCache {
     }
 
     @Override
-    public boolean addGame(Game game) {
+    public boolean saveGame(Game game) {
         String key = "game:" + game.getGame();
-        // If first insert, save token user
+        // If first insert, save name in global liste
+        if (!jedis.exists(key)) {
+            jedis.sadd("games", game.getGame());
+        }
         return "OK".equals(jedis.set(key.getBytes(), ObjectHelper.serialize(game)));
     }
 
@@ -61,8 +56,8 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public void addPlayer(Player player, Game game) {
-        String key = "player:" + player.getToken();
-        jedis.set(key.getBytes(), ObjectHelper.serialize(player));
+        // String key = "player:" + player.getToken();
+        // jedis.set(key.getBytes(), ObjectHelper.serialize(player));
 
         String keyGame = "game:player:" + player.getToken();
         jedis.set(keyGame, game.getGame());
@@ -70,12 +65,17 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public Player getPlayer(String token) {
-        String key = "player:" + token;
-        byte[] player = jedis.get(key.getBytes());
-        if (player == null) {
-            return null;
+        Game game = getGameByTokenPlayer(token);
+        if (game != null) {
+            return game.getPlayerByToken(token);
         }
-        return ObjectHelper.deserialize(Player.class, player);
+        return null;
+        // String key = "player:" + token;
+        // byte[] player = jedis.get(key.getBytes());
+        // if (player == null) {
+        // return null;
+        // }
+        // return ObjectHelper.deserialize(Player.class, player);
     }
 
     @Override
@@ -85,5 +85,17 @@ public class RedisGameCache implements GameCache {
         return getGame(game);
     }
 
+    /* Save the time of last HB */
+    @Override
+    public void heartbeat(Player player) {
+        String key = "player:heartbeat:" + player.getToken();
+        jedis.set(key, String.valueOf(System.currentTimeMillis()));
+    }
 
+    @Override
+    public Long lastHeartbeat(Player player) {
+        String key = "player:heartbeat:" + player.getToken();
+        String heartbeat = jedis.get(key);
+        return heartbeat != null ? Long.valueOf(heartbeat) : null;
+    }
 }

@@ -50,7 +50,6 @@ public class TichuWebSocket implements TichuClientCommunication {
         this.player = gameService.connectGame(token);
         if (this.player != null) {
             messageCache.register(this.player, this);
-
             this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_OK, gameService.getContextGame(this.player));
             // If reconnection, no checktabke
@@ -99,8 +98,9 @@ public class TichuWebSocket implements TichuClientCommunication {
             }
             try {
                 this.basic.sendText(message);
+            } catch (NullPointerException nex) {
+                System.out.println(nex);
             } catch (IOException ioex) {
-                System.out.println(ioex);
             }
         }
     }
@@ -109,7 +109,9 @@ public class TichuWebSocket implements TichuClientCommunication {
      * Can receive annonce (tichu, grand tichu), fold
      * 
      * @param message
+     *            : Message received
      * @param session
+     *            : Session of websocket
      */
     @OnMessage
     public void message(String message, Session session) {

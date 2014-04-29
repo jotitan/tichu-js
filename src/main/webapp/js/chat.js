@@ -47,6 +47,7 @@ var Chat = {
         this._showMessage({name:"INFO"},message,"green");
     },
     _showMessage:function(player,message,color){
+        if(PlayerManager.getPlayerUser().equals(player)){return;}
         color = color || 'black';
         if(this.div){
             this.div.append('<span style="color:' + color + '">' + player.name + " : " + unescape(message) + '</span><br/>');

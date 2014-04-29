@@ -6,6 +6,8 @@ import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.RequestWS;
 import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.service.cache.CacheFactory;
+import fr.titan.tichu.service.cache.GameCache;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -14,6 +16,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class MessageService {
 
     private GameService gameService = new GameService();
+    private GameCache gameCache = CacheFactory.getCache();
 
     public void treatMessage(Player player, String message) {
         ObjectMapper om = new ObjectMapper();
@@ -40,6 +43,9 @@ public class MessageService {
             case FOLD:
                 Fold fold = (Fold) readObject(request.getValue(), Fold.class);
                 gameService.playFold(player, fold);
+                break;
+            case HEARTBEAT:
+                gameCache.heartbeat(player);
                 break;
             }
         } catch (Exception e) {

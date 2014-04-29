@@ -4,7 +4,6 @@ import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
-import fr.titan.tichu.ws.TichuWebSocket;
 
 /**
  * To put message into temp cache
@@ -37,6 +36,8 @@ public interface MessageCache {
      * @param clientCommunication
      */
     void register(Player player, TichuClientCommunication clientCommunication);
+
+    void registerChat(Player player, TichuClientCommunication clientCommunication);
 
     /**
      * Unregister the player and his websocket

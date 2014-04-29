@@ -5,7 +5,7 @@
     <display-name>Restful Web Application</display-name>
 
     <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
+        <welcome-file>html/tichu.html</welcome-file>
     </welcome-file-list>
 
     <!-- Auto scan rest service -->
@@ -40,5 +40,6 @@
         <servlet-name>resteasy-servlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
+
 
 </web-app>

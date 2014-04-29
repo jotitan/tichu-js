@@ -9,10 +9,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.titan.tichu.Orientation;
-import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.PlayerWS;
-import fr.titan.tichu.ws.ChatWebSocket;
 
 /**
  *
@@ -36,9 +34,6 @@ public class Player implements Serializable {
     /* List of win folds */
     private List<Card> cardOfFolds = new ArrayList<Card>();
 
-    private TichuClientCommunication client;
-    private ChatWebSocket chatClient;
-
     private boolean reconnect = false;
 
     private void sortCards() {
@@ -56,7 +51,7 @@ public class Player implements Serializable {
     }
 
     public boolean isConnected() {
-        return this.client != null;
+        return playerStatus.equals(PlayerStatus.CONNECTED);
     }
 
     public int getNbcard() {
@@ -190,17 +185,16 @@ public class Player implements Serializable {
                         if (value <= previousValue && value >= previousValue - nbPair) {
                             nbPairs.add(nbPair);
                         }
-                        if(values.get(valueCard)>=2){
-                            nbPair=1;
+                        if (values.get(valueCard) >= 2) {
+                            nbPair = 1;
                             previousValue = valueCard;
                             jokerNotUsed = phoenix;
-                        }else{
-                            if(phoenix){
-                                nbPair=1;
+                        } else {
+                            if (phoenix) {
+                                nbPair = 1;
                                 previousValue = valueCard;
                                 jokerNotUsed = true;
-                            }
-                            else{
+                            } else {
                                 nbPair = 0;
                                 previousValue = 0;
                                 jokerNotUsed = phoenix;
@@ -475,14 +469,6 @@ public class Player implements Serializable {
 
     public boolean isDistributeAllCards() {
         return distributeAllCards;
-    }
-
-    public ChatWebSocket getChatClient() {
-        return chatClient;
-    }
-
-    public void setChatClient(ChatWebSocket chatClient) {
-        this.chatClient = chatClient;
     }
 
     public boolean isReconnect() {
