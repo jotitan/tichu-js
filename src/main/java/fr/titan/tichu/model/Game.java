@@ -410,4 +410,12 @@ public class Game implements Serializable {
     public List<Fold> getFolds() {
         return folds;
     }
+
+    public Team getTeam1() {
+        return team1;
+    }
+
+    public Team getTeam2() {
+        return team2;
+    }
 }

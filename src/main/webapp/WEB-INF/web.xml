@@ -21,8 +21,11 @@
 
     <listener>
         <listener-class>
-            org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
+            <!--org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap-->
+            org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener
+        </listener-class>
     </listener>
+
 
 
     <servlet>

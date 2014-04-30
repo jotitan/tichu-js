@@ -1,5 +1,6 @@
 package fr.titan.tichu.service.cache;
 
+import com.google.inject.ImplementedBy;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
@@ -7,6 +8,7 @@ import fr.titan.tichu.model.ws.ResponseType;
 /**
  *
  */
+@ImplementedBy(GameCacheImpl.class)
 public interface GameCache {
     boolean saveGame(Game game);
 

@@ -52,9 +52,12 @@ var Table = {
             }
             pl.setAnnonce(p.annonce);
             if(!pl.equals(PlayerManager.getPlayerUser())){
-                pl.createEmptyCards(p.nbCard);
+                //pl.createEmptyCards(p.nbCard);
+                pl.setNecessaryEmptyCards(p.nbCard);
             }
         });
+
+        CardManager.resetStatus();
         if(data.cards && data.cards.length > 0){
             data.cards.forEach(function(c){
                PlayerManager.getPlayerUser().giveCard(CardManager.get(c.value,c.color));
@@ -71,6 +74,15 @@ var Table = {
         data.folds.forEach(function(fold){
            PlayerManager.playFold(fold);
         });
+
+        // Load score
+        Scorer.newgame();
+        if(data.scoreTeam1!=null && data.scoreTeam2!=null && data.scoreTeam1.length == data.scoreTeam2.length){
+            for(var i = 0 ; i < data.scoreTeam1.length ; i++){
+                scorer.addResult({score1:data.scoreTeam1[i],score2:data.scoreTeam2[i]})
+            }
+        }
+
         this._dispatchState(data);
     },
     _dispatchState:function(data){

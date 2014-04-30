@@ -227,6 +227,11 @@ var CardManager = {
 
 		this.sortCards();
 	},
+	resetStatus:function(){
+	    this.cards.forEach(function(c){
+	       c.setStatus(STATUS_CARD.NO_STATUS_CARD);
+	    });
+	},
 	get:function(value,color){
         return this.cardsByValue[value+color];
 	},

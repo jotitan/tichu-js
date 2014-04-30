@@ -3,20 +3,28 @@ package fr.titan.tichu.model.ws;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import fr.titan.tichu.model.Score;
 
 /**
  * Represent game context when user connect
  */
 public class ContextWS {
+    /* List of player on table */
     private List<PlayerWS> players = Lists.newArrayList();
     private PlayerWS playerUser;
     private PlayerWS currentPlayer;
     private boolean gameBegin;
+    /* Cards in hands players */
     private List<CardWS> cards = Lists.newArrayList();
 
+    /* Fold on table */
     private List<Fold> folds = Lists.newArrayList();
 
-    private ResponseType type; // Dernier evenement ?
+    private List<Score> scoreTeam1;
+    private List<Score> scoreTeam2;
+
+    /* Last event */
+    private ResponseType type;
 
     public List<PlayerWS> getPlayers() {
         return players;
@@ -80,5 +88,21 @@ public class ContextWS {
 
     public void setFolds(List<Fold> folds) {
         this.folds = folds;
+    }
+
+    public List<Score> getScoreTeam1() {
+        return scoreTeam1;
+    }
+
+    public void setScoreTeam1(List<Score> scoreTeam1) {
+        this.scoreTeam1 = scoreTeam1;
+    }
+
+    public List<Score> getScoreTeam2() {
+        return scoreTeam2;
+    }
+
+    public void setScoreTeam2(List<Score> scoreTeam2) {
+        this.scoreTeam2 = scoreTeam2;
     }
 }

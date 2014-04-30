@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 
+import com.google.inject.Inject;
 import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
@@ -15,13 +16,15 @@ import fr.titan.tichu.service.cache.MessageCache;
 /**
  * Chat in websocket to communicate
  */
-@ServerEndpoint("/chat")
+@ServerEndpoint(value = "/chat", configurator = WebSocketConfigurator.class)
 public class ChatWebSocket implements TichuClientCommunication {
 
-    private GameService gameService = new GameService();
+    @Inject
+    private GameService gameService;
+    @Inject
+    private MessageCache messageCache;
     private Player player;
     private RemoteEndpoint.Basic basic;
-    private MessageCache messageCache = CacheFactory.getMessageCache();
 
     @OnOpen
     public void open(Session session) {

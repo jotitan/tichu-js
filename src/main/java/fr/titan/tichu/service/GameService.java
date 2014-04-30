@@ -3,26 +3,28 @@ package fr.titan.tichu.service;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.titan.tichu.Orientation;
 import fr.titan.tichu.exception.CheatException;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.*;
-import fr.titan.tichu.service.cache.CacheFactory;
 import fr.titan.tichu.service.cache.GameCache;
 import fr.titan.tichu.service.cache.MessageCache;
 
 /**
  * ORDER : fold < turn < round < game une main (fold) dans un tour de jeu (turn) au sein d'une partie (round) d'une manche (game) en 1000 points
  */
+@Singleton
 public class GameService {
+    @Inject
     public GameCache cacheService;
+    @Inject
     public MessageCache messageCache;
 
     public GameService() {
-        cacheService = CacheFactory.getCache();
-        messageCache = CacheFactory.getMessageCache();
     }
 
     public GameWS getGame(String name) {
@@ -38,6 +40,23 @@ public class GameService {
         game.getPlayers().get(3).setName(gameRequest.getPlayerS());
         cacheService.saveGame(game);
         return game;
+    }
+
+    /**
+     * When player connect to ws
+     * 
+     * @return
+     */
+    public Player connectGame(String token) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
+        if (player != null
+                && (player.getPlayerStatus().equals(PlayerStatus.AUTHENTICATE) || (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && canForceReconnect(player)))) {
+            player.setPlayerStatus(PlayerStatus.CONNECTED);
+            cacheService.saveGame(game);
+            broadCast(game, ResponseType.PLAYER_SEATED, player.getPlayerWS());
+        }
+        return player;
     }
 
     public Player joinGame(String gameName, String name, String password) throws Exception {
@@ -80,7 +99,9 @@ public class GameService {
     public ContextWS getContextGame(Player player) {
         Game game = cacheService.getGameByTokenPlayer(player.getToken());
         ContextWS context = new ContextWS();
+
         context.setFolds(game.getFolds());
+        /* Compact players */
         for (Player p : game.getPlayers()) {
             PlayerWS playerWS = p.getPlayerWS();
             playerWS.setNbCard(p.getNbcard() > 0 ? p.isDistributeAllCards() ? 14 : 9 : 0);
@@ -110,23 +131,10 @@ public class GameService {
                 }
             }
         }
+        /* Send score */
+        context.setScoreTeam1(game.getTeam1().getScores());
+        context.setScoreTeam2(game.getTeam2().getScores());
         return context;
-    }
-
-    /**
-     * When player connect to ws
-     * 
-     * @return
-     */
-    public Player connectGame(String token) {
-        Game game = cacheService.getGameByTokenPlayer(token);
-        Player player = game.getPlayerByToken(token);
-        if (player != null) {
-            player.setPlayerStatus(PlayerStatus.CONNECTED);
-            cacheService.saveGame(game);
-            broadCast(game, ResponseType.PLAYER_SEATED, player.getPlayerWS());
-        }
-        return player;
     }
 
     public Player getPlayerByToken(String token) {

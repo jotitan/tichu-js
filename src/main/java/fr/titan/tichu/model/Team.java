@@ -13,7 +13,7 @@ public class Team implements Serializable {
     private Player player1;
     private Player player2;
 
-    private List<Score> scores = Lists.newArrayList();
+    private List<Score> scores = Lists.newLinkedList();
 
     public Team() {
     }
@@ -91,5 +91,9 @@ public class Team implements Serializable {
 
     public void setPlayer2(Player player2) {
         this.player2 = player2;
+    }
+
+    public List<Score> getScores() {
+        return scores;
     }
 }

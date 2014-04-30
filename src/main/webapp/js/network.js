@@ -58,20 +58,37 @@ var WebSocketManager = {
         }
         this.player = player;
         this.token = token;
-        this.ws = new WebSocket(this.url + "?token=" + this.token);
-        this.ws.onmessage = function(message){
-            Logger.info(message);
-            WebSocketManager.readMessage(message.data);
+        try{
+            this.ws = new WebSocket(this.url + "?token=" + this.token);
+            this.ws.onmessage = function(message){
+                Logger.info(message);
+                WebSocketManager.readMessage(message.data);
+            }
+            this.ws.onopen = function(message){
+                Logger.info("Open connexion");
+                Chat.connect(WebSocketManager.token);
+                WebSocketManager.heartbeat.start();
+            },
+            this.ws.onclose = function(){
+                Logger.error("CONNECTION CLOSE");
+                WebSocketManager.heartbeat.stop();
+                // Try to reconnect
+                WebSocketManager.reconnect();
+            },
+            this.ws.onerror = function(e){
+                Logger.error("Connection error " + e);
+            }
+        }catch(e){
+            Logger.error("Error when creating websocket " + e);
         }
-        this.ws.onopen = function(message){
-            Logger.info("Open connexion");
-            Chat.connect(WebSocketManager.token);
-            WebSocketManager.heartbeat.start();
-        },
-        this.ws.onclose = function(){
-            Logger.error("Error, connection closed");
-            WebSocketManager.heartbeat.stop();
-        }
+    },
+    /* When server close connection, try to reconnect */
+    reconnect:function(){
+       Logger.error("TRY RECONNECT...");
+       // Wait 1/2 s
+       // 2 solutions : get delta events or load everything (reset screen)
+       //setTimeout(
+       this.init(this.token,this.player);
     },
     heartbeat:{
       process:null,

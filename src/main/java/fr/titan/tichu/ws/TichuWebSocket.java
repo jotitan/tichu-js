@@ -1,5 +1,8 @@
 package fr.titan.tichu.ws;
 
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.PlayerStatus;
@@ -22,14 +25,17 @@ import java.io.IOException;
 /**
  * User: Titan Date: 26/03/14 Time: 20:36
  */
-@ServerEndpoint(value = "/chat4")
+@ServerEndpoint(value = "/chat4", configurator = WebSocketConfigurator.class)
 public class TichuWebSocket implements TichuClientCommunication {
     private Logger logger = LoggerFactory.getLogger(TichuWebSocket.class);
 
+    @Inject
     private MessageService messageService;
 
+    @Inject
     private GameService gameService;
 
+    @Inject
     private MessageCache messageCache;
 
     private Player player;
@@ -38,9 +44,7 @@ public class TichuWebSocket implements TichuClientCommunication {
 
     public TichuWebSocket() {
         logger.info("INIT WEB");
-        messageService = new MessageService();
-        gameService = new GameService();
-        messageCache = CacheFactory.getMessageCache();
+        // messageCache = CacheFactory.getMessageCache();
     }
 
     @OnOpen
@@ -115,7 +119,9 @@ public class TichuWebSocket implements TichuClientCommunication {
      */
     @OnMessage
     public void message(String message, Session session) {
-        logger.info("MESSAGE : " + message);
+        if (!message.contains("HEARTBEAT")) {
+            logger.info("MESSAGE : " + message);
+        }
         messageService.treatMessage(this.player, message);
     }
 

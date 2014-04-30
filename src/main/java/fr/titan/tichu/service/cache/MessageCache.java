@@ -1,5 +1,6 @@
 package fr.titan.tichu.service.cache;
 
+import com.google.inject.ImplementedBy;
 import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
@@ -8,6 +9,7 @@ import fr.titan.tichu.model.ws.ResponseType;
 /**
  * To put message into temp cache
  */
+@ImplementedBy(MessageCacheImpl.class)
 public interface MessageCache {
 
     /**

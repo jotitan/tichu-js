@@ -42,12 +42,17 @@
             <artifactId>resteasy-jaxrs</artifactId>
             <version>2.2.1.GA</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-guice</artifactId>
+            <version>2.2.1.GA</version>
+        </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jackson-provider</artifactId>
             <version>2.2.1.GA</version>
         </dependency>
+
 
         <dependency>
             <groupId>javax.websocket</groupId>
@@ -78,6 +83,14 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>2.4.2</version>
+        </dependency>
+
+
+        <!-- IOC !-->
+        <dependency>
+            <groupId>com.google.code.guice</groupId>
+            <artifactId>guice</artifactId>
+            <version>1.0</version>
         </dependency>
 
 

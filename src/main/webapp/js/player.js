@@ -136,6 +136,16 @@ function Player(orientation,name,visible){
 		card.setStatus(STATUS_CARD.DISTRIBUTED_CARD);
 	}
 
+    /* Add empty card until player has nb cards */
+    this.setNecessaryEmptyCards = function(nb){
+        if(nb == this.cards.length){return;}
+        if(nb < this.cards.length){
+            this.removeEmptyCards(this.cards.length - nb);
+        }else{
+            this.createEmptyCards(nb - this.cards.length);
+        }
+    }
+
 	this.createEmptyCards = function(nb){
 	    for(var i = 0 ; i < nb ; i++){
 	        var c = new EmptyCard(this.cards.length);
@@ -153,7 +163,6 @@ function Player(orientation,name,visible){
 	        if(pos!=-1){
 	            CardManager.emptyCards.splice(pos,1);
 	        }
-
 	    }
 	}
 

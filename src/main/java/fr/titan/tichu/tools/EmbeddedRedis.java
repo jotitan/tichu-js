@@ -1,5 +1,6 @@
 package fr.titan.tichu.tools;
 
+import com.google.common.base.Joiner;
 import redis.clients.jedis.Jedis;
 import redis.embedded.RedisServer;
 
@@ -18,9 +19,9 @@ public class EmbeddedRedis {
         Scanner scanner = new Scanner(System.in);
         String value = null;
         do {
-            System.out.println("Command ?");
+            System.out.print("# ");
             value = scanner.nextLine();
-            switch (value) {
+            switch (value.toLowerCase()) {
             case "stats":
                 embed.showStats();
                 break;
@@ -30,7 +31,16 @@ public class EmbeddedRedis {
             case "keys":
                 embed.keys();
                 break;
-
+            case "exit":
+                System.out.println("Bye");
+                break;
+            case "help":
+                System.out.println("reset\nstats\nkeys\nshow key\nexit");
+                break;
+            default:
+                if (value.startsWith("show ")) {
+                    embed.show(value.substring(5));
+                }
             }
         } while (!"exit".equals(value));
 
@@ -46,6 +56,22 @@ public class EmbeddedRedis {
     public void stop() throws Exception {
         jedis.close();
         server.stop();
+    }
+
+    public void show(String key) {
+        switch (jedis.type(key)) {
+        case "string":
+            System.out.println(key + " : " + jedis.get(key));
+            break;
+        case "list":
+            System.out.println("LIST : " + key + " (" + jedis.llen(key) + "): " + Joiner.on(",").join(jedis.lrange(key, 0, 10)));
+            break;
+        case "set":
+            System.out.println("SET : " + key + " (" + jedis.smembers(key).size() + "): " + Joiner.on(",").join(jedis.smembers(key)));
+            break;
+        default:
+            System.out.println("Unknown type for " + key);
+        }
     }
 
     private void keys() {

@@ -14,7 +14,7 @@ public class CacheFactory {
 
     private static MessageCache messageCache;
 
-    final static private Logger logger = LoggerFactory.getLogger(RedisMessageCache.class);
+    final static private Logger logger = LoggerFactory.getLogger(CacheFactory.class);
 
     private static String host;
     private static int port;
@@ -29,10 +29,6 @@ public class CacheFactory {
             logger.error("Error when loading redis properties, default configuration");
         } catch (Exception e) {
         }
-    }
-
-    public static GameCache getCache() {
-        return getCache(host, port);
     }
 
     /**
@@ -51,10 +47,6 @@ public class CacheFactory {
             gameCache = new MemoryGameCache();
         }
         return gameCache;
-    }
-
-    public static MessageCache getMessageCache() {
-        return getMessageCache(host, port);
     }
 
     public static MessageCache getMessageCache(String host, Integer port) {

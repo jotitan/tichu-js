@@ -1,5 +1,7 @@
 package fr.titan.tichu.service;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import fr.titan.tichu.model.AnnonceType;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.Player;
@@ -13,10 +15,14 @@ import org.codehaus.jackson.map.ObjectMapper;
 /**
  * Lead message between server and gamers
  */
+@Singleton
 public class MessageService {
 
-    private GameService gameService = new GameService();
-    private GameCache gameCache = CacheFactory.getCache();
+    @Inject
+    private GameService gameService;
+
+    @Inject
+    private GameCache gameCache;// = CacheFactory.getCache();
 
     public void treatMessage(Player player, String message) {
         ObjectMapper om = new ObjectMapper();
