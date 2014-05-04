@@ -31,6 +31,9 @@ public class GameRest {
     private GameService gameService;// = new GameService();
 
     public GameRest() {
+        if(gameService == null){
+            gameService = Guice.createInjector().getInstance(GameService.class);
+        }
     }
 
     @GET
@@ -93,6 +96,7 @@ public class GameRest {
             return buildResponse(playerWS, callback);
         } catch (Exception e) {
             ResponseRest response = new ResponseRest(0, e.getMessage());
+            logger.error("Error when Join game",e);
             return buildResponse(response, callback);
         }
     }
