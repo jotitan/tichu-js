@@ -12,7 +12,8 @@
 
 function createPartie(){
     var datas = {"name":"test","playerO":"bob","playerN":"teddy","playerE":"machin","playerS":"truc"};
-    var url = 'http://localhost:8081/tichu-server/rest/game/create';
+    var url = location.origin + location.pathname.substr(0,location.pathname.substr(1).indexOf("/")+1);
+    url += '/rest/game/create';
     function ret(data){console.log("RET",data)}
     $.ajax({url:url,data:datas,type:'GET',dataType:'jsonp',success:function(data){console.log(data)}});
 }
