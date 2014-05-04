@@ -1,6 +1,6 @@
 /* Manage chez chat between user */
 
-var CHAT_URL = 'ws://localhost:8081/tichu-server/chat';
+var CHAT_URL = BASE_URL.replace("http","ws") + 'chat';
 
 var Chat = {
     chatWS:null,

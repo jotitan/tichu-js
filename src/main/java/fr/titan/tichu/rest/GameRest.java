@@ -2,6 +2,7 @@ package fr.titan.tichu.rest;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.rest.ResponseRest;
@@ -26,11 +27,10 @@ public class GameRest {
 
     private Logger logger = LoggerFactory.getLogger(GameRest.class);
 
-    // @Inject
+     @Inject
     private GameService gameService;// = new GameService();
 
     public GameRest() {
-        gameService = Guice.createInjector().getInstance(GameService.class);
     }
 
     @GET

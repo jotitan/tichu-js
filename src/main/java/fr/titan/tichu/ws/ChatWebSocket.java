@@ -30,7 +30,9 @@ public class ChatWebSocket implements TichuClientCommunication {
     public void open(Session session) {
         String token = session.getRequestParameterMap().get("token").get(0);
         this.player = gameService.getPlayerByToken(token);
-        messageCache.registerChat(this.player, this);
+        if(this.player!=null){
+            messageCache.registerChat(this.player, this);
+        }
         this.basic = session.getBasicRemote();
     }
 

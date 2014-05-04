@@ -1,5 +1,5 @@
 /* Manage messages between server and clients */
-var BASE_URL = document.location.host + "/tichu-server";
+var BASE_URL = location.href;
 var Logger = {
     threshold:2,
     info:function(message){
@@ -15,7 +15,7 @@ var Logger = {
 
 
 var	GameConnection = {
-    baseUrl:'/tichu-server/rest',
+    baseUrl: BASE_URL + 'rest',
     loadGame:function(name){
         $.ajax({
             url:this.baseUrl + '/game/info/' + name,
@@ -50,7 +50,7 @@ var WebSocketManager = {
     token:null,	// token give by server to communicate
     player:null,
     ws:null,
-    url:"ws://" + BASE_URL + "/chat4",
+    url:BASE_URL.replace("http","ws") + 'chat4',
     init:function(token,player){
         if(token == null){
           Logger.error("No token defined");

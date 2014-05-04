@@ -2,6 +2,7 @@ package fr.titan.tichu.service.cache;
 
 import java.util.HashMap;
 
+import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,13 +12,14 @@ import fr.titan.tichu.model.Player;
 /**
  *
  */
+@Singleton
 public class MemoryGameCache implements GameCache {
 
     private Logger logger = LoggerFactory.getLogger(MemoryGameCache.class);
 
-    private HashMap<String, Game> gameByNames = new HashMap<>();
+    private static HashMap<String, Game> gameByNames = new HashMap<>();
 
-    private HashMap<String, Player> playersByToken = new HashMap<>();
+    private static HashMap<String, Player> playersByToken = new HashMap<>();
 
     @Override
     public Game getGame(String name) {
