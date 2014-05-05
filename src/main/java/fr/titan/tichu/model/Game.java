@@ -191,7 +191,7 @@ public class Game implements Serializable {
      */
     public boolean canPlay() {
         for (Player player : this.players) {
-            if (!player.getPlayerStatus().equals(PlayerStatus.CONNECTED)) {
+            if (!player.getPlayerStatus().equals(PlayerStatus.CONNECTED) || player.getNbcard() > 0) {
                 return false;
             }
         }

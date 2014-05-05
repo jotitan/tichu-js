@@ -1,4 +1,4 @@
-package fr.titan.tichu.service.cache;
+package fr.titan.tichu.service.cache.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -26,25 +27,31 @@ public class RedisMessageCache implements MessageCache {
 
     public RedisMessageCache(String host, int port) throws Exception {
         jedisPool = new JedisPool(host, port);
+        Jedis jedis = jedisPool.getResource();
         try {
-            jedisPool.getResource().isConnected();
+            jedis.isConnected();
         } catch (Exception e) {
             throw new Exception("Cannot connect to redis server");
+        } finally {
+            jedisPool.returnResource(jedis);
         }
     }
 
     @Override
-    public void register(final Player player, final TichuClientCommunication clientCommunication) {
+    public void register(final String game, final String token, final TichuClientCommunication clientCommunication) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String key = "message:player:" + player.getToken();
-                String keyGame = "message:game:" + player.getGame().getGame();
+                String key = "message:player:" + token;
+                String keyGame = "message:game:" + game;
+                Jedis jedis = jedisPool.getResource();
                 try {
-                    jedisPool.getResource().subscribe(createJedisSubscribe(clientCommunication), key, keyGame);
+                    jedis.subscribe(createJedisSubscribe(clientCommunication), key, keyGame);
                 } catch (JedisConnectionException jex) {
                     // Connexion reset
-                    logger.info("Connection end " + player.getName());
+                    logger.info("Connection end " + token);
+                } finally {
+                    jedisPool.returnResource(jedis);
                 }
             }
         }).start();
@@ -56,11 +63,14 @@ public class RedisMessageCache implements MessageCache {
             @Override
             public void run() {
                 String keyChat = "chat:game:" + player.getGame().getGame();
+                Jedis jedis = jedisPool.getResource();
                 try {
-                    jedisPool.getResource().subscribe(createJedisSubscribe(clientCommunication), keyChat);
+                    jedis.subscribe(createJedisSubscribe(clientCommunication), keyChat);
                 } catch (JedisConnectionException jex) {
                     // Connexion reset
                     logger.info("Connection end " + player.getName());
+                } finally {
+                    jedisPool.returnResource(jedis);
                 }
             }
         }).start();
@@ -98,22 +108,32 @@ public class RedisMessageCache implements MessageCache {
     }
 
     @Override
-    public void unregister(Player player) {
+    public void unregister(String token) {
         // jedis
 
     }
 
     @Override
     public void sendMessage(Game game, Player player, ResponseType type, Object o) {
-        jedisPool.getResource().publish("message:player:" + player.getToken(), createMessage(type, o));
+        Jedis jedis = jedisPool.getResource();
+        try {
+            jedis.publish("message:player:" + player.getToken(), createMessage(type, o));
+        } finally {
+            jedisPool.returnResource(jedis);
+        }
     }
 
     @Override
     public void sendMessageToAll(Game game, ResponseType type, Object o) {
-        if (type.equals(ResponseType.CHAT)) {
-            jedisPool.getResource().publish("chat:game:" + game.getGame(), (String) o);
-        } else {
-            jedisPool.getResource().publish("message:game:" + game.getGame(), createMessage(type, o));
+        Jedis jedis = jedisPool.getResource();
+        try {
+            if (type.equals(ResponseType.CHAT)) {
+                jedis.publish("chat:game:" + game.getGame(), (String) o);
+            } else {
+                jedis.publish("message:game:" + game.getGame(), createMessage(type, o));
+            }
+        } finally {
+            jedisPool.returnResource(jedis);
         }
     }
 

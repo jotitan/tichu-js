@@ -1,9 +1,5 @@
 FROM ubuntu:12.10
 RUN apt-get update
 RUN apt-get -y install redis-server
-RUN apt-get -y install openssh-server
-RUN mkdir /var/run/sshd
-RUN /etc/init.d/ssh start
-EXPOSE 6379 22
-#ENTRYPOINT /usr/sbin/sshd -D
+EXPOSE 6379
 ENTRYPOINT /etc/init.d/ssh start && /usr/bin/redis-server

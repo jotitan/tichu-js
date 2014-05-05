@@ -1,13 +1,15 @@
-package fr.titan.tichu.service.cache;
+package fr.titan.tichu.service.cache.message;
 
 import java.io.IOException;
 import java.util.Properties;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.service.cache.RedisConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,23 +22,23 @@ public class MessageCacheImpl implements MessageCache {
 
     final private Logger logger = LoggerFactory.getLogger(MessageCacheImpl.class);
 
-    public MessageCacheImpl() {
-        Properties p = new Properties();
-        try {
-            p.load(MessageCacheImpl.class.getResourceAsStream("/tichu.properties"));
+    @Inject
+    public MessageCacheImpl(RedisConfiguration redisConfiguration) {
+        Object[] config = redisConfiguration.getConfiguration();
+        if (config != null) {
+            try {
+                messageCache = new RedisMessageCache((String) config[0], (Integer) config[1]);
+            } catch (Exception e) {
+                setDefault();
+            }
+        } else {
+            setDefault();
+        }
+    }
 
-        } catch (IOException ioex) {
-            logger.error("Error when loading redis properties, default configuration");
-        } catch (Exception e) {
-        }
-        String host = p.getProperty("redis.host");
-        int port = Integer.valueOf(p.getProperty("redis.port"));
-        try {
-            messageCache = new RedisMessageCache(host, port);
-        } catch (Exception e) {
-            logger.info("No Redis found, use memory message cache instead");
-            messageCache = new MemoryMessageCache();
-        }
+    private void setDefault() {
+        logger.info("No Redis found, use memory message cache instead");
+        messageCache = new MemoryMessageCache();
     }
 
     @Override
@@ -50,8 +52,8 @@ public class MessageCacheImpl implements MessageCache {
     }
 
     @Override
-    public void register(Player player, TichuClientCommunication clientCommunication) {
-        messageCache.register(player, clientCommunication);
+    public void register(String game, String token, TichuClientCommunication clientCommunication) {
+        messageCache.register(game, token, clientCommunication);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class MessageCacheImpl implements MessageCache {
     }
 
     @Override
-    public void unregister(Player player) {
-        messageCache.unregister(player);
+    public void unregister(String token) {
+        messageCache.unregister(token);
     }
 }

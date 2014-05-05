@@ -1,4 +1,4 @@
-package fr.titan.tichu.service.cache;
+package fr.titan.tichu.service.cache.message;
 
 import java.util.HashMap;
 
@@ -42,8 +42,8 @@ public class MemoryMessageCache implements MessageCache {
     }
 
     @Override
-    public void register(Player player, TichuClientCommunication clientCommunication) {
-        webSocketByToken.put(player.getToken(), clientCommunication);
+    public void register(String game, String token, TichuClientCommunication clientCommunication) {
+        webSocketByToken.put(token, clientCommunication);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MemoryMessageCache implements MessageCache {
     }
 
     @Override
-    public void unregister(Player player) {
-        webSocketByToken.remove(player.getToken());
+    public void unregister(String token) {
+        webSocketByToken.remove(token);
     }
 }

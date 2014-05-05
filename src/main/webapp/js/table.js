@@ -58,9 +58,10 @@ var Table = {
         });
 
         CardManager.resetStatus();
+        PlayerManager.getPlayerUser().removeCards();
         if(data.cards && data.cards.length > 0){
             data.cards.forEach(function(c){
-               PlayerManager.getPlayerUser().giveCard(CardManager.get(c.value,c.color));
+                PlayerManager.getPlayerUser().giveCard(CardManager.get(c.value,c.color));
             });
             PlayerManager.getPlayerUser().sortCards();
             PlayerManager.getPlayerUser().detectBombs();
@@ -68,7 +69,6 @@ var Table = {
                 // Player served, reconnect, he can see all his cards
                 PlayerManager.getPlayerUser().served = true;
             }
-
         }
         // Get the folds
         data.folds.forEach(function(fold){

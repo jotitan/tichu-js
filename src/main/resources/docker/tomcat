@@ -15,17 +15,15 @@ RUN rm -Rf apache-tomcat-7.0.53.tar.gz
 # Config and install App
 RUN apt-get -y install git
 RUN apt-get -y install maven
-RUN apt-get -y install openssh-server
-RUN mkdir /var/run/sshd
-RUN /etc/init.d/ssh start
 RUN git clone https://github.com/jotitan/tichu-js.git
 RUN cd tichu-js && git pull
+# TODO : externalize port of redis with ENV
 RUN sed -e s/localhost/192.168.0.20/ tichu-js/src/main/resources/tichu.properties > tichu.properties.temp
 RUN mv tichu.properties.temp tichu-js/src/main/resources/tichu.properties
 RUN more  tichu-js/src/main/resources/tichu.properties
 RUN cd tichu-js && mvn clean install -DskipTests=true
 RUN mv tichu-js/target/tichu.war /var/lib/tomcat7/webapps
-EXPOSE 8080 22
+EXPOSE 8080
 
 # Run tomcat
 ENTRYPOINT ./var/lib/tomcat7/bin/startup.sh && tail -500f /var/lib/tomcat7/logs/catalina.out

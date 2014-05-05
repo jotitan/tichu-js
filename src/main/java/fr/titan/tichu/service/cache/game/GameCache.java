@@ -1,9 +1,8 @@
-package fr.titan.tichu.service.cache;
+package fr.titan.tichu.service.cache.game;
 
 import com.google.inject.ImplementedBy;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
-import fr.titan.tichu.model.ws.ResponseType;
 
 /**
  *
@@ -27,9 +26,9 @@ public interface GameCache {
     /**
      * Player say frequently he's here with a HB let the player reconnect at non empty chair when server crash
      * 
-     * @param player
+     * @param token
      */
-    void heartbeat(Player player);
+    void heartbeat(String token);
 
     Long lastHeartbeat(Player player);
 

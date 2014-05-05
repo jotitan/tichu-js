@@ -3,6 +3,12 @@ package fr.titan.tichu.service.cache;
 import java.io.IOException;
 import java.util.Properties;
 
+import fr.titan.tichu.service.cache.game.GameCache;
+import fr.titan.tichu.service.cache.game.MemoryGameCache;
+import fr.titan.tichu.service.cache.message.MemoryMessageCache;
+import fr.titan.tichu.service.cache.game.RedisGameCache;
+import fr.titan.tichu.service.cache.message.MessageCache;
+import fr.titan.tichu.service.cache.message.RedisMessageCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

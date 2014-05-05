@@ -131,10 +131,18 @@ function Player(orientation,name,visible){
 	}
 
 	this.giveCard = function(card){
-		this.cards.push(card);
+	    this.cards.push(card);
 		card.setPlayer(this,this.cards.length);
 		card.setStatus(STATUS_CARD.DISTRIBUTED_CARD);
 	}
+
+    this.haveCard = function(card){
+        return this.cards.indexOf(card) != -1;
+    }
+
+    this.removeCards = function(){
+        this.cards = [];
+    }
 
     /* Add empty card until player has nb cards */
     this.setNecessaryEmptyCards = function(nb){

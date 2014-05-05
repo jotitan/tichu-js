@@ -1,8 +1,6 @@
 package fr.titan.tichu.rest;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.rest.ResponseRest;
@@ -27,13 +25,10 @@ public class GameRest {
 
     private Logger logger = LoggerFactory.getLogger(GameRest.class);
 
-     @Inject
+    @Inject
     private GameService gameService;// = new GameService();
 
     public GameRest() {
-        if(gameService == null){
-            gameService = Guice.createInjector().getInstance(GameService.class);
-        }
     }
 
     @GET
@@ -47,7 +42,7 @@ public class GameRest {
     @Path("/info/{name}")
     public Response getInfoGame(@PathParam("name") String name, @QueryParam("callback") String callback) {
         logger.info("INFO " + name);
-        GameWS game = gameService.getGame(name);
+        GameWS game = gameService.getGameWS(name);
         if (game != null) {
             return buildResponse(game, callback);
         } else {
@@ -96,7 +91,7 @@ public class GameRest {
             return buildResponse(playerWS, callback);
         } catch (Exception e) {
             ResponseRest response = new ResponseRest(0, e.getMessage());
-            logger.error("Error when Join game",e);
+            logger.error("Error when Join game : " + e.getMessage());
             return buildResponse(response, callback);
         }
     }

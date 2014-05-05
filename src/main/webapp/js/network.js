@@ -71,6 +71,8 @@ var WebSocketManager = {
             },
             this.ws.onclose = function(){
                 Logger.error("CONNECTION CLOSE");
+                this.close();
+                WebSocketManager.ws = null;
                 WebSocketManager.heartbeat.stop();
                 // Try to reconnect
                 WebSocketManager.reconnect();
@@ -79,7 +81,7 @@ var WebSocketManager = {
                 Logger.error("Connection error " + e);
             }
         }catch(e){
-            Logger.error("Error when creating websocket " + e);
+            Logger.error("Error with game websocket " + e);
         }
     },
     /* When server close connection, try to reconnect */
@@ -87,8 +89,9 @@ var WebSocketManager = {
        Logger.error("TRY RECONNECT...");
        // Wait 1/2 s
        // 2 solutions : get delta events or load everything (reset screen)
-       //setTimeout(
-       this.init(this.token,this.player);
+       setTimeout(function(){
+           WebSocketManager.init(WebSocketManager.token,WebSocketManager.player);
+       },1000);
     },
     heartbeat:{
       process:null,
@@ -163,6 +166,7 @@ var SenderManager = {
 }
 
  var MessageDispatcher = {
+
     dispatch:function(data){
         switch(data.type){
             case "CONNECTION_KO" : WebSocketManager.close();break;

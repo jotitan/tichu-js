@@ -29,18 +29,22 @@ var Chat = {
     },
     connect:function(token){
         this.token = token;
-        this.chatWS = new WebSocket(this.url + '?token=' + token);
-        this.chatWS.onmessage = function(message){
-            var data = JSON.parse(message.data);
-            var p = PlayerManager.getByOrientation(data.player);
-            Chat._showMessage(p,data.message);
-        }
-        this.chatWS.onopen = function(){
-            console.log("chat connected");
-        }
-        this.chatWS.close = function(){
-            Chat.chatWS = null;
-            Chat.connect(Chat.token);
+        try{
+            this.chatWS = new WebSocket(this.url + '?token=' + token);
+            this.chatWS.onmessage = function(message){
+                var data = JSON.parse(message.data);
+                var p = PlayerManager.getByOrientation(data.player);
+                Chat._showMessage(p,data.message);
+            }
+            this.chatWS.onopen = function(){
+                console.log("chat connected");
+            }
+            this.chatWS.close = function(){
+                Chat.chatWS = null;
+                Chat.connect(Chat.token);
+            }
+        }catch(e){
+            Logger.error("Error with chat websocket " + e);
         }
     },
     info:function(message){

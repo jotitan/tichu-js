@@ -1,0 +1,11 @@
+# To build an image with tomcat
+docker build -t titan/tomcat7 .
+
+# To Run an image (-d : background, -P : auto map ports)
+docker run -d --name=tomcat titan/tomcat7 -P
+
+# To Run image redis (-p map container port 6379 on local port 7600)
+docker run -d --name=redis titan/redis -p 7600:6379
+
+# Clean Exited container
+docker ps -a | grep Exit | awk '{pring $1}' | xargs docker rm

@@ -34,8 +34,6 @@ public class Player implements Serializable {
     /* List of win folds */
     private List<Card> cardOfFolds = new ArrayList<Card>();
 
-    private boolean reconnect = false;
-
     private void sortCards() {
         Collections.sort(this.cards, new Comparator<Card>() {
             @Override
@@ -91,7 +89,16 @@ public class Player implements Serializable {
         return false;
     }
 
-    /* Find if a combinaison with a specific value exist (case mahjong) */
+    /**
+     * Find if a combinaison with a specific value exist (case mahjong)
+     * 
+     * @param value
+     *            Value required by the mahjong
+     * @param type
+     * @param high
+     * @param length
+     * @return
+     */
     public boolean canPlayMahjongValue(int value, FoldType type, Integer high, Integer length) {
         if (!hasCard(value)) {
             return false;
@@ -100,12 +107,14 @@ public class Player implements Serializable {
         if (type == null) {
             return true;
         }
-
+        // Bomb case
+        if (countCards(value) == 4 || isStraightBomb(value)) {
+            return true;
+        }
         /* When previous card is higher */
         if (high != null && value <= high && (type.equals(FoldType.SINGLE) || type.equals(FoldType.PAIR) || type.equals(FoldType.BRELAN))) {
             return false;
         }
-        // TODO : bomb case, play when y want
         boolean phoenix = hasPhoenix();
         switch (type) {
         case SINGLE:
@@ -200,7 +209,6 @@ public class Player implements Serializable {
                                 jokerNotUsed = phoenix;
                             }
                         }
-
                     }
                 }
             }
@@ -284,6 +292,41 @@ public class Player implements Serializable {
         default:
             return false;
         }
+    }
+
+    private boolean isStraightBomb(int valueMahjong) {
+        Map<String, List<Card>> colorStraight = Maps.newHashMap();
+        for (Card card : cards) {
+            if (card instanceof ValueCard) {
+                String color = ((ValueCard) card).getColor();
+                if (!colorStraight.containsKey(color)) {
+                    colorStraight.put(color, new ArrayList<Card>());
+                }
+                colorStraight.get(color).add(card);
+            }
+        }
+
+        for (String color : colorStraight.keySet()) {
+            int previous = 0;
+            int nb = 0;
+            int first = colorStraight.get(color).get(0).getValue();
+            for (Card card : colorStraight.get(color)) {
+                if (previous == 0 || previous == card.getValue() - 1) {
+                    nb++;
+                } else {
+                    if (nb >= 5 && valueMahjong >= first && valueMahjong <= first + nb) {
+                        return true;
+                    }
+                    nb = 0;
+                    first = card.getValue();
+                }
+                previous = card.getValue();
+            }
+            if (nb >= 5 && valueMahjong >= first && valueMahjong <= first + nb) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* Count card with this value */
@@ -467,16 +510,8 @@ public class Player implements Serializable {
         this.distributeAllCards = distributeAllCards;
     }
 
-    public boolean isDistributeAllCards() {
+    public boolean getDistributeAllCards() {
         return distributeAllCards;
-    }
-
-    public boolean isReconnect() {
-        return reconnect;
-    }
-
-    public void setReconnect(boolean reconnect) {
-        this.reconnect = reconnect;
     }
 
     @Override

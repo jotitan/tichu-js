@@ -1,4 +1,4 @@
-package fr.titan.tichu.service.cache;
+package fr.titan.tichu.service.cache.message;
 
 import com.google.inject.ImplementedBy;
 import fr.titan.tichu.TichuClientCommunication;
@@ -34,17 +34,18 @@ public interface MessageCache {
     /**
      * Register the websocket with the player
      * 
-     * @param player
+     * @param game
+     * @param token
      * @param clientCommunication
      */
-    void register(Player player, TichuClientCommunication clientCommunication);
+    void register(String game, String token, TichuClientCommunication clientCommunication);
 
     void registerChat(Player player, TichuClientCommunication clientCommunication);
 
     /**
      * Unregister the player and his websocket
      * 
-     * @param player
+     * @param token
      */
-    void unregister(Player player);
+    void unregister(String token);
 }

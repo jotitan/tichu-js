@@ -11,8 +11,8 @@ import fr.titan.tichu.exception.CheatException;
 import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.*;
-import fr.titan.tichu.service.cache.GameCache;
-import fr.titan.tichu.service.cache.MessageCache;
+import fr.titan.tichu.service.cache.game.GameCache;
+import fr.titan.tichu.service.cache.message.MessageCache;
 
 /**
  * ORDER : fold < turn < round < game une main (fold) dans un tour de jeu (turn) au sein d'une partie (round) d'une manche (game) en 1000 points
@@ -25,9 +25,14 @@ public class GameService {
     public MessageCache messageCache;
 
     public GameService() {
+
     }
 
-    public GameWS getGame(String name) {
+    public Game getGame(String name) {
+        return cacheService.getGame(name);
+    }
+
+    public GameWS getGameWS(String name) {
         Game game = cacheService.getGame(name);
         return game != null ? game.toGameWS() : null;
     }
@@ -67,12 +72,12 @@ public class GameService {
         for (Player player : game.getPlayers()) {
             if (player.getName().equals(name)) {
                 if (player.getPlayerStatus().equals(PlayerStatus.FREE_CHAIR) || player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)
-                        || (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && canForceReconnect(player))) {
-                    player.setReconnect(player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED));
+                        || canForceReconnect(player)) {
                     player.setPlayerStatus(PlayerStatus.AUTHENTICATE);
                     player.createToken(gameName);
                     cacheService.addPlayer(player, game);
                     cacheService.saveGame(game);
+                    cacheService.heartbeat(player.getToken());
                     return player;
                 } else {
                     throw new Exception("The chair is not free anymore");
@@ -96,15 +101,17 @@ public class GameService {
     /*
      * Get context about the current game : - Connected players - Status of game
      */
-    public ContextWS getContextGame(Player player) {
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
+    public ContextWS getContextGame(String token) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
+
         ContextWS context = new ContextWS();
 
         context.setFolds(game.getFolds());
         /* Compact players */
         for (Player p : game.getPlayers()) {
             PlayerWS playerWS = p.getPlayerWS();
-            playerWS.setNbCard(p.getNbcard() > 0 ? p.isDistributeAllCards() ? 14 : 9 : 0);
+            playerWS.setNbCard(p.getNbcard() > 0 ? p.getDistributeAllCards() ? 14 : 9 : 0);
             playerWS.setConnected(p.isConnected());
             context.addPlayer(playerWS);
 
@@ -116,12 +123,12 @@ public class GameService {
             if (p.equals(player)) {
                 context.setPlayerUser(playerWS);
                 if (player.getCards() != null && player.getCards().size() > 0) {
-                    List<Card> cards = player.getCards().size() != 14 || player.isDistributeAllCards() ? player.getCards() : player.getCards().subList(
+                    List<Card> cards = player.getCards().size() != 14 || player.getDistributeAllCards() ? player.getCards() : player.getCards().subList(
                             0, 9);
                     for (Card card : cards) {
                         context.addCard(card.toCardWS());
                     }
-                    if (!player.isDistributeAllCards()) {
+                    if (!player.getDistributeAllCards()) {
                         context.setType(ResponseType.DISTRIBUTION_PART1);
                     } else {
                         if (context.getCurrentPlayer() == null && !player.getChangeCards().isComplete()) {
@@ -142,8 +149,10 @@ public class GameService {
     }
 
     /* Show to the player the last 5 cards */
-    public void getSuiteCards(Player player) {
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
+    public void getSuiteCards(String token) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
+
         List<CardWS> cardsWS = Lists.newArrayList();
         for (Card card : player.getCards().subList(9, player.getCards().size())) {
             cardsWS.add(card.toCardWS());
@@ -155,8 +164,9 @@ public class GameService {
         broadCast(game, ResponseType.SEE_ALL_CARDS, player.getPlayerWS());
     }
 
-    public void makeAnnonce(Player player, AnnonceType annonce) {
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
+    public void makeAnnonce(String token, AnnonceType annonce) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
         // Verifiy if player has already played a card
         switch (annonce) {
         case TICHU:
@@ -166,7 +176,7 @@ public class GameService {
             }
             break;
         case GRAND_TICHU:
-            if (player.isDistributeAllCards() || !player.canTichu()) {
+            if (player.getDistributeAllCards() || !player.canTichu()) {
                 messageCache.sendMessage(game, player, ResponseType.ANNONCE_FORBIDDEN, annonce);
                 return;
             }
@@ -177,8 +187,8 @@ public class GameService {
         broadCast(game, ResponseType.PLAYER_ANNONCE, player.getPlayerWS());
     }
 
-    protected void broadCast(Player playerFrom, ResponseType type, Object object) {
-        Game game = cacheService.getGameByTokenPlayer(playerFrom.getToken());
+    protected void broadCast(String token, ResponseType type, Object object) {
+        Game game = cacheService.getGameByTokenPlayer(token);
         broadCast(game, type, object);
     }
 
@@ -186,8 +196,8 @@ public class GameService {
         messageCache.sendMessageToAll(game, type, object);
     }
 
-    public void checkTableComplete(Player player) {
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
+    public void checkTableComplete(String token) {
+        Game game = cacheService.getGameByTokenPlayer(token);
         if (game.canPlay()) {
             broadCast(game, ResponseType.GAME_MODE, "");
             distribute(game);
@@ -211,8 +221,10 @@ public class GameService {
         LEFT, CENTER, RIGHT
     };
 
-    public void playerChangeCard(Player player, ChangeCards cards) {
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
+    public void playerChangeCard(String token, ChangeCards cards) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
+
         giveCardToPlayer(cards.getToLeft(), player, player.getOrientation().getLeft(), Position.RIGHT);
         giveCardToPlayer(cards.getToPartner(), player, player.getOrientation().getFace(), Position.CENTER);
         giveCardToPlayer(cards.getToRight(), player, player.getOrientation().getRight(), Position.LEFT);
@@ -270,9 +282,11 @@ public class GameService {
     }
 
     /** Play a bomb */
-    public void playBomb(Player player, Fold fold) {
+    public void playBomb(String token, Fold fold) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
         fold.setPlayer(player.getOrientation());
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
+
         if (fold.isBomb()) {
             game.setCurrentPlayer(player);
             if (game.verifyBomb(fold)) {
@@ -289,9 +303,10 @@ public class GameService {
     }
 
     /** Play a classic fold */
-    public void playFold(Player player, Fold fold) {
+    public void playFold(String token, Fold fold) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
         fold.setPlayer(player.getOrientation());
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
         if (!player.equals(game.getCurrentPlayer())) {
             messageCache.sendMessage(game, player, ResponseType.NOT_YOUR_TURN, "");
             return;
@@ -311,8 +326,9 @@ public class GameService {
     }
 
     /* Player doesn't play a fold */
-    public void callTurn(Player player) {
-        Game game = cacheService.getGameByTokenPlayer(player.getToken());
+    public void callTurn(String token) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
         // Verifie mahjong
         if (!game.verifyCall(player)) {
             messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
@@ -387,5 +403,14 @@ public class GameService {
     private void newTurn(Game game) {
         broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
         game.newTurn();
+    }
+
+    public void playerDisconnect(String token) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = game.getPlayerByToken(token);
+        player.setPlayerStatus(PlayerStatus.DISCONNECTED);
+        cacheService.saveGame(game);
+
+        broadCast(token, ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
     }
 }

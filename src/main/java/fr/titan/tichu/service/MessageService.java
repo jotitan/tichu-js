@@ -8,8 +8,7 @@ import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.RequestWS;
 import fr.titan.tichu.model.ws.ResponseType;
-import fr.titan.tichu.service.cache.CacheFactory;
-import fr.titan.tichu.service.cache.GameCache;
+import fr.titan.tichu.service.cache.game.GameCache;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -22,45 +21,43 @@ public class MessageService {
     private GameService gameService;
 
     @Inject
-    private GameCache gameCache;// = CacheFactory.getCache();
+    private GameCache gameCache;
 
-    public void treatMessage(Player player, String message) {
+    public void treatMessage(String token, String message) {
         ObjectMapper om = new ObjectMapper();
         try {
             RequestWS request = om.reader(RequestWS.class).readValue(message);
             switch (request.getType()) {
             case SUITE_CARDS:
-                gameService.getSuiteCards(player);
+                gameService.getSuiteCards(token);
                 break;
             case ANNONCE:
-                gameService.makeAnnonce(player, AnnonceType.valueOf(request.getValue()));
+                gameService.makeAnnonce(token, AnnonceType.valueOf(request.getValue()));
                 break;
             case CALL:
-                gameService.callTurn(player);
+                gameService.callTurn(token);
                 break;
             case CHANGE_CARDS:
                 ChangeCards cards = (ChangeCards) readObject(request.getValue(), ChangeCards.class);
-                gameService.playerChangeCard(player, cards);
+                gameService.playerChangeCard(token, cards);
                 break;
             case BOMB:
                 Fold bomb = (Fold) readObject(request.getValue(), Fold.class);
-                gameService.playBomb(player, bomb);
+                gameService.playBomb(token, bomb);
                 break;
             case FOLD:
                 Fold fold = (Fold) readObject(request.getValue(), Fold.class);
-                gameService.playFold(player, fold);
+                gameService.playFold(token, fold);
                 break;
             case HEARTBEAT:
-                gameCache.heartbeat(player);
+                gameCache.heartbeat(token);
                 break;
             }
         } catch (Exception e) {
         }
     }
 
-    public void playerDisconnect(Player player) {
-        gameService.broadCast(player, ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
-    }
+
 
     private Object readObject(String value, Class c) throws Exception {
         ObjectMapper om = new ObjectMapper();

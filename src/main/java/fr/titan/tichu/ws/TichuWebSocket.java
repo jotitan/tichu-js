@@ -1,9 +1,8 @@
 package fr.titan.tichu.ws;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import fr.titan.tichu.TichuClientCommunication;
+import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.PlayerStatus;
 import fr.titan.tichu.model.rest.ResponseRest;
@@ -11,8 +10,7 @@ import fr.titan.tichu.model.ws.ResponseType;
 import fr.titan.tichu.model.ws.ResponseWS;
 import fr.titan.tichu.service.GameService;
 import fr.titan.tichu.service.MessageService;
-import fr.titan.tichu.service.cache.CacheFactory;
-import fr.titan.tichu.service.cache.MessageCache;
+import fr.titan.tichu.service.cache.message.MessageCache;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,28 +36,31 @@ public class TichuWebSocket implements TichuClientCommunication {
     @Inject
     private MessageCache messageCache;
 
-    private Player player;
+    private String playerName;
+
+    private String token;
+
+    private String gameName;
 
     private RemoteEndpoint.Basic basic;
 
     public TichuWebSocket() {
         logger.info("INIT WEB");
-        // messageCache = CacheFactory.getMessageCache();
     }
 
     @OnOpen
     public void open(Session session) {
         logger.info("OPEN");
-        String token = session.getRequestParameterMap().get("token").get(0);
-        this.player = gameService.connectGame(token);
-        if (this.player != null) {
-            messageCache.register(this.player, this);
+        token = session.getRequestParameterMap().get("token").get(0);
+        Player player = gameService.connectGame(token);
+        playerName = player.getName();
+        gameName = player.getGame().getGame();
+        if (player != null) {
+            messageCache.register(gameName, token, this);
             this.basic = session.getBasicRemote();
-            send(ResponseType.CONNECTION_OK, gameService.getContextGame(this.player));
-            // If reconnection, no checktabke
-            if (!player.isReconnect()) {
-                gameService.checkTableComplete(player);
-            }
+            send(ResponseType.CONNECTION_OK, gameService.getContextGame(token));
+            // If reconnection, no checktable
+            gameService.checkTableComplete(token);
         } else {
             this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_KO, new ResponseRest(0, "erreur"));
@@ -75,8 +76,8 @@ public class TichuWebSocket implements TichuClientCommunication {
      */
     public void send(ResponseType type, Object object) {
         synchronized (this) {
-            logger.info("Response " + type + "(" + this.player.getName() + ")");
-            if (this.basic != null && player != null && player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
+            logger.info("Response " + type + "(" + gameName + ")");
+            if (this.basic == null || token == null) {
                 return;
             }
 
@@ -96,8 +97,8 @@ public class TichuWebSocket implements TichuClientCommunication {
     @Override
     public void send(String message) {
         synchronized (this) {
-            logger.info("Response Auto " + "(" + this.player.getName() + ")");
-            if (this.basic != null && player != null && player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)) {
+            logger.info("Response Auto " + "(" + playerName + ")");
+            if (this.basic == null || token == null) {
                 return;
             }
             try {
@@ -122,19 +123,20 @@ public class TichuWebSocket implements TichuClientCommunication {
         if (!message.contains("HEARTBEAT")) {
             logger.info("MESSAGE : " + message);
         }
-        messageService.treatMessage(this.player, message);
+        messageService.treatMessage(token, message);
     }
 
     @OnClose
     public void close(Session session, CloseReason closeReason) {
         // Have to pause the game
-        logger.info("CLOSE " + this.player.getName());
+
+        logger.info("CLOSE " + playerName);
         synchronized (this) {
             this.basic = null;
-            if (this.player != null) {
-                this.player.setPlayerStatus(PlayerStatus.DISCONNECTED);
-                messageCache.unregister(this.player);
-                messageService.playerDisconnect(this.player);
+            if (token != null) {
+                messageCache.unregister(token);
+                gameService.playerDisconnect(token);
+
             }
         }
 

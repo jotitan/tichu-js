@@ -1,10 +1,17 @@
 package fr.titan.tichu.service.cache;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Module;
 import fr.titan.tichu.Orientation;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.service.cache.message.MemoryMessageCache;
+import fr.titan.tichu.service.cache.message.MessageCache;
+import fr.titan.tichu.service.cache.message.MessageCacheImpl;
+import fr.titan.tichu.service.cache.message.RedisMessageCache;
 import fr.titan.tichu.service.mock.TichuWebSocketMock;
 import junit.framework.Assert;
 import org.junit.After;

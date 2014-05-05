@@ -1,4 +1,4 @@
-package fr.titan.tichu.service.cache;
+package fr.titan.tichu.service.cache.game;
 
 import java.util.HashMap;
 
@@ -59,7 +59,7 @@ public class MemoryGameCache implements GameCache {
     }
 
     @Override
-    public void heartbeat(Player player) {
+    public void heartbeat(String token) {
     }
 
     @Override

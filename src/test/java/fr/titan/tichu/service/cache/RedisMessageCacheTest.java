@@ -4,6 +4,8 @@ import fr.titan.tichu.Orientation;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.service.cache.message.MessageCache;
+import fr.titan.tichu.service.cache.message.RedisMessageCache;
 import fr.titan.tichu.service.mock.TichuWebSocketMock;
 import junit.framework.Assert;
 import org.junit.After;
@@ -37,10 +39,10 @@ public class RedisMessageCacheTest {
 
         TichuWebSocketMock wsMock = new TichuWebSocketMock(player.getName(), new ArrayList<ResponseType>());
 
-        messageCache.register(player, wsMock);
+        messageCache.register(game.getGame(), player.getToken(), wsMock);
 
         messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
-        messageCache.unregister(player);
+        messageCache.unregister(player.getToken());
 
     }
 

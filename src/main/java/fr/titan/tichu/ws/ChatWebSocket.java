@@ -10,8 +10,7 @@ import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
 import fr.titan.tichu.service.GameService;
-import fr.titan.tichu.service.cache.CacheFactory;
-import fr.titan.tichu.service.cache.MessageCache;
+import fr.titan.tichu.service.cache.message.MessageCache;
 
 /**
  * Chat in websocket to communicate

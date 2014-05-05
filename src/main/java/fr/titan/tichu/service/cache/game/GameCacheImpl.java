@@ -1,11 +1,15 @@
-package fr.titan.tichu.service.cache;
+package fr.titan.tichu.service.cache.game;
 
 import java.io.IOException;
 import java.util.Properties;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
+import fr.titan.tichu.service.cache.RedisConfiguration;
+import fr.titan.tichu.service.cache.message.MemoryMessageCache;
+import fr.titan.tichu.service.cache.message.RedisMessageCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,23 +22,23 @@ public class GameCacheImpl implements GameCache {
 
     final private Logger logger = LoggerFactory.getLogger(GameCacheImpl.class);
 
-    public GameCacheImpl() {
-        Properties p = new Properties();
-        try {
-            p.load(GameCacheImpl.class.getResourceAsStream("/tichu.properties"));
+    @Inject
+    public GameCacheImpl(RedisConfiguration redisConfiguration) {
+        Object[] config = redisConfiguration.getConfiguration();
+        if (config != null) {
+            try {
+                gameCache = new RedisGameCache((String) config[0], (Integer) config[1]);
+            } catch (Exception e) {
+                setDefault((String) config[0], (Integer) config[1]);
+            }
+        } else {
+            setDefault(null, null);
+        }
+    }
 
-        } catch (IOException ioex) {
-            logger.error("Error when loading redis properties, default configuration");
-        } catch (Exception e) {
-        }
-        String host = p.getProperty("redis.host");
-        int port = Integer.valueOf(p.getProperty("redis.port"));
-        try {
-            gameCache = new RedisGameCache(host, port);
-        } catch (Exception e) {
-            logger.info("No Redis found, use memory cache instead (" + host + ":" + port + ")");
-            gameCache = new MemoryGameCache();
-        }
+    private void setDefault(String host, Integer port) {
+        logger.info("No Redis found, use memory cache instead (" + host + ":" + port + ")");
+        gameCache = new MemoryGameCache();
     }
 
     @Override
@@ -73,8 +77,8 @@ public class GameCacheImpl implements GameCache {
     }
 
     @Override
-    public void heartbeat(Player player) {
-        gameCache.heartbeat(player);
+    public void heartbeat(String token) {
+        gameCache.heartbeat(token);
     }
 
     @Override

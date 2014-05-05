@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 /**
- * Created with IntelliJ IDEA. User: 960963 Date: 02/04/14 Time: 17:47 To change this template use File | Settings | File Templates.
+ * 
  */
 public class PlayerTest {
     @Test
@@ -44,6 +44,8 @@ public class PlayerTest {
 
         p.addCard(cp.getCard(new CardWS(3, "green")));
         Assert.assertTrue(p.canPlayMahjongValue(3, FoldType.SQUAREBOMB, 2, null));
+
+        p.giveCard(cp.getCard(new CardWS(3, "green")));
 
         p.addCard(cp.getCard(new CardWS(4, "blue")));
         p.addCard(cp.getCard(new CardWS(4, "green")));
@@ -138,6 +140,21 @@ public class PlayerTest {
         p.giveCard(cp.getCard(new CardWS(12, "blue")));
         p.addCard(cp.getCard(new CardWS(16, "white")));
         Assert.assertFalse(p.canPlayMahjongValue(10, FoldType.STRAIGHTBOMB, 3, 5));
+
+        p.resetCards();
+
+        p.addCard(cp.getCard(new CardWS(9, "green")));
+        p.addCard(cp.getCard(new CardWS(9, "blue")));
+        p.addCard(cp.getCard(new CardWS(10, "blue")));
+        p.addCard(cp.getCard(new CardWS(11, "blue")));
+        p.addCard(cp.getCard(new CardWS(12, "blue")));
+        Assert.assertFalse(p.canPlayMahjongValue(9, FoldType.SINGLE, 11, null));
+
+        p.addCard(cp.getCard(new CardWS(8, "red")));
+        Assert.assertFalse(p.canPlayMahjongValue(9, FoldType.SINGLE, 11, null));
+
+        p.addCard(cp.getCard(new CardWS(8, "blue")));
+        Assert.assertTrue(p.canPlayMahjongValue(9, FoldType.SINGLE, 11, null));
 
     }
 }
