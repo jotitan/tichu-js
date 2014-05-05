@@ -1,0 +1,32 @@
+FROM ubuntu:12.10
+# Config Container
+RUN apt-get clean
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y install openjdk-7-jdk
+RUN apt-get -y install wget
+RUN wget http://wwwftp.ciril.fr/pub/apache/tomcat/tomcat-7/v7.0.53/bin/apache-tomcat-7.0.53.tar.gz
+RUN tar -xvzf apache-tomcat-7.0.53.tar.gz
+RUN mv apache-tomcat-7.0.53 tomcat7
+RUN mkdir -p /var/lib/ && mv tomcat7 /var/lib/
+RUN mkdir /var/log/tomcat7
+RUN rm -Rf apache-tomcat-7.0.53.tar.gz
+
+# Config and install App
+RUN apt-get -y install git
+RUN apt-get -y install maven
+RUN apt-get -y install openssh-server
+RUN mkdir /var/run/sshd
+RUN /etc/init.d/ssh start
+RUN git clone https://github.com/jotitan/tichu-js.git
+RUN cd tichu-js && git pull
+RUN sed -e s/localhost/192.168.0.20/ tichu-js/src/main/resources/tichu.properties > tichu.properties.temp
+RUN mv tichu.properties.temp tichu-js/src/main/resources/tichu.properties
+RUN more  tichu-js/src/main/resources/tichu.properties
+RUN cd tichu-js && mvn clean install -DskipTests=true
+RUN mv tichu-js/target/tichu.war /var/lib/tomcat7/webapps
+EXPOSE 8080 22
+
+# Run tomcat
+ENTRYPOINT ./var/lib/tomcat7/bin/startup.sh && tail -500f /var/lib/tomcat7/logs/catalina.out
+#ENTRYPOINT git clone https://github.com/jotitan/tichu-js.git && cd tichu-js && mvn clean install -DskipTests=true &&  mv tichu-js/target/tichu.war /var/lib/tomcat7/webapps && ./var/lib/tomcat7/bin/startup.sh && tail -500f /var/lib/tomcat7/logs/catalina.out

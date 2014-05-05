@@ -32,7 +32,7 @@ public class GameCacheImpl implements GameCache {
         try {
             gameCache = new RedisGameCache(host, port);
         } catch (Exception e) {
-            logger.info("No Redis found, use memory cache instead");
+            logger.info("No Redis found, use memory cache instead (" + host + ":" + port + ")");
             gameCache = new MemoryGameCache();
         }
     }

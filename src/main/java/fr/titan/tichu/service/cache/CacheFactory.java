@@ -43,7 +43,7 @@ public class CacheFactory {
         try {
             gameCache = new RedisGameCache(host, port);
         } catch (Exception e) {
-            logger.info("No Redis found, use memory cache instead");
+            logger.info("No Redis found, use memory cache instead (" + host + ":" + port + ")");
             gameCache = new MemoryGameCache();
         }
         return gameCache;
@@ -56,7 +56,7 @@ public class CacheFactory {
         try {
             messageCache = new RedisMessageCache(host, port);
         } catch (Exception e) {
-            logger.info("No Redis found, use memory message cache instead");
+            logger.info("No Redis found, use memory cache instead (" + host + ":" + port + ")");
             messageCache = new MemoryMessageCache();
         }
         return messageCache;
