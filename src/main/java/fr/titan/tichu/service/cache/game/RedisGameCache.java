@@ -1,5 +1,7 @@
 package fr.titan.tichu.service.cache.game;
 
+import org.apache.commons.pool2.PooledObjectFactory;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.Jedis;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
@@ -14,7 +16,9 @@ public class RedisGameCache implements GameCache {
     private JedisPool jedisPool;
 
     public RedisGameCache(String host, int port) throws Exception {
-        jedisPool = new JedisPool(host, port);
+        GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+        config.setMaxIdle(50);
+        jedisPool = new JedisPool(config,host, port);
         Jedis jedis = jedisPool.getResource();
         try {
             jedis.connect();

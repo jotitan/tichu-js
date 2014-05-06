@@ -225,9 +225,9 @@ public class GameService {
         Game game = cacheService.getGameByTokenPlayer(token);
         Player player = game.getPlayerByToken(token);
 
-        giveCardToPlayer(cards.getToLeft(), player, player.getOrientation().getLeft(), Position.RIGHT);
-        giveCardToPlayer(cards.getToPartner(), player, player.getOrientation().getFace(), Position.CENTER);
-        giveCardToPlayer(cards.getToRight(), player, player.getOrientation().getRight(), Position.LEFT);
+        giveCardToPlayer(game,cards.getToLeft(), player, player.getOrientation().getLeft(), Position.RIGHT);
+        giveCardToPlayer(game,cards.getToPartner(), player, player.getOrientation().getFace(), Position.CENTER);
+        giveCardToPlayer(game,cards.getToRight(), player, player.getOrientation().getRight(), Position.LEFT);
 
         messageCache.sendMessage(game, player, ResponseType.CARDS_CHANGED, null);
 
@@ -263,8 +263,7 @@ public class GameService {
         return true;
     }
 
-    private void giveCardToPlayer(CardWS cardWS, Player playerFrom, Orientation to, Position position) {
-        Game game = cacheService.getGameByTokenPlayer(playerFrom.getToken());
+    private void giveCardToPlayer(Game game, CardWS cardWS, Player playerFrom, Orientation to, Position position) {
         Card card = game.getCardPackage().getCard(cardWS);
         Player playerTo = game.getPlayer(to);
         playerFrom.giveCard(card);

@@ -1,9 +1,11 @@
 package fr.titan.tichu.model.ws;
 
+import java.io.Serializable;
+
 /**
 *
  */
-public class CardWS {
+public class CardWS implements Serializable{
     private int value;
     private String color;
 

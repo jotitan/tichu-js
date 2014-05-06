@@ -51,6 +51,7 @@ public class EmbeddedRedis {
         server = new RedisServer(7600);
         server.start();
         jedis = new Jedis("localhost", 7600);
+        jedis.connect();
     }
 
     public void stop() throws Exception {

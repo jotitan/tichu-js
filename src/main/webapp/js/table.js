@@ -182,11 +182,16 @@ var Table = {
     behaviours:{
         changeMode:{
             boxes:[],
+            isEnabled:false,
             enable:function(){
+                if(this.isEnabled){
+                    return;
+                }
                 /* Add box to drop the card */
                 this._buildBoxes();
                 this.mouseController.enable(this.boxes);
                 Actions.build('swapCards');
+                this.isEnabled = true;
             },
             _buildBoxes:function(){
                 var width = ComponentManager.variables.width/2;
@@ -217,6 +222,7 @@ var Table = {
                 });
                 PlayerManager.getPlayerUser().sortCards();
                 this.mouseController.disable();
+                this.isEnabled = false;
             },
             /* Display received cards */
             showChangedCards:function(fromLeft,fromPartner,fromRight){
