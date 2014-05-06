@@ -3,6 +3,8 @@ package fr.titan.tichu.service.cache.message;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import fr.titan.tichu.service.cache.RedisConfiguration;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +28,13 @@ public class RedisMessageCache implements MessageCache {
     final private JedisPool jedisPool;
 
     public RedisMessageCache(String host, int port) throws Exception {
-        jedisPool = new JedisPool(host, port);
-        Jedis jedis = jedisPool.getResource();
+        /* In this case, 2 connections per user, so 2 block resource */
+        GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+        config.setMaxTotal(RedisConfiguration.NUMBER_CONNECTION);
+        jedisPool = new JedisPool(config, host, port);
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             jedis.isConnected();
         } catch (Exception e) {
             throw new Exception("Cannot connect to redis server");
@@ -39,84 +45,26 @@ public class RedisMessageCache implements MessageCache {
 
     @Override
     public void register(final String game, final String token, final TichuClientCommunication clientCommunication) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String key = "message:player:" + token;
-                String keyGame = "message:game:" + game;
-                Jedis jedis = jedisPool.getResource();
-                try {
-                    jedis.subscribe(createJedisSubscribe(clientCommunication), key, keyGame);
-                } catch (JedisConnectionException jex) {
-                    // Connexion reset
-                    logger.info("Connection end " + token);
-                } finally {
-                    jedisPool.returnResource(jedis);
-                }
-            }
-        }).start();
+        String key = "message:player:" + token;
+        String keyGame = "message:game:" + game;
+        MessagePublishThread thread = new MessagePublishThread(new String[] { key, keyGame }, clientCommunication, jedisPool);
+        clientCommunication.setPublishThread(thread);
+        thread.start();
     }
 
     @Override
     public void registerChat(final Player player, final TichuClientCommunication clientCommunication) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String keyChat = "chat:game:" + player.getGame().getGame();
-                Jedis jedis = jedisPool.getResource();
-                try {
-                    jedis.subscribe(createJedisSubscribe(clientCommunication), keyChat);
-                } catch (JedisConnectionException jex) {
-                    // Connexion reset
-                    logger.info("Connection end " + player.getName());
-                } finally {
-                    jedisPool.returnResource(jedis);
-                }
-            }
-        }).start();
-    }
-
-    private JedisPubSub createJedisSubscribe(final TichuClientCommunication clientCommunication) {
-        return new JedisPubSub() {
-            @Override
-            public void onMessage(String channel, String message) {
-                logger.info("Receive on " + channel + " : " + message);
-                clientCommunication.send(message);
-            }
-
-            @Override
-            public void onPMessage(String pattern, String channel, String message) {
-            }
-
-            @Override
-            public void onSubscribe(String channel, int subscribedChannels) {
-                logger.info("Suscribe to " + channel);
-            }
-
-            @Override
-            public void onUnsubscribe(String channel, int subscribedChannels) {
-            }
-
-            @Override
-            public void onPUnsubscribe(String pattern, int subscribedChannels) {
-            }
-
-            @Override
-            public void onPSubscribe(String pattern, int subscribedChannels) {
-            }
-        };
-    }
-
-    @Override
-    public void unregister(String token) {
-        // jedis
-
+        String keyChat = "chat:game:" + player.getGame().getGame();
+        MessagePublishThread thread = new MessagePublishThread(new String[] { keyChat }, clientCommunication, jedisPool);
+        clientCommunication.setPublishThread(thread);
+        thread.start();
     }
 
     @Override
     public void sendMessage(Game game, Player player, ResponseType type, Object o) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             jedis.publish("message:player:" + player.getToken(), createMessage(type, o));
         } finally {
             jedisPool.returnResource(jedis);
@@ -125,8 +73,9 @@ public class RedisMessageCache implements MessageCache {
 
     @Override
     public void sendMessageToAll(Game game, ResponseType type, Object o) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             if (type.equals(ResponseType.CHAT)) {
                 jedis.publish("chat:game:" + game.getGame(), (String) o);
             } else {

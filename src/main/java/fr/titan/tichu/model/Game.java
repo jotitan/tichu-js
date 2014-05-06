@@ -73,6 +73,13 @@ public class Game implements Serializable {
     public void newTurn() {
         if (this.lastPlayer != null) {
             this.lastPlayer.addCardsOfFold(this.cardOfFolds);
+            if (this.lastPlayer.ended()) {
+                try {
+                    this.nextPlayer();
+                } catch (Exception e) {
+                    // Impossible cause end game test before
+                }
+            }
         }
         this.currentPlayer = this.lastPlayer;
         this.lastPlayer = null;
@@ -319,15 +326,19 @@ public class Game implements Serializable {
 
     /* Define the next player */
     private void searchNextPlayer() throws Exception {
-        if (this.orderEndRound >= 2) {
+        if (this.orderEndRound >= 3) {
             throw new Exception("End of game");
         }
+        /* First round */
         if (this.currentPlayer == null) {
-            /* First round */
             this.currentPlayer = this.getCardPackage().getMahjongCard().getOwner();
         } else {
             Orientation or = this.currentPlayer.getOrientation().getNext();
             this.currentPlayer = this.players.get(or.getPos());
+            /* If last player has just ended, game stop on him */
+            if (this.currentPlayer.equals(this.lastPlayer) && this.currentPlayer.ended()) {
+                return;
+            }
             if (this.currentPlayer.ended()) {
                 searchNextPlayer();
             }

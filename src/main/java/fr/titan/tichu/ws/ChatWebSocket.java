@@ -11,6 +11,7 @@ import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
 import fr.titan.tichu.service.GameService;
 import fr.titan.tichu.service.cache.message.MessageCache;
+import fr.titan.tichu.service.cache.message.MessagePublishThread;
 
 /**
  * Chat in websocket to communicate
@@ -25,11 +26,13 @@ public class ChatWebSocket implements TichuClientCommunication {
     private Player player;
     private RemoteEndpoint.Basic basic;
 
+    private MessagePublishThread chatThread;
+
     @OnOpen
     public void open(Session session) {
         String token = session.getRequestParameterMap().get("token").get(0);
         this.player = gameService.getPlayerByToken(token);
-        if(this.player!=null){
+        if (this.player != null) {
             messageCache.registerChat(this.player, this);
         }
         this.basic = session.getBasicRemote();
@@ -56,5 +59,13 @@ public class ChatWebSocket implements TichuClientCommunication {
 
     @OnClose
     public void close(Session session) {
+        if (chatThread != null) {
+            this.chatThread.close();
+        }
+    }
+
+    @Override
+    public void setPublishThread(MessagePublishThread thread) {
+        this.chatThread = thread;
     }
 }

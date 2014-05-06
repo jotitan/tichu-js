@@ -50,9 +50,4 @@ public class MemoryMessageCache implements MessageCache {
     public void registerChat(Player player, TichuClientCommunication clientCommunication) {
         chatByToken.put(player.getToken(), clientCommunication);
     }
-
-    @Override
-    public void unregister(String token) {
-        webSocketByToken.remove(token);
-    }
 }

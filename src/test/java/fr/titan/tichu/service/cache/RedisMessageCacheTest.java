@@ -42,7 +42,6 @@ public class RedisMessageCacheTest {
         messageCache.register(game.getGame(), player.getToken(), wsMock);
 
         messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
-        messageCache.unregister(player.getToken());
 
     }
 

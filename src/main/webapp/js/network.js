@@ -192,7 +192,7 @@ var SenderManager = {
             case "NO_CALL_WHEN_FIRST":alert("Have to play a card");break;
             case "BAD_FOLD":alert("Bad fold");break;
             case "TURN_WIN":PlayerManager.winTurn(data.object);break;
-            case "ROUND_WIN":alert("Player " + data.name + " win the game");break;
+            case "ROUND_WIN":alert("Player " + data.object.name + " win the game");break;
             case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break
             case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break
             case "ANNONCE_FORBIDDEN":alert("Annonce forbidden " + data.object);break

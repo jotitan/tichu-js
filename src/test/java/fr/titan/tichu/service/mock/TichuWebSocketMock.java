@@ -4,6 +4,7 @@ import java.util.List;
 
 import fr.titan.tichu.TichuClientCommunication;
 import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.service.cache.message.MessagePublishThread;
 
 /**
 *
@@ -29,4 +30,8 @@ public class TichuWebSocketMock implements TichuClientCommunication {
         System.out.println("MOCK " + this.player + " " + message);
     }
 
+    @Override
+    public void setPublishThread(MessagePublishThread thread) {
+
+    }
 }

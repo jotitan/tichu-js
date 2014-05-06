@@ -1,5 +1,6 @@
 package fr.titan.tichu.service.cache.game;
 
+import fr.titan.tichu.service.cache.RedisConfiguration;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.Jedis;
@@ -17,10 +18,12 @@ public class RedisGameCache implements GameCache {
 
     public RedisGameCache(String host, int port) throws Exception {
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
-        config.setMaxIdle(50);
-        jedisPool = new JedisPool(config,host, port);
-        Jedis jedis = jedisPool.getResource();
+        config.setMaxTotal(RedisConfiguration.NUMBER_CONNECTION);
+        jedisPool = new JedisPool(config, host, port);
+
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             jedis.connect();
         } catch (Exception e) {
             throw new Exception("Cannot connect to redis server");
@@ -31,8 +34,9 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public boolean saveGame(Game game) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             String key = "game:" + game.getGame();
             // If first insert, save name in global liste
             if (!jedis.exists(key)) {
@@ -46,8 +50,9 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public Game getGame(String name) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             if (name == null) {
                 return null;
             }
@@ -64,8 +69,9 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public void removeGame(String name) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             String key = "game:" + name;
             jedis.del(key);
         } finally {
@@ -74,8 +80,9 @@ public class RedisGameCache implements GameCache {
     }
 
     public void close() {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             jedis.close();
         } finally {
             jedisPool.returnResource(jedis);
@@ -84,8 +91,9 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public void addPlayer(Player player, Game game) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             String keyGame = "game:player:" + player.getToken();
             jedis.set(keyGame, game.getGame());
         } finally {
@@ -104,8 +112,9 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public Game getGameByTokenPlayer(String token) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             String keyGame = "game:player:" + token;
             String game = jedis.get(keyGame);
             return getGame(game);
@@ -117,8 +126,9 @@ public class RedisGameCache implements GameCache {
     /* Save the time of last HB */
     @Override
     public void heartbeat(String token) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             String key = "player:heartbeat:" + token;
             jedis.set(key, String.valueOf(System.currentTimeMillis()));
         } finally {
@@ -128,8 +138,9 @@ public class RedisGameCache implements GameCache {
 
     @Override
     public Long lastHeartbeat(Player player) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
+            jedis = jedisPool.getResource();
             String key = "player:heartbeat:" + player.getToken();
             String heartbeat = jedis.get(key);
             return heartbeat != null ? Long.valueOf(heartbeat) : null;

@@ -60,9 +60,4 @@ public class MessageCacheImpl implements MessageCache {
     public void registerChat(Player player, TichuClientCommunication clientCommunication) {
         messageCache.registerChat(player, clientCommunication);
     }
-
-    @Override
-    public void unregister(String token) {
-        messageCache.unregister(token);
-    }
 }

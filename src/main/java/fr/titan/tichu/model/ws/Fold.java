@@ -1,5 +1,6 @@
 package fr.titan.tichu.model.ws;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +11,7 @@ import fr.titan.tichu.model.FoldType;
 /**
  * Represent a fold of a player
  */
-public class Fold {
+public class Fold implements Serializable{
     private List<CardWS> cards = new ArrayList<CardWS>();
     private FoldType type;
     private int high;

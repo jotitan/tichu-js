@@ -1,6 +1,7 @@
 package fr.titan.tichu;
 
 import fr.titan.tichu.model.ws.ResponseType;
+import fr.titan.tichu.service.cache.message.MessagePublishThread;
 
 /**
  *
@@ -20,4 +21,11 @@ public interface TichuClientCommunication {
      * @param message
      */
     void send(String message);
+
+    /**
+     * Set the publish thread used to communicate with redis. Usefull to close thread when connection fail
+     * 
+     * @param thread
+     */
+    void setPublishThread(MessagePublishThread thread);
 }

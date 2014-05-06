@@ -42,10 +42,4 @@ public interface MessageCache {
 
     void registerChat(Player player, TichuClientCommunication clientCommunication);
 
-    /**
-     * Unregister the player and his websocket
-     * 
-     * @param token
-     */
-    void unregister(String token);
 }

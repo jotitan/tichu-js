@@ -11,6 +11,7 @@ import fr.titan.tichu.model.ws.ResponseWS;
 import fr.titan.tichu.service.GameService;
 import fr.titan.tichu.service.MessageService;
 import fr.titan.tichu.service.cache.message.MessageCache;
+import fr.titan.tichu.service.cache.message.MessagePublishThread;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,8 @@ public class TichuWebSocket implements TichuClientCommunication {
     private String gameName;
 
     private RemoteEndpoint.Basic basic;
+
+    private MessagePublishThread publishThread;
 
     public TichuWebSocket() {
         logger.info("INIT WEB");
@@ -134,7 +137,9 @@ public class TichuWebSocket implements TichuClientCommunication {
         synchronized (this) {
             this.basic = null;
             if (token != null) {
-                messageCache.unregister(token);
+                if (this.publishThread != null) {
+                    publishThread.close();
+                }
                 gameService.playerDisconnect(token);
 
             }
@@ -142,4 +147,8 @@ public class TichuWebSocket implements TichuClientCommunication {
 
     }
 
+    @Override
+    public void setPublishThread(MessagePublishThread thread) {
+        this.publishThread = thread;
+    }
 }

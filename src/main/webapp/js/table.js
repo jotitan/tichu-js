@@ -58,6 +58,7 @@ var Table = {
         });
 
         CardManager.resetStatus();
+        CombinaisonsValidator.resetTurn();
         PlayerManager.getPlayerUser().removeCards();
         if(data.cards && data.cards.length > 0){
             data.cards.forEach(function(c){

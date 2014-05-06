@@ -16,6 +16,8 @@ public class RedisConfiguration {
 
     final private Logger logger = LoggerFactory.getLogger(RedisConfiguration.class);
 
+    final public static Integer NUMBER_CONNECTION = 64;
+
     public Object[] getConfiguration() {
         Properties p = new Properties();
         try {
