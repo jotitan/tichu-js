@@ -35,11 +35,20 @@ public class EmbeddedRedis {
                 System.out.println("Bye");
                 break;
             case "help":
-                System.out.println("reset\nstats\nkeys\nshow key\nexit");
+                embed.help();
                 break;
             default:
                 if (value.startsWith("show ")) {
                     embed.show(value.substring(5));
+                }
+                if (value.startsWith("save ")) {
+                    embed.save(value.substring(5));
+                }
+                if (value.startsWith("restore ")) {
+                    embed.restore(value.substring(8));
+                }
+                if (value.startsWith("delete ")) {
+                    embed.delete(value.substring(7));
                 }
             }
         } while (!"exit".equals(value));
@@ -52,6 +61,21 @@ public class EmbeddedRedis {
         server.start();
         jedis = new Jedis("localhost", 7600);
         jedis.connect();
+    }
+
+    public void help(){
+       StringBuilder builder = new StringBuilder();
+        builder
+                .append("delete (usage : delete key) : ").append("Delete specific key").append("\n")
+                .append("exit : ").append("Shutdown redis").append("\n")
+                .append("keys : ").append("List all keys").append("\n")
+                .append("reset : ").append("Delete all keys").append("\n")
+                .append("restore (usage : restore pattern) : ").append("Restore all keys previously save with pattern").append("\n")
+                .append("save (usage : save pattern) : ").append("Save all keys previously matching pattern (add .save to key)").append("\n")
+                .append("show (usage : show key) : ").append("Show the value of a key").append("\n")
+                .append("stats : ").append("Show number of keys").append("\n");
+        System.out.println(builder.toString());
+
     }
 
     public void stop() throws Exception {
@@ -73,6 +97,50 @@ public class EmbeddedRedis {
         default:
             System.out.println("Unknown type for " + key);
         }
+    }
+
+    /**
+     * Save keys by pattern. Suffix with .old
+     * @param pattern
+     */
+    public void save(String pattern){
+        Set<String> keys = jedis.keys(pattern);
+        for(String key : keys){
+            String saveKey = key + ".save";
+            copyTo(key,saveKey);
+        }
+        System.err.println(keys.size() + " keys saved");
+    }
+
+    private void copyTo(String keyFrom, String keyTo){
+        jedis.del(keyTo);
+        switch(jedis.type(keyFrom)){
+            case "string":
+                jedis.set(keyTo.getBytes(),jedis.get(keyFrom.getBytes()));
+                break;
+            case "set":
+                jedis.sadd(keyTo,jedis.smembers(keyFrom).toArray(new String[]{}));
+                break;
+            case "list":
+                jedis.rpush(keyTo,jedis.lrange(keyFrom,0,jedis.llen(keyFrom)).toArray(new String[]{}));
+                break;
+        }
+    }
+
+    public void delete(String key){
+        if(jedis.del(key)>0){
+            System.err.println(key + " deleted");
+        }
+
+    }
+
+    public void restore(String pattern){
+        Set<String> keys = jedis.keys(pattern+".save");
+        for(String key : keys){
+            String restoreKey = key.replace(".save","");
+            copyTo(key,restoreKey);
+        }
+        System.err.println(keys.size() + " keys restored");
     }
 
     private void keys() {
