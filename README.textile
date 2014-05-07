@@ -3,6 +3,13 @@ tichu-js
 
 Tichu JS
 
-Communication with WebSocket (TODO, test with atmosphere)
+Communication with WebSocket
 Deploy on tomcat 7 (test with maven plugin)
 Use Redis to stock game context and save message
+
+TODO :
+Test atmosphere
+Display annonce (until first card played)
+Display bombs buttons
+Display when user Call
+Change display to well placed played cards

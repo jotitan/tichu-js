@@ -76,6 +76,7 @@ public class Game implements Serializable {
             if (this.lastPlayer.ended()) {
                 try {
                     this.nextPlayer();
+                    this.lastPlayer = this.currentPlayer;
                 } catch (Exception e) {
                     // Impossible cause end game test before
                 }

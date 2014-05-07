@@ -20,6 +20,7 @@ function Card(value,color){
 	this.status = STATUS_CARD.NO_STATUS_CARD;
 	this.id = color + value;
 	this.checked = false;
+    this.bombs = [];    // Bombs which card is include
 
 	this.drawing = new DrawingCard(0,0,this);
 
@@ -267,6 +268,11 @@ function Bomb(cards,type){
     this.type = type;
     this.high = cards[0].value;
     this.nb = cards.length;
+
+    this.cards.forEach(function(c){
+       c.bombs.push(this);
+    },this);
+
 }
 
 

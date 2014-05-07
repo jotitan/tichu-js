@@ -4,10 +4,12 @@
 	<script language="javascript" src="../lib/jquery-1.11.0.min.js">;</script>   
 	<script language="Javascript" src="../lib/qunit-1.12.0.js">;</script>
 	<script language="Javascript" src="../js/CombinaisonsValidator.js">;</script>
-	<script language="Javascript" src="../js/Card.js">;</script>
+	<script language="Javascript" src="../js/graphics.js">;</script>
+	<script language="Javascript" src="../js/card.js">;</script>
 	<link rel="stylesheet" type="text/css" href="../css/qunit-1.12.0.css"/>
             
 	<script>
+        BASE_URL = '../';
 		test("Empty Hand",function(){
 			CombinaisonsValidator.resetTurn();
 
@@ -87,6 +89,13 @@
 			equal(combinaison.high,2,"check high pair, 2");
 			equal(combinaison.nb,3,"check nb pair, 3");
 			equal(combinaison.jokerValue,3,"Phoenix replace 3");
+
+            cards = createCards([{v:16},{v:2,c:"R"},{v:3,c:"R"},{v:3,c:"B"},{v:4,c:"V"},{v:2,c:"V"}]);
+            combinaison = CombinaisonsValidator.detect(cards);
+            equal(combinaison.type,CombinaisonType.STRAIGHTPAIR,"STRAIGHT PAIR, from 2 to 4");
+            equal(combinaison.high,2,"check high pair, 2");
+            equal(combinaison.nb,3,"check nb pair, 3");
+            equal(combinaison.jokerValue,4,"Phoenix replace 4");
 
 			cards = createCards([{v:16},{v:2,c:"R"},{v:4,c:"R"},{v:3,c:"B"},{v:5,c:"V"},{v:2,c:"V"}]); 
 			combinaison = CombinaisonsValidator.detect(cards);			
