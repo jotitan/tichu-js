@@ -365,10 +365,14 @@ public class GameService {
                 return;
             }
             if (game.isLastIsDog()) {
+                game.newTurn();
                 broadCast(game, ResponseType.TURN_WIN, null);
-            }
+                nextPlayer(game,false);
+            }else
+                nextPlayer(game);
+        }else{
+            nextPlayer(game);
         }
-        nextPlayer(game);
     }
 
     private void endRound(Game game) {
@@ -380,16 +384,21 @@ public class GameService {
         } else {
             // Send the score of the teams
             broadCast(game, ResponseType.SCORE, gameWS);
-            game.newRound();
         }
         distribute(game);
     }
 
     private void nextPlayer(Game game) {
+        nextPlayer(game,true);
+    }
+
+    private void nextPlayer(Game game,boolean nextPlayer) {
         try {
-            game.nextPlayer();
-            if (game.isTurnWin()) {
-                newTurn(game);
+            if(nextPlayer){
+                game.nextPlayer();
+                if (game.isTurnWin()) {
+                    newTurn(game);
+                }
             }
             broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
         } catch (Exception e) {
@@ -406,11 +415,13 @@ public class GameService {
 
     public void playerDisconnect(String token) {
         Game game = cacheService.getGameByTokenPlayer(token);
-        Player player = game.getPlayerByToken(token);
-        if (player != null) {
-            player.setPlayerStatus(PlayerStatus.DISCONNECTED);
-            cacheService.saveGame(game);
-            broadCast(token, ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
+        if(game !=null){
+            Player player = game.getPlayerByToken(token);
+            if (player != null) {
+                player.setPlayerStatus(PlayerStatus.DISCONNECTED);
+                cacheService.saveGame(game);
+                broadCast(token, ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
+            }
         }
 
     }

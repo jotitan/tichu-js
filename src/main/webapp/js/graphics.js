@@ -43,6 +43,42 @@ var ComponentManager = {
 	}
 }
 
+function CompteRebours(){
+    Component.apply(this);
+    this.begin;
+    this.end = false;
+    this.previous;
+    this.size = 40;
+    this.draw = function(canvas){
+        if(this.end){return;}
+        this.begin = this.begin || new Date().getTime();
+
+        var diff = new Date().getTime() - this.begin;
+        var val = Math.round((3000 - diff) / 1000);
+        if(val < 0){
+            this.end = true;
+            return;
+        }
+        if(this.previous == null || this.previous != val){
+            this.previous = val;
+            this.size = 40;
+        }
+
+        this.size-=(this.size > 15)?1:0;
+
+        canvas.font = this.size + "px Arial";
+        canvas.fillText(val,200,200);
+    }
+ }
+
+
+ ComponentManager.add(new CompteRebours());
+
+
+
+
+
+
 function Component(){
 	this.id = ComponentManager.getNextId();
 	this.draw = function(){

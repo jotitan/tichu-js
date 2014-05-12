@@ -12,6 +12,7 @@ function Player(orientation,name,visible){
     this.select = false;    // Current player
     this.served = false;    // Player has all cards (14)
     this.bombs = [];    // List of available bomb
+    this.annonce = null;
 
     this.equals = function(player){
         if(player == null){
@@ -24,6 +25,7 @@ function Player(orientation,name,visible){
     ComponentManager.add(this.drawing);
 
     this.setAnnonce = function(annonce){
+        this.annonce = annonce;
         if(annonce == null){
             this.drawing.annonce = null;
         }else{
@@ -32,6 +34,10 @@ function Player(orientation,name,visible){
                 case "TICHU":this.drawing.annonce = "T";break
             }
         }
+    }
+
+    this.isAnnonce = function(){
+        return this.annonce!= null;
     }
 
     this.setSelected = function(select){
@@ -62,6 +68,11 @@ function Player(orientation,name,visible){
         this.bombs = BombDetector.detect(this.cards);
     }
 
+    this.displayBombs = function(){
+        this.bombs.forEach(function(bomb){
+           Actions.addBombAction(bomb);
+        });
+    }
 	/* Sort by number and color */
     /* @param fullSort : init also the orientation */
 	this.sortCards = function(fullSort){
@@ -93,14 +104,33 @@ function Player(orientation,name,visible){
                 if(card.isPhoenix){
                     card.replaceValue = fold.jokerValue;
                 }
+                card.bombs.forEach(function(bomb){
+                    this.removeBomb(bomb);
+                },this);
                 return card;
-            });
+            },this);
             Table.doPlayFold(cards,this);
+
             this.playFoldOnTurn++;
 		}catch(impossible){
-			alert("Impossible combinaison");
+			alert("Impossible combinaison " + impossible);
 		}
 	}
+
+    this.removeBomb = function(bomb){
+        var idx = this.bombs.indexOf(bomb);
+        if(idx > 0){
+            this.bombs.splice(idx,1);
+        }
+        if(bomb.remove!=null){
+            bomb.remove();
+        }
+    }
+
+    this.playBomb = function(fold){
+        this.playFold(fold);
+
+    }
 	
 	this.showRecto = function(){
 		this.cards.forEach(function(c){
@@ -276,6 +306,12 @@ var PlayerManager = {
         CombinaisonsValidator.addFold(fold);
     },
     playBomb:function(bomb){
-        var player = this.getByOrientation(fold.player);
+        var player = this.getByOrientation(bomb.player);
+        player.playBomb(bomb);
+        CombinaisonsValidator.addFold(bomb);
+    },
+    call:function(player){
+        var player = this.getByOrientation(player);
+        console.log(player.name + " CALL");
     }
 }

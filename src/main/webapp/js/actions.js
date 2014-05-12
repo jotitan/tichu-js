@@ -10,11 +10,15 @@ var Actions = {
         if(bomb.type == CombinaisonType.SQUAREBOMB){
             title+= " " + bomb.high;
         }else{
-            title+= " " + bomb.cards[0].value + " - " + bomb.cards[bomb.cards.length -1].value;
+            title+= " " + bomb.cards[0].value + " - " + bomb.cards[bomb.cards.length -1].value + " " + bomb.cards[0].color;
         }
         var btn = {name:title,fct:function(){
-            alert("click");
-        }};
+            Table.behaviours.gameMode.playBomb(bomb);
+        },class:"bomb",id:title};
+        bomb.remove = function(){
+            Actions.deleteById(title);
+        };
+        this._addButton(btn);
 	},
 	build:function(){
 	  var actions = [];
@@ -26,14 +30,34 @@ var Actions = {
 	create:function(actions){
 		this.empty();
 		actions.forEach(function(action){
-			var button = $('<button>' + action.name + '</button>');
-			button.bind('click',action.fct);
-            this.div.append(button);
+            this._addButton(action);
 		},this);
 	},
-	empty:function(){
-		this.div.empty()
+    _addButton:function(action){
+        var button = $('<button>' + action.name + '</button>');
+        if(action.class){
+            button.attr('class',action.class);
+        }
+        if(action.id){
+            button.attr('id',action.id);
+        }
+        button.bind('click',action.fct);
+        this.div.append(button);
+    },
+	empty:function(deleteAll){
+		if(deleteAll){
+            this.div.empty();
+        }
+        else{
+            this.div.find('button:not([class])').remove();
+        }
 	},
+    deleteByClass:function(cssClass){
+        this.div.find('button[class="' + cssClass + '"]').remove();
+    },
+    deleteById:function(id){
+        this.div.find('#' + id).remove();
+    },
 	actions:{
 	    play:{
 	        name:"Play",
@@ -58,7 +82,9 @@ var Actions = {
             name:"Tichu",
             fct:function(){
                 SenderManager.annonceTichu();
-            }
+                Actions.deleteByClass('tichu');
+            } ,
+            class:"tichu"
         },
         lastCards:{
             name:"Last cards",

@@ -116,7 +116,8 @@ var WebSocketManager = {
     readMessage:function(message){
         try{
             var data = JSON.parse(message);
-            MessageDispatcher.dispatch(data);
+            Fifo.exec(data);
+            //MessageDispatcher.dispatch(data);
         }catch(e){
             Logger.error("NOT JSON : " + message + e);
         }
@@ -157,7 +158,8 @@ var SenderManager = {
         this._send('CALL','')
     },
     _send:function(type,object){
-        this._sendJSON(type,JSON.stringify(object));
+        var data = typeof object == "object" ? JSON.stringify(object) : object;
+        this._sendJSON(type,data);
     },
     _sendJSON:function(type,json){
         var data = {type:type,value:json};
@@ -188,7 +190,7 @@ var SenderManager = {
             case "NOT_YOUR_TURN":alert("Not your turn, stop it");break;
             case "FOLD_PLAYED":PlayerManager.playFold(data.object);break;
             case "BOMB_PLAYED":PlayerManager.playBomb(data.object);break;
-            case "CALL_PLAYED":console.log("CALL");break;
+            case "CALL_PLAYED":PlayerManager.call(data.object);break;
             case "NO_CALL_WHEN_FIRST":alert("Have to play a card");break;
             case "BAD_FOLD":alert("Bad fold");break;
             case "TURN_WIN":PlayerManager.winTurn(data.object);break;
@@ -201,8 +203,47 @@ var SenderManager = {
         }
     }
  }
-     /*
 
-BOMB_PLAYED
+var Fifo = {
+    buffer : new Array(),
+    pause : false,
 
-*/
+    /* Exec immediately or put in fifo execution */
+    exec : function(task){
+        if(!this.pause && this.buffer.length == 0){
+            this._execTask(task);
+        }else{
+            this._add(task);
+        }
+    },
+
+    _execTask : function(task){
+        if(task == null){return;}
+        MessageDispatcher.dispatch(task);
+    },
+
+    // Stop running tasks, put in fifo
+    stop : function(){
+        this.pause = true;
+    }  ,
+
+    start : function(){
+        while(this.buffer.length>0 && this.pause == true){
+            this._execTask(this._get());
+        }
+    },
+
+    _add : function(task){
+        this.buffer.push(task);
+    },
+
+    _get : function(){
+        var value = this.buffer.splice(0,1);
+        if(value.length == 0){
+            return null;
+        }
+        return value[0];
+    }
+
+
+}

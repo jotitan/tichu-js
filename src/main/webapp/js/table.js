@@ -39,6 +39,9 @@ var Table = {
         // Reorganize cards
         player.sortCards();
         CardManager.sortCards();
+        if(player.equals(PlayerManager.getPlayerUser())){
+            Actions.deleteByClass("tichu");
+        }
     },
     /* Display the context */
     display:function(data){
@@ -52,8 +55,11 @@ var Table = {
             }
             pl.setAnnonce(p.annonce);
             if(!pl.equals(PlayerManager.getPlayerUser())){
-                //pl.createEmptyCards(p.nbCard);
                 pl.setNecessaryEmptyCards(p.nbCard);
+            }else{
+                if(!pl.isAnnonce() && p.nbCard == 14){
+                    Actions.build("tichu");
+                }
             }
         });
 
@@ -66,6 +72,7 @@ var Table = {
             });
             PlayerManager.getPlayerUser().sortCards();
             PlayerManager.getPlayerUser().detectBombs();
+            PlayerManager.getPlayerUser().displayBombs();
             if(data.type == "NEXT_PLAYER"){
                 // Player served, reconnect, he can see all his cards
                 PlayerManager.getPlayerUser().served = true;
@@ -112,8 +119,8 @@ var Table = {
         PlayerManager.getPlayerUser().giveCard(cp);
         PlayerManager.getPlayerUser().giveCard(cr);
         this.behaviours.changeMode.showChangedCards(cl,cp,cr);
-        PlayerManager.getPlayerUser().detectBombs();
         this.resetTurn();
+        PlayerManager.getPlayerUser().detectBombs();
     },
     notifyPlayerSeeCards:function(player){
       var p = PlayerManager.getByOrientation(player.orientation);
@@ -175,6 +182,9 @@ var Table = {
     distributeSecondPart:function(cards){
         Actions.empty();
         var user = PlayerManager.getPlayerUser();
+        if(!user.isAnnonce()){
+            Actions.build("tichu");
+        }
         cards.forEach(function(card){
             user.giveCard(CardManager.get(card.value,card.color));
         });
@@ -241,6 +251,7 @@ var Table = {
                 this.boxes = [];
                 PlayerManager.getPlayerUser().sortCards(true);
                 Actions.empty();
+                PlayerManager.getPlayerUser().displayBombs();
                 if(PlayerManager.getPlayerUser().equals(PlayerManager.currentPlayer)){
                     Table.behaviours.gameMode.enable();
                 }
@@ -350,7 +361,9 @@ var Table = {
             },
             playBomb:function(bomb){
                 var bombCombinaison = new Combinaison(bomb.type,bomb.high,bomb.nb);
-                bombCombinaison.cards = bomb.cards;
+                bomb.cards.forEach(function(c){
+                    bombCombinaison.cards.push({value:c.value,color:c.color});
+                });
 
                 SenderManager.playBomb(bombCombinaison);
             },
