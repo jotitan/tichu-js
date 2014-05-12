@@ -110,6 +110,7 @@ var Table = {
     disconnectPlayer:function(orientation,currentUser){
         PlayerManager.getByOrientation(orientation).drawing.setOffline();
     },
+    /* When receive the 3 cards of others players */
     receiveCards:function(cards){
         var cl = CardManager.get(cards.toLeft.value,cards.toLeft.color);
         var cp = CardManager.get(cards.toPartner.value,cards.toPartner.color);

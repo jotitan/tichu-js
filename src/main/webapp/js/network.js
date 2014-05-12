@@ -168,7 +168,13 @@ var SenderManager = {
 }
 
  var MessageDispatcher = {
-
+    countdown:null,
+    init:function(){
+        this.countdown = new CountDown(function(){
+            Fifo.start();
+        });
+        ComponentManager.add(this.countdown);
+    },
     dispatch:function(data){
         switch(data.type){
             case "CONNECTION_KO" : WebSocketManager.close();break;
@@ -221,7 +227,10 @@ var Fifo = {
         if(task == null){return;}
         MessageDispatcher.dispatch(task);
     },
-
+    run:function(){
+        this.pause = true;
+        this.start();
+    },
     // Stop running tasks, put in fifo
     stop : function(){
         this.pause = true;
@@ -244,6 +253,6 @@ var Fifo = {
         }
         return value[0];
     }
-
-
 }
+
+MessageDispatcher.init();

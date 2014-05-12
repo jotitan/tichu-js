@@ -43,12 +43,14 @@ var ComponentManager = {
 	}
 }
 
-function CompteRebours(){
+/* Actual FPS is 20 (50ms) */
+function CountDown(callback){
     Component.apply(this);
     this.begin;
-    this.end = false;
+    this.end = true;
     this.previous;
     this.size = 40;
+    this.endCallback = callback;
     this.draw = function(canvas){
         if(this.end){return;}
         this.begin = this.begin || new Date().getTime();
@@ -57,27 +59,25 @@ function CompteRebours(){
         var val = Math.round((3000 - diff) / 1000);
         if(val < 0){
             this.end = true;
+            if(this.endCallback){
+                this.endCallback();
+            }
             return;
         }
         if(this.previous == null || this.previous != val){
             this.previous = val;
             this.size = 40;
         }
-
         this.size-=(this.size > 15)?1:0;
 
         canvas.font = this.size + "px Arial";
         canvas.fillText(val,200,200);
     }
+    this.start = function(){
+        this.begin = null;
+        this.end = false;
+    }
  }
-
-
- ComponentManager.add(new CompteRebours());
-
-
-
-
-
 
 function Component(){
 	this.id = ComponentManager.getNextId();
