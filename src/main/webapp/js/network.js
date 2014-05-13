@@ -116,8 +116,9 @@ var WebSocketManager = {
     readMessage:function(message){
         try{
             var data = JSON.parse(message);
-            Fifo.exec(data);
-            //MessageDispatcher.dispatch(data);
+            var task = function(){MessageDispatcher.dispatch(data);};
+            //Fifo.exec(data);
+            Fifo.exec(task);
         }catch(e){
             Logger.error("NOT JSON : " + message + e);
         }
@@ -171,7 +172,7 @@ var SenderManager = {
     countdown:null,
     init:function(){
         this.countdown = new CountDown(function(){
-            Fifo.start();
+            Fifo.run();
         });
         ComponentManager.add(this.countdown);
     },
@@ -199,7 +200,11 @@ var SenderManager = {
             case "CALL_PLAYED":PlayerManager.call(data.object);break;
             case "NO_CALL_WHEN_FIRST":alert("Have to play a card");break;
             case "BAD_FOLD":alert("Bad fold");break;
-            case "TURN_WIN":PlayerManager.winTurn(data.object);break;
+            case "TURN_WIN":
+                Fifo.stop();
+                Fifo.exec(function(){PlayerManager.winTurn(data.object);});
+                this.countdown.start(6000);
+                break;
             case "ROUND_WIN":alert("Player " + data.object.name + " win the game");break;
             case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break
             case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break
@@ -225,10 +230,11 @@ var Fifo = {
 
     _execTask : function(task){
         if(task == null){return;}
-        MessageDispatcher.dispatch(task);
+        task();
+        //MessageDispatcher.dispatch(task);
     },
     run:function(){
-        this.pause = true;
+        this.pause = false;
         this.start();
     },
     // Stop running tasks, put in fifo

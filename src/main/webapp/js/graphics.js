@@ -51,12 +51,13 @@ function CountDown(callback){
     this.previous;
     this.size = 40;
     this.endCallback = callback;
+    this.value = 3000;
     this.draw = function(canvas){
         if(this.end){return;}
         this.begin = this.begin || new Date().getTime();
 
         var diff = new Date().getTime() - this.begin;
-        var val = Math.round((3000 - diff) / 1000);
+        var val = Math.round((this.value - diff) / 1000);
         if(val < 0){
             this.end = true;
             if(this.endCallback){
@@ -73,7 +74,8 @@ function CountDown(callback){
         canvas.font = this.size + "px Arial";
         canvas.fillText(val,200,200);
     }
-    this.start = function(){
+    this.start = function(value){
+        this.value = value || this.value;
         this.begin = null;
         this.end = false;
     }
