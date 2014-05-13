@@ -37,12 +37,58 @@
 </div>
 <div style="clear:both"></div>
 <div id="actions"></div>
-<div style="width:600px;height:150px;" id="idChatDiv"></div>
+<div style="width:600px;height:150px;overflow:auto" id="idChatDiv"></div>
 <input type="text" style="width:500px;" id="idMessage"/>
 
+<style>
+    .box{
+        display:inline-block;
+        width:200px;
+        border:solid 2px blue;
+        margin:20px;
+        padding-left:5px;
+    }
+
+    .glue {
+        display:inline-block;
+        width:200px;
+    }
+
+</style>
+
+<div id="selectGame">
+    <div id="idMessageInfo"></div>
+    Game : <input type="text" id="idGameName"/><button id="idLoadGame">OK</button><br/>
+    <span class="glue"></span>
+    <span style="" class="box joueur_N">N : <span></span></span>     <br/>
+    <span style="" class="box joueur_O">O : <span></span></span>
+    <span class="glue"></span>
+    <span style="" class="box joueur_E">E : <span></span></span><br/>
+    <span class="glue"></span>
+    <span style="" class="box joueur_S">S : <span></span></span>     <br/>
+
+</div>
 
 
 <script>
+
+    var div = $('#selectGame');
+    $('#idLoadGame').click(function(){
+        GameConnection.loadGame($('#idGameName').val(),function(data){
+            if(data.message){
+                $('#idMessageInfo').html(data.message);
+                $('span[class*="joueur_"] > span',div).unbind('click').html('');
+            }else{
+                $('#idMessageInfo').html("Well loaded");
+                data.players.forEach(function(j){
+                   $('.joueur_' + j.orientation + ' > span',div).bind('click',function(){
+                        alert("Connection de " + j.name);
+                   }).html(j.name);
+                });
+            }
+            console.log(data);
+        });
+    });
 
 PlayerManager.init();
 CardManager.init();

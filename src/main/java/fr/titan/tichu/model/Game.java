@@ -51,8 +51,8 @@ public class Game implements Serializable {
         for (Orientation or : Orientation.values()) {
             this.players.add(or.getPos(), new Player(this, or));
         }
-        team1 = new Team(this.players.get(0), this.players.get(2));
-        team2 = new Team(this.players.get(1), this.players.get(3));
+        team1 = new Team(this.players.get(0), this.players.get(2), 0);
+        team2 = new Team(this.players.get(1), this.players.get(3), 1);
         createCards();
     }
 

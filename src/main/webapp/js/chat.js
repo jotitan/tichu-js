@@ -50,11 +50,14 @@ var Chat = {
     info:function(message){
         this._showMessage({name:"INFO"},message,"green");
     },
+    error:function(message){
+        this._showMessage({name:"INFO"},message,"red");
+    },
     _showMessage:function(player,message,color){
         if(PlayerManager.getPlayerUser().equals(player)){return;}
         color = color || 'black';
         if(this.div){
-            this.div.append('<span style="color:' + color + '">' + player.name + " : " + unescape(message) + '</span><br/>');
+            this.div.prepend('<span style="color:' + color + '">' + player.name + " : " + unescape(message) + '</span><br/>');
         }else{
             console.log(player.name,unescape(message));
         }

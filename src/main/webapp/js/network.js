@@ -16,12 +16,12 @@ var Logger = {
 
 var	GameConnection = {
     baseUrl: BASE_URL + 'rest',
-    loadGame:function(name){
+    loadGame:function(name,callback){
         $.ajax({
             url:this.baseUrl + '/game/info/' + name,
             dataType:'jsonp',
             success:function(data){
-                Table.display(data);
+                callback(data);
             }
         });
     },
@@ -193,25 +193,36 @@ var SenderManager = {
             case "CARDS_CHANGED":Table.behaviours.changeMode.disable();break;
             case "NEW_CARDS":Table.receiveCards(data.object);break;
             case "NEXT_PLAYER":PlayerManager.nextPlayer(data.object);break;
-            case "GAME_MODE":break;
-            case "NOT_YOUR_TURN":alert("Not your turn, stop it");break;
+            case "GAME_MODE":Chat.info("Let's go");break;
+            case "NOT_YOUR_TURN":Chat.error("Not your turn, stop it");break;
             case "FOLD_PLAYED":PlayerManager.playFold(data.object);break;
             case "BOMB_PLAYED":PlayerManager.playBomb(data.object);break;
             case "CALL_PLAYED":PlayerManager.call(data.object);break;
-            case "NO_CALL_WHEN_FIRST":alert("Have to play a card");break;
-            case "BAD_FOLD":alert("Bad fold");break;
+            case "NO_CALL_WHEN_FIRST":Chat.error("Have to play a card");break;
+            case "BAD_FOLD":Chat.error("Bad fold");break;
             case "TURN_WIN":
-                Fifo.stop();
-                Fifo.exec(function(){PlayerManager.winTurn(data.object);});
-                this.countdown.start(6000);
+                this.temporize(5000,function(){PlayerManager.winTurn(data.object);});
                 break;
-            case "ROUND_WIN":alert("Player " + data.object.name + " win the game");break;
-            case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break
-            case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break
-            case "ANNONCE_FORBIDDEN":alert("Annonce forbidden " + data.object);break
-            case "SCORE":Scorer.addResult(data.object);break
-            case "GAME_WIN":alert("End of the game");break
+            case "ROUND_WIN":Chat.info("Player " + data.object.name + " finish first");break;
+            case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break;
+            case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break;
+            case "ANNONCE_FORBIDDEN":Chat.error("Annonce forbidden " + data.object);break;
+            case "SCORE":
+                Scorer.addResult(data.object);
+                this.temporize(4000);
+                break;
+            case "GAME_WIN":
+                this.temporize(6000);
+                break;
         }
+    },
+    /* Tezmporize execution of behave. Bufferize instructions */
+    temporize:function(during,fct){
+       Fifo.stop();
+       if(fct){
+        Fifo.exec(fct);
+       }
+       this.countdown.start(during);
     }
  }
 

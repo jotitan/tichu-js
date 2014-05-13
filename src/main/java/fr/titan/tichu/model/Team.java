@@ -9,20 +9,26 @@ import java.util.List;
  *
  */
 public class Team implements Serializable {
+    private String name;
     private int score;
+    /* Order of team (first of second) */
+    private int order;
     private Player player1;
     private Player player2;
+
+    private static final int WIN_LIMIT = 1000;
 
     private List<Score> scores = Lists.newLinkedList();
 
     public Team() {
     }
 
-    public Team(Player player1, Player player2) {
+    public Team(Player player1, Player player2, int order) {
         this.player1 = player1;
         this.player2 = player2;
         this.player1.setPartner(this.player2);
         this.player2.setPartner(this.player1);
+        this.order = order;
     }
 
     public Score buildScore(boolean isOtherCapot) {
@@ -51,7 +57,7 @@ public class Team implements Serializable {
     }
 
     public boolean hasWon() {
-        return score >= 1000;
+        return score >= WIN_LIMIT;
     }
 
     public int getPointAnnonce(Player player) {
@@ -95,5 +101,9 @@ public class Team implements Serializable {
 
     public List<Score> getScores() {
         return scores;
+    }
+
+    public int getOrder() {
+        return order;
     }
 }

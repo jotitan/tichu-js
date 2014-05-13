@@ -367,10 +367,10 @@ public class GameService {
             if (game.isLastIsDog()) {
                 game.newTurn();
                 broadCast(game, ResponseType.TURN_WIN, null);
-                nextPlayer(game,false);
-            }else
+                nextPlayer(game, false);
+            } else
                 nextPlayer(game);
-        }else{
+        } else {
             nextPlayer(game);
         }
     }
@@ -378,23 +378,22 @@ public class GameService {
     private void endRound(Game game) {
         GameWS gameWS = game.saveScore();
         Team team = game.getWinner();
+        broadCast(game, ResponseType.SCORE, gameWS);
         if (team != null) {
-            broadCast(game, ResponseType.GAME_WIN, null);
+            // Propose to play a new game
+            broadCast(game, ResponseType.GAME_WIN, team.getOrder());
             game.newGame();
-        } else {
-            // Send the score of the teams
-            broadCast(game, ResponseType.SCORE, gameWS);
         }
         distribute(game);
     }
 
     private void nextPlayer(Game game) {
-        nextPlayer(game,true);
+        nextPlayer(game, true);
     }
 
-    private void nextPlayer(Game game,boolean nextPlayer) {
+    private void nextPlayer(Game game, boolean nextPlayer) {
         try {
-            if(nextPlayer){
+            if (nextPlayer) {
                 game.nextPlayer();
                 if (game.isTurnWin()) {
                     newTurn(game);
@@ -415,7 +414,7 @@ public class GameService {
 
     public void playerDisconnect(String token) {
         Game game = cacheService.getGameByTokenPlayer(token);
-        if(game !=null){
+        if (game != null) {
             Player player = game.getPlayerByToken(token);
             if (player != null) {
                 player.setPlayerStatus(PlayerStatus.DISCONNECTED);

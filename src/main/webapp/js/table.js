@@ -129,6 +129,10 @@ var Table = {
         p.createEmptyCards(5);
       }
     },
+    showGameWinner:function(teamWin){
+        Chat.info("End of the game, team " + (teamWin+1) + " win");
+        Scorer.showWinner(teamWin);
+    },
     resetTurn:function(){
         CombinaisonsValidator.resetTurn();
         this.folds = [];

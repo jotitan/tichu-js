@@ -156,8 +156,12 @@ function DrawingCard(x,y,card){
 			        case "O" : this.x = 100;this.y=ComponentManager.variables.height/2;break;
 			        case "E" : this.x = ComponentManager.variables.width-120 - foldLength*5;this.y=ComponentManager.variables.height/2;break;
 			    }
+			    if(player.orientationTable == "S"){
+                    this.y-=15*player.playFoldOnTurn;
+			    }else{
+			        this.y+=15*player.playFoldOnTurn;
+			    }
 			    this.x+=5*player.playFoldOnTurn;
-			    this.y+=15*player.playFoldOnTurn;
                 break;
 			case "N" : this.x = ComponentManager.variables.width-140;this.y = this.height+10;break;
 			case "S" : this.x = 140;this.y = ComponentManager.variables.height-this.height-10;break;
@@ -272,9 +276,7 @@ function Bomb(cards,type){
     this.cards.forEach(function(c){
        c.bombs.push(this);
     },this);
-
 }
-
 
 var Sorter = {
     cards:function(cards){
