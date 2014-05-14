@@ -162,7 +162,17 @@ function TitleBox(name,orientation){
     }
 
     this._drawTitleSmallCaps = function(canvas){
-        var value = this.name.toUpperCase();
+        var name = (this.name + ((this.annonce!=null)?' - ' + this.annonce:'')).toUpperCase();
+        canvas.fillStyle = this.color;
+        canvas.font = "bold 14px Arial";
+        var left = 50 - canvas.measureText(name).width/2;
+
+        canvas.font = "bold 18px Arial";
+        var carac = canvas.measureText(name.substring(0,1)).width;
+        canvas.fillText(name.substring(0,1),left,20);
+        canvas.font = "bold 14px Arial";
+
+        canvas.fillText(name.substring(1,name.length),left+carac,20);
     }
 
     this.draw = function(canvas){
@@ -170,15 +180,18 @@ function TitleBox(name,orientation){
         canvas.save();
         canvas.translate(this.x,this.y);
         canvas.rotate(this.rotate);
-        canvas.strokeStyle=this.color;
 
-        canvas.lineWidth = this.select ? 5 : 1;
-        canvas.strokeRect(0,0,100,50);
-        canvas.font = (this.select ? "small-caps bold ":"") +  "14px Arial";
-        canvas.fillStyle = this.color;
-
-        var name = this.name + ((this.annonce!=null)?' - ' + this.annonce:'');
-        canvas.fillText(name,50 - canvas.measureText(name).width/2,20);
+        //canvas.strokeStyle=this.color;
+        //canvas.lineWidth = this.select ? 5 : 1;
+        //canvas.strokeRect(0,0,100,50);
+        if(this.select){
+             this._drawTitleSmallCaps(canvas);
+        }else{
+            canvas.font = "14px Arial";
+            canvas.fillStyle = this.color;
+            var name = this.name + ((this.annonce!=null)?' - ' + this.annonce:'');
+            canvas.fillText(name,50 - canvas.measureText(name).width/2,20);
+        }
         canvas.restore();
     }
 
