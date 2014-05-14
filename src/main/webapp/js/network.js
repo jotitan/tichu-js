@@ -13,24 +13,37 @@ var Logger = {
     }
 }
 
+var GameInfo = {
+    baseUrl: BASE_URL + 'rest',
+   loadGame:function(name,callback){
+       $.ajax({
+           url:this.baseUrl + '/game/info/' + name,
+           dataType:'jsonp',
+           success:function(data){
+               callback(data);
+           }
+       });
+   },
+   listGames:function(callback){
+        $.ajax({
+            url:this.baseUrl + '/game/list',
+            dataType:'jsonp'
+        })
+   }
+}
 
 var	GameConnection = {
     baseUrl: BASE_URL + 'rest',
-    loadGame:function(name,callback){
-        $.ajax({
-            url:this.baseUrl + '/game/info/' + name,
-            dataType:'jsonp',
-            success:function(data){
-                callback(data);
-            }
-        });
-    },
     /* Create connection to a party */
-    connect:function(game,player){
-        console.log(this.url)
+    /* @param rename : set if user want to change connection name */
+    connect:function(game,player,rename){
+        var data = {game:game,name:player};
+        if(rename && rename != player){
+            data.renameData = rename;
+        }
         $.ajax({
             url:this.baseUrl + '/game/join',
-            data:{game:game,name:player},
+            data:data,
             dataType:'jsonp',
             success:function(data){
                if(data.status!=null && data.status == 0){

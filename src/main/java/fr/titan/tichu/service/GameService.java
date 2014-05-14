@@ -1,6 +1,7 @@
 package fr.titan.tichu.service;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -13,6 +14,8 @@ import fr.titan.tichu.model.rest.GameRequest;
 import fr.titan.tichu.model.ws.*;
 import fr.titan.tichu.service.cache.game.GameCache;
 import fr.titan.tichu.service.cache.message.MessageCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ORDER : fold < turn < round < game une main (fold) dans un tour de jeu (turn) au sein d'une partie (round) d'une manche (game) en 1000 points
@@ -23,6 +26,8 @@ public class GameService {
     public GameCache cacheService;
     @Inject
     public MessageCache messageCache;
+
+    private Logger logger = LoggerFactory.getLogger(GameService.class);
 
     public GameService() {
 
@@ -87,6 +92,10 @@ public class GameService {
         throw new Exception("No player with this name");
     }
 
+    public Set<String> getGames() {
+        return cacheService.getGames();
+    }
+
     /**
      * Check the heartbeat. If heartbeat exist and greater than 1000ms, permet reconnect
      * 
@@ -105,42 +114,7 @@ public class GameService {
         Game game = cacheService.getGameByTokenPlayer(token);
         Player player = game.getPlayerByToken(token);
 
-        ContextWS context = new ContextWS();
-
-        context.setFolds(game.getFolds());
-        /* Compact players */
-        for (Player p : game.getPlayers()) {
-            PlayerWS playerWS = p.getPlayerWS();
-            playerWS.setNbCard(p.getNbcard() > 0 ? p.getDistributeAllCards() ? 14 : 9 : 0);
-            playerWS.setConnected(p.isConnected());
-            context.addPlayer(playerWS);
-
-            if (p.equals(game.getCurrentPlayer())) {
-                context.setType(ResponseType.NEXT_PLAYER);
-                context.setCurrentPlayer(playerWS);
-            }
-            /* Context for user */
-            if (p.equals(player)) {
-                context.setPlayerUser(playerWS);
-                if (player.getCards() != null && player.getCards().size() > 0) {
-                    List<Card> cards = player.getCards().size() != 14 || player.getDistributeAllCards() ? player.getCards() : player.getCards().subList(
-                            0, 9);
-                    for (Card card : cards) {
-                        context.addCard(card.toCardWS());
-                    }
-                    if (!player.getDistributeAllCards()) {
-                        context.setType(ResponseType.DISTRIBUTION_PART1);
-                    } else {
-                        if (context.getCurrentPlayer() == null && !player.getChangeCards().isComplete()) {
-                            context.setType(ResponseType.CHANGE_CARD_MODE);
-                        }
-                    }
-                }
-            }
-        }
-        /* Send score */
-        context.setScoreTeam1(game.getTeam1().getScores());
-        context.setScoreTeam2(game.getTeam2().getScores());
+        ContextWS context = new ContextWS(game, player);
         return context;
     }
 
@@ -401,8 +375,7 @@ public class GameService {
             }
             broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            // Game ended, no nextPlayer
+            logger.error(e.getMessage());
         }
     }
 

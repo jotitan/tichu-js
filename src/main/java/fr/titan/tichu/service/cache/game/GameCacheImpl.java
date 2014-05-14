@@ -2,6 +2,7 @@ package fr.titan.tichu.service.cache.game;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -14,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manage Redis cache to save game information
+ * Choose good implementation of cache : redis (shared) if available or memory (not shared)
  */
 @Singleton
 public class GameCacheImpl implements GameCache {
@@ -84,5 +85,10 @@ public class GameCacheImpl implements GameCache {
     @Override
     public Long lastHeartbeat(Player player) {
         return gameCache.lastHeartbeat(player);
+    }
+
+    @Override
+    public Set<String> getGames() {
+        return gameCache.getGames();
     }
 }

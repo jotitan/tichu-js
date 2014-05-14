@@ -471,6 +471,7 @@ public class Player implements Serializable {
     public PlayerWS getPlayerWS() {
         PlayerWS player = new PlayerWS(this.name, this.orientation, this.endPosition);
         player.setAnnonce(this.annonce);
+        player.setConnected(playerStatus.equals(PlayerStatus.CONNECTED));
         return player;
     }
 

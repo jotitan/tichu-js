@@ -9,6 +9,9 @@ import fr.titan.tichu.model.Player;
 import fr.titan.tichu.service.ObjectHelper;
 import redis.clients.jedis.JedisPool;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  *
  */
@@ -144,6 +147,17 @@ public class RedisGameCache implements GameCache {
             String key = "player:heartbeat:" + player.getToken();
             String heartbeat = jedis.get(key);
             return heartbeat != null ? Long.valueOf(heartbeat) : null;
+        } finally {
+            jedisPool.returnResource(jedis);
+        }
+    }
+
+    @Override
+    public Set<String> getGames() {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.smembers("games");
         } finally {
             jedisPool.returnResource(jedis);
         }

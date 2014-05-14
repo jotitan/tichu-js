@@ -4,6 +4,9 @@ import com.google.inject.ImplementedBy;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  *
  */
@@ -31,5 +34,7 @@ public interface GameCache {
     void heartbeat(String token);
 
     Long lastHeartbeat(Player player);
+
+    Set<String> getGames();
 
 }

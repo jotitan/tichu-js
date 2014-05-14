@@ -3,6 +3,9 @@ package fr.titan.tichu.model.ws;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import fr.titan.tichu.model.Card;
+import fr.titan.tichu.model.Game;
+import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.Score;
 
 /**
@@ -25,6 +28,46 @@ public class ContextWS {
 
     /* Last event */
     private ResponseType type;
+
+    public ContextWS() {
+    }
+
+    public ContextWS(Game game, Player player) {
+        setFolds(game.getFolds());
+        /* Compact players */
+        for (Player p : game.getPlayers()) {
+            PlayerWS playerWS = p.getPlayerWS();
+            playerWS.setNbCard(p.getNbcard() > 0 ? p.getDistributeAllCards() ? 14 : 9 : 0);
+            playerWS.setConnected(p.isConnected());
+            addPlayer(playerWS);
+
+            if (p.equals(game.getCurrentPlayer())) {
+                setType(ResponseType.NEXT_PLAYER);
+                setCurrentPlayer(playerWS);
+            }
+            /* Context for user */
+            if (p.equals(player)) {
+                setPlayerUser(playerWS);
+                if (player.getCards() != null && player.getCards().size() > 0) {
+                    List<Card> cards = player.getCards().size() != 14 || player.getDistributeAllCards() ? player.getCards() : player.getCards().subList(
+                            0, 9);
+                    for (Card card : cards) {
+                        addCard(card.toCardWS());
+                    }
+                    if (!player.getDistributeAllCards()) {
+                        setType(ResponseType.DISTRIBUTION_PART1);
+                    } else {
+                        if (getCurrentPlayer() == null && !player.getChangeCards().isComplete()) {
+                            setType(ResponseType.CHANGE_CARD_MODE);
+                        }
+                    }
+                }
+            }
+        }
+        /* Send score */
+        setScoreTeam1(game.getTeam1().getScores());
+        setScoreTeam2(game.getTeam2().getScores());
+    }
 
     public List<PlayerWS> getPlayers() {
         return players;

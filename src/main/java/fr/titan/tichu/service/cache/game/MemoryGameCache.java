@@ -1,6 +1,7 @@
 package fr.titan.tichu.service.cache.game;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -65,5 +66,10 @@ public class MemoryGameCache implements GameCache {
     @Override
     public Long lastHeartbeat(Player player) {
         return null;
+    }
+
+    @Override
+    public Set<String> getGames() {
+        return gameByNames.keySet();
     }
 }

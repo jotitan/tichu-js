@@ -1,9 +1,7 @@
 package fr.titan.tichu.model.rest;
 
 /**
- * User: Titan
- * Date: 30/03/14
- * Time: 01:45
+ * User: Titan Date: 30/03/14 Time: 01:45
  */
 public class GameRequest {
     private String name;
@@ -14,10 +12,10 @@ public class GameRequest {
     private String playerS;
 
     public GameRequest(String name, String playerO, String playerN, String playerE, String playerS) {
-        this.playerO = playerO;
-        this.playerN = playerN;
-        this.playerE = playerE;
-        this.playerS = playerS;
+        this.playerO = playerO != null ? playerO : "Player O";
+        this.playerN = playerN != null ? playerN : "Player N";
+        this.playerE = playerE != null ? playerE : "Player E";
+        this.playerS = playerS != null ? playerS : "Player S";
         this.name = name;
     }
 

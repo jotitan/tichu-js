@@ -2,6 +2,7 @@
 
 <head>
 <script type="text/javascript" src="lib/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="lib/jquery-ui-1.10.4.custom.min.js"></script>
 <script type="text/javascript" src="js/card.js"></script>
 <script type="text/javascript" src="js/tichu.js"></script>
 <script type="text/javascript" src="js/player.js"></script>
@@ -13,7 +14,7 @@
 <script type="text/javascript" src="js/score.js"></script>
 <script type="text/javascript" src="js/CombinaisonsValidator.js"></script>
 
-<style></style>
+<link rel="stylesheet" type="text/css" href="css/ui-lightness/jquery-ui-1.10.4.custom.min.css"/>
 
 </head>
 
@@ -43,51 +44,87 @@
 <style>
     .box{
         display:inline-block;
-        width:200px;
+        width:100px;
         border:solid 2px blue;
         margin:20px;
         padding-left:5px;
+        background-color:pink;
+        cursor:pointer;
     }
 
     .glue {
         display:inline-block;
-        width:200px;
+        width:100px;
     }
+
+    .connected {
+        background-color:lightgreen;
+    }
+
+    .select_box{
+        border-width:4px;
+    }
+
+
 
 </style>
 
 <div id="selectGame">
     <div id="idMessageInfo"></div>
-    Game : <input type="text" id="idGameName"/><button id="idLoadGame">OK</button><br/>
+    Game : <input type="text" id="idGameName" value="test"/><button id="idLoadGame">OK</button><br/>
     <span class="glue"></span>
     <span style="" class="box joueur_N">N : <span></span></span>     <br/>
     <span style="" class="box joueur_O">O : <span></span></span>
-    <span class="glue"></span>
+    <span class="glue"><input type="text" style="width:100%" id="idRename"/></span>
     <span style="" class="box joueur_E">E : <span></span></span><br/>
     <span class="glue"></span>
     <span style="" class="box joueur_S">S : <span></span></span>     <br/>
 
 </div>
 
-
 <script>
 
     var div = $('#selectGame');
+    var selected = null;
     $('#idLoadGame').click(function(){
-        GameConnection.loadGame($('#idGameName').val(),function(data){
+        GameInfo.loadGame($('#idGameName').val(),function(data){
             if(data.message){
                 $('#idMessageInfo').html(data.message);
                 $('span[class*="joueur_"] > span',div).unbind('click').html('');
             }else{
                 $('#idMessageInfo').html("Well loaded");
                 data.players.forEach(function(j){
-                   $('.joueur_' + j.orientation + ' > span',div).bind('click',function(){
-                        alert("Connection de " + j.name);
-                   }).html(j.name);
+                   $('.joueur_' + j.orientation,div).bind('click',function(){
+                        if(selected){
+                            selected.div.removeClass('select_box');
+                        }
+                        selected = {div:$(this),data:j};
+                        $('#idRename').val(j.name);
+                        selected.div.addClass('select_box');
+                   }).find('span').html(j.name);
+                    if(j.connected){
+                        $('.joueur_' + j.orientation,div).addClass('connected');
+                    }
                 });
             }
-            console.log(data);
         });
+    });
+
+    $('#selectGame').dialog({
+       title:'Connection',
+        modal:true,
+        width:600,
+        buttons:[{
+         text:"Connect",
+         click:function(){
+            if(!selected){
+                alert("Impossible");
+                return;
+            }
+            GameConnection.connect($('#idGameName').val(),selected.data.name,$('#idRename').val());
+            $('#selectGame').dialog('close');
+         }
+        }]
     });
 
 PlayerManager.init();

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
+import java.util.Set;
 
 /**
  * Methods to create a game, get users ...
@@ -36,6 +37,13 @@ public class GameRest {
     public Response deleteGame(Game game) {
         logger.info("DELETE " + game.getGame());
         return Response.status(200).build();
+    }
+
+    @GET
+    @Path("/list")
+    public Response listGames(@QueryParam("callback") String callback) {
+        logger.info("LIST");
+        return buildResponse(gameService.getGames(), callback);
     }
 
     @GET
@@ -79,8 +87,8 @@ public class GameRest {
     @GET
     @Path("/join")
     @Produces("application/json")
-    public Response registerGame(@QueryParam("game") String game, @QueryParam("name") String name, @QueryParam("password") String password,
-            @QueryParam("callback") String callback) {
+    public Response registerGame(@QueryParam("game") String game, @QueryParam("name") String name, @QueryParam("renameName") String renameName,
+            @QueryParam("password") String password, @QueryParam("callback") String callback) {
 
         try {
             Player player = gameService.joinGame(game, name, password);
