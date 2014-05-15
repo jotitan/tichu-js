@@ -36,7 +36,7 @@ var	GameConnection = {
     baseUrl: BASE_URL + 'rest',
     /* Create connection to a party */
     /* @param rename : set if user want to change connection name */
-    connect:function(game,player,rename){
+    connect:function(game,player,rename,success,error){
         var data = {game:game,name:player};
         if(rename && rename != player){
             data.renameData = rename;
@@ -48,9 +48,14 @@ var	GameConnection = {
             success:function(data){
                if(data.status!=null && data.status == 0){
                     Logger.error(data.message);
-                    alert(data.message);
+                    if(error){
+                        error(data.message);
+                    }
                 }else{
                     WebSocketManager.init(data.token,player);
+                    if(success){
+                        success();
+                    }
                 }
             },error:function(a,b,c){
                 console.log("ERROR",a,b,c);

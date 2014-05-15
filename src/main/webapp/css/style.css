@@ -1,0 +1,26 @@
+.box{
+    display:inline-block;
+    width:100px;
+    border:solid 2px blue;
+    margin:20px;
+    padding-left:5px;
+    background-color:pink;
+    cursor:pointer;
+}
+
+.glue {
+    display:inline-block;
+    width:100px;
+}
+
+.connected {
+    background-color:lightgreen;
+}
+
+.select_box{
+    border-width:4px;
+}
+
+.error {
+    color:red;
+}

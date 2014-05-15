@@ -16,6 +16,8 @@ public class GameWS {
     private Score score1;
     private Score score2;
 
+    private boolean password = false;
+
     public String getGame() {
         return game;
     }
@@ -50,5 +52,13 @@ public class GameWS {
 
     public void setScore2(Score score2) {
         this.score2 = score2;
+    }
+
+    public boolean isPassword() {
+        return password;
+    }
+
+    public void setPassword(boolean password) {
+        this.password = password;
     }
 }

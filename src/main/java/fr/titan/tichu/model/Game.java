@@ -416,6 +416,9 @@ public class Game implements Serializable {
         for (Player player : this.players) {
             game.addPlayer(player.getPlayerWS());
         }
+        if (password != null && !"".equals(password.trim())) {
+            game.setPassword(true);
+        }
         return game;
     }
 

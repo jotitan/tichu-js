@@ -59,7 +59,7 @@ public class ChatWebSocket implements TichuClientCommunication {
 
     @OnClose
     public void close(Session session) {
-        if (chatThread != null) {
+        if (chatThread != null && chatThread.isAlive()) {
             this.chatThread.close();
         }
     }
