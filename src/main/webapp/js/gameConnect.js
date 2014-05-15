@@ -15,11 +15,11 @@ var GameConnect = {
             buttons:[{
              text:"Connect",
              click:function(){
-                if(!selected){
+                if(!GameConnect.selected){
                     alert("Impossible");
                     return;
                 }
-                GameConnection.connect($('#idGameName').val(),this.selected.data.name,$('#idRename').val(),
+                GameConnection.connect($('#idGameName').val(),GameConnect.selected.data.name,$('#idRename').val(),
                     function(){GameConnect.close();},
                     function(error){GameConnect.showError(error)});
              }}]
@@ -43,17 +43,17 @@ var GameConnect = {
             }
             data.players.forEach(function(j){
                $('.joueur_' + j.orientation,this.div).bind('click',function(){
-                    if(this.selected){
-                        this.selected.div.removeClass('select_box');
+                    if(GameConnect.selected){
+                        GameConnect.selected.div.removeClass('select_box');
                     }
-                    this.selected = {div:$(this),data:j};
+                    GameConnect.selected = {div:$(this),data:j};
                     $('#idRename').val(j.name);
-                    this.selected.div.addClass('select_box');
+                    GameConnect.selected.div.addClass('select_box');
                }).find('span').html(j.name);
                 if(j.connected){
                     $('.joueur_' + j.orientation,this.div).addClass('connected');
                 }
-            });
+            },this);
         }
     }
 }
