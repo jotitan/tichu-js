@@ -43,6 +43,9 @@ var Table = {
             Actions.deleteByClass("tichu");
         }
     },
+    doPlayCall:function(player){
+
+    },
     /* Display the context */
     display:function(data){
         data.players.forEach(function(p){

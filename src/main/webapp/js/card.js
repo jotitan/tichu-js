@@ -151,17 +151,17 @@ function DrawingCard(x,y,card){
 			case "C" :
 			    // Special case, display near the player
 			    switch(player.orientationTable){
-			        case "N" : this.x = 160;this.y=100;break;
+			        case "N" : this.x = 160;this.y=70;break;
 			        case "S" : this.x = 160;this.y=ComponentManager.variables.height-100;break;
 			        case "O" : this.x = 100;this.y=ComponentManager.variables.height/2;break;
 			        case "E" : this.x = ComponentManager.variables.width-120 - foldLength*5;this.y=ComponentManager.variables.height/2;break;
 			    }
 			    if(player.orientationTable == "S"){
-                    this.y-=15*player.playFoldOnTurn;
+                    this.y-=12*player.playFoldOnTurn;
 			    }else{
-			        this.y+=15*player.playFoldOnTurn;
+			        this.y+=12*player.playFoldOnTurn;
 			    }
-			    this.x+=5*player.playFoldOnTurn;
+			    this.x+=10*player.playFoldOnTurn;
                 break;
 			case "N" : this.x = ComponentManager.variables.width-140;this.y = this.height+10;break;
 			case "S" : this.x = 140;this.y = ComponentManager.variables.height-this.height-10;break;

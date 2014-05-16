@@ -233,6 +233,7 @@ public class Game implements Serializable {
 
     /* Verify if fold can be play */
     /* Change the return to explain problem */
+    /* TODO : return an real error code */
     public boolean verifyFold(Fold fold, Player player) throws CheatException {
         // Verify if the mahjongValue contract is respected
         List<Card> cards = cardPackage.getCards(fold.getCards());

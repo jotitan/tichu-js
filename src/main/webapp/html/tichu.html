@@ -22,11 +22,6 @@
 
 <body>
 
-<input type="text" size="10" id="idName"/>
-<input type="button" onclick="GameConnection.connect('test',$('#idName').val())" value="Connexion"/>
-
-<br/>
-
 <canvas id="canvas" width="600" height="400" style="border:solid 1px black;float:left"></canvas>
 <div id="idScoreDiv" style="float:left;width:200px;color:white;background-color:#111111;height:400px;text-align:center">
     <div style="float:left;width:49%">Eux</div>
@@ -50,8 +45,8 @@
     <span style="" class="box joueur_N">N : <span></span></span>     <br/>
     <span style="" class="box joueur_O">O : <span></span></span>
     <span class="glue">
-         <input type="text" style="width:49%" id="idRename"/>
-         <span id="idPass" style="display:none;width:49%"><input type="password"/></span>
+         <input type="text" style="width:100%" id="idRename"/>
+         <span id="idPass" style="display:none;"><input type="password" style="width:100%"/></span>
     </span>
     <span style="" class="box joueur_E">E : <span></span></span><br/>
     <span class="glue"></span>

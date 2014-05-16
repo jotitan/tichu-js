@@ -95,6 +95,7 @@ function Player(orientation,name,visible){
 	}
 	
 	this.playFold = function(fold){
+
 		try{
 		    if(fold.mahjongValue!=null){
                 Chat.info("A " + fold.mahjongValue + " is needed !")
@@ -115,6 +116,11 @@ function Player(orientation,name,visible){
 		}catch(impossible){
 			alert("Impossible combinaison " + impossible);
 		}
+	}
+
+	/* When user play a call */
+	this.playCall = function(){
+
 	}
 
     this.removeBomb = function(bomb){
@@ -312,6 +318,6 @@ var PlayerManager = {
     },
     call:function(player){
         var player = this.getByOrientation(player);
-        console.log(player.name + " CALL");
+        Chat.info(player.name + " CALL");
     }
 }

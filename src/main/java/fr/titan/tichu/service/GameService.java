@@ -141,7 +141,7 @@ public class GameService {
     public void makeAnnonce(String token, AnnonceType annonce) {
         Game game = cacheService.getGameByTokenPlayer(token);
         Player player = game.getPlayerByToken(token);
-        // Verifiy if player has already played a card
+        // Verifiy if player has already played a card and if partner make an annonce
         switch (annonce) {
         case TICHU:
             if (!player.canTichu()) {
@@ -286,7 +286,7 @@ public class GameService {
         }
         try {
             if (!game.verifyFold(fold, player)) {
-                messageCache.sendMessage(game, player, ResponseType.NOT_YOUR_TURN, "");
+                messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
                 return;
             }
         } catch (CheatException cheatEx) {

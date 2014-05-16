@@ -181,9 +181,6 @@ function TitleBox(name,orientation){
         canvas.translate(this.x,this.y);
         canvas.rotate(this.rotate);
 
-        //canvas.strokeStyle=this.color;
-        //canvas.lineWidth = this.select ? 5 : 1;
-        //canvas.strokeRect(0,0,100,50);
         if(this.select){
              this._drawTitleSmallCaps(canvas);
         }else{

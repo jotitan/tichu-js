@@ -36,7 +36,9 @@ public class MessagePublishThread extends Thread {
             logger.info("Publish Jedis Connection End");
         } finally {
             logger.info("Free jedis resource");
-            pool.returnResource(jedis);
+            if (jedis.isConnected()) {
+                pool.returnResource(jedis);
+            }
         }
     }
 
@@ -45,8 +47,9 @@ public class MessagePublishThread extends Thread {
      */
     public void close() {
         if (this.jedis.isConnected()) {
-            this.jedis.quit();
+            this.jedis.disconnect();
         }
+        // this.jedis.quit();
     }
 
     private JedisPubSub createJedisSubscribe(final TichuClientCommunication clientCommunication) {

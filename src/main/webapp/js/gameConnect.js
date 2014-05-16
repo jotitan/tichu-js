@@ -15,15 +15,18 @@ var GameConnect = {
             buttons:[{
              text:"Connect",
              click:function(){
-                if(!GameConnect.selected){
-                    alert("Impossible");
-                    return;
-                }
-                GameConnection.connect($('#idGameName').val(),GameConnect.selected.data.name,$('#idRename').val(),
-                    function(){GameConnect.close();},
-                    function(error){GameConnect.showError(error)});
+                  GameConnect._clickConnect();
              }}]
         });
+    },
+    _clickConnect:function(){
+        if(!this.selected){
+            alert("Impossible");
+            return;
+        }
+        GameConnection.connect($('#idGameName').val(),this.selected.data.name,$('#idRename').val(),
+            function(){GameConnect.close();},
+            function(error){GameConnect.showError(error)});
     },
     showError:function(message){
         this.errorDiv.html(message);
@@ -42,19 +45,28 @@ var GameConnect = {
                 $('#idPass').hide();
             }
             data.players.forEach(function(j){
-               $('.joueur_' + j.orientation,this.div).bind('click',function(){
-                    if(GameConnect.selected){
-                        GameConnect.selected.div.removeClass('select_box');
-                    }
-                    GameConnect.selected = {div:$(this),data:j};
-                    $('#idRename').val(j.name);
-                    GameConnect.selected.div.addClass('select_box');
-               }).find('span').html(j.name);
+               $('.joueur_' + j.orientation,this.div)
+               .bind('click',function(){
+                    GameConnect._clickName(j);
+               })
+               .bind('dblclick',function(){
+                    GameConnect._clickName(j);
+                    GameConnect._clickConnect();
+               })
+               .find('span').html(j.name);
                 if(j.connected){
                     $('.joueur_' + j.orientation,this.div).addClass('connected');
                 }
             },this);
         }
+    },
+    _clickName:function(j){
+        if(this.selected){
+            this.selected.div.removeClass('select_box');
+        }
+        this.selected = {div:$(this),data:j};
+        $('#idRename').val(j.name);
+        this.selected.div.addClass('select_box');
     }
 }
 
