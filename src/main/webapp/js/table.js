@@ -56,6 +56,9 @@ var Table = {
             }else{
                 pl.drawing.setOffline();
             }
+            if(p.lastFoldIsCall){
+                pl.playCall();
+            }
             pl.setAnnonce(p.annonce);
             if(!pl.equals(PlayerManager.getPlayerUser())){
                 pl.setNecessaryEmptyCards(p.nbCard);

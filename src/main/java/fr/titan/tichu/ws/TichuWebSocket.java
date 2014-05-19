@@ -56,9 +56,9 @@ public class TichuWebSocket implements TichuClientCommunication {
         logger.info("OPEN");
         token = session.getRequestParameterMap().get("token").get(0);
         Player player = gameService.connectGame(token);
-        playerName = player.getName();
-        gameName = player.getGame().getGame();
         if (player != null) {
+            playerName = player.getName();
+            gameName = player.getGame().getGame();
             messageCache.register(gameName, token, this);
             this.basic = session.getBasicRemote();
             send(ResponseType.CONNECTION_OK, gameService.getContextGame(token));

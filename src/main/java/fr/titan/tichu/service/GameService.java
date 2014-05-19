@@ -59,6 +59,9 @@ public class GameService {
      */
     public Player connectGame(String token) {
         Game game = cacheService.getGameByTokenPlayer(token);
+        if (game == null) {
+            return null;
+        }
         Player player = game.getPlayerByToken(token);
         if (player != null
                 && (player.getPlayerStatus().equals(PlayerStatus.AUTHENTICATE) || (player.getPlayerStatus().equals(PlayerStatus.CONNECTED) && canForceReconnect(player)))) {
@@ -345,6 +348,7 @@ public class GameService {
             } else
                 nextPlayer(game);
         } else {
+            player.playCall();
             nextPlayer(game);
         }
     }

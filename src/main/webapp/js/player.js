@@ -21,7 +21,7 @@ function Player(orientation,name,visible){
         return this.orientation == player.orientation;
     }
 
-    this.drawing = new TitleBox(name,orientation);
+    this.drawing = new TitleBox(name,orientation,this);
     ComponentManager.add(this.drawing);
 
     this.setAnnonce = function(annonce){
@@ -95,7 +95,7 @@ function Player(orientation,name,visible){
 	}
 	
 	this.playFold = function(fold){
-
+        this.drawing.playCall = false;
 		try{
 		    if(fold.mahjongValue!=null){
                 Chat.info("A " + fold.mahjongValue + " is needed !")
@@ -120,7 +120,7 @@ function Player(orientation,name,visible){
 
 	/* When user play a call */
 	this.playCall = function(){
-
+        this.drawing.playCall = true;
 	}
 
     this.removeBomb = function(bomb){
@@ -317,7 +317,8 @@ var PlayerManager = {
         CombinaisonsValidator.addFold(bomb);
     },
     call:function(player){
-        var player = this.getByOrientation(player);
+        var player = this.getByOrientation(player.orientation);
+        player.playCall();
         Chat.info(player.name + " CALL");
     }
 }

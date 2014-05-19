@@ -31,6 +31,9 @@ public class Player implements Serializable {
     /* Order of position when end the round */
     private int endPosition = -1;
     private boolean distributeAllCards = false;
+
+    /* When the last fold of a player is call */
+    private boolean lastFoldIsCall = false;
     /* List of win folds */
     private List<Card> cardOfFolds = new ArrayList<Card>();
 
@@ -385,10 +388,15 @@ public class Player implements Serializable {
     }
 
     public void playFold(List<Card> fold) {
+        lastFoldIsCall = false;
         for (Card card : fold) {
             card.setOwner(null);
         }
         this.cards.removeAll(fold);
+    }
+
+    public void playCall() {
+        lastFoldIsCall = true;
     }
 
     public void resetCards() {
@@ -398,6 +406,7 @@ public class Player implements Serializable {
         annonce = null;
         endPosition = -1;
         distributeAllCards = false;
+        lastFoldIsCall = false;
     }
 
     public int getSucceedAnnonce() {
@@ -532,6 +541,10 @@ public class Player implements Serializable {
             return false;
 
         return true;
+    }
+
+    public boolean isLastFoldIsCall() {
+        return lastFoldIsCall;
     }
 
     @Override

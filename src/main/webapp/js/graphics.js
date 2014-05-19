@@ -141,16 +141,18 @@ function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation){
 }
 
 /* Display the name, the orientation and the status of the player */
-function TitleBox(name,orientation){
+function TitleBox(name,orientation,player){
     Component.call(this);
     this.name = name;
     this.orientation = orientation;
+    this.player = player;
     this.status = 0;    // 0 : OFFLINE, 1 : ONLINE
     this.rotate = 0;
     this.color = '#FF0000';
     this.x = 0;this.y = 0;
     this.select = false;
     this.annonce = null;
+    this.playCall = false;
 
     this.init = function(){
         switch(this.orientation){
@@ -190,6 +192,13 @@ function TitleBox(name,orientation){
             canvas.fillText(name,50 - canvas.measureText(name).width/2,20);
         }
         canvas.restore();
+
+        if(this.playCall){
+            var infos = calculateCardPosition(player,0,40);
+            canvas.font = "14px Arial";
+            canvas.fillStyle="black";
+            canvas.fillText("CALL",infos.x,infos.y);
+        }
     }
 
     this.setOnline = function(){
@@ -210,4 +219,23 @@ function TitleBox(name,orientation){
     }
 
     this.init();
+}
+
+/* Calculate position of card according to a player */
+function calculateCardPosition(player,foldLength,decallage){
+    decallage = decallage || 0;
+    var result = {x:0,y:0};
+    switch(player.orientationTable){
+        case "N" : result.x = 160;result.y=70;break;
+        case "S" : result.x = 160;result.y=ComponentManager.variables.height-100;break;
+        case "O" : result.x = 100;result.y=ComponentManager.variables.height/2;break;
+        case "E" : result.x = ComponentManager.variables.width-120 - foldLength*5;result.y=ComponentManager.variables.height/2;break;
+    }
+    if(player.orientationTable == "S"){
+        result.y-=12*player.playFoldOnTurn - decallage;
+    }else{
+        result.y+=12*player.playFoldOnTurn + decallage;
+    }
+    result.x+=10*player.playFoldOnTurn;
+    return result;
 }
