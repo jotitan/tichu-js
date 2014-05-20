@@ -42,6 +42,7 @@ function Player(orientation,name,visible){
 
     this.setSelected = function(select){
         this.select = select;
+        this.drawing.playCall = false;
         this.drawing.select = select;
     }
 

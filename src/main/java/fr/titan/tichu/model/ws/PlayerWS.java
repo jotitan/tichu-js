@@ -17,6 +17,7 @@ public class PlayerWS {
     private boolean connected;
     private int orderEnd = -1;
     private AnnonceType annonce;
+    private boolean lastFoldIsCall;
 
     public PlayerWS() {
     }
@@ -77,6 +78,14 @@ public class PlayerWS {
 
     public void setAnnonce(AnnonceType annonce) {
         this.annonce = annonce;
+    }
+
+    public boolean isLastFoldIsCall() {
+        return lastFoldIsCall;
+    }
+
+    public void setLastFoldIsCall(boolean lastFoldIsCall) {
+        this.lastFoldIsCall = lastFoldIsCall;
     }
 
     @Override

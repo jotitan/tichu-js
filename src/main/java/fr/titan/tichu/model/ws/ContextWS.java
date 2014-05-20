@@ -37,6 +37,7 @@ public class ContextWS {
         /* Compact players */
         for (Player p : game.getPlayers()) {
             PlayerWS playerWS = p.getPlayerWS();
+            playerWS.setLastFoldIsCall(p.isLastFoldIsCall());
             playerWS.setNbCard(p.getNbcard() > 0 ? p.getDistributeAllCards() ? 14 : 9 : 0);
             playerWS.setConnected(p.isConnected());
             addPlayer(playerWS);

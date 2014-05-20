@@ -8,6 +8,9 @@ var ComponentManager = {
     variables:{
         width:600,height:400
     },
+    stop:function(){
+        clearInterval(this.interval);
+    },
 	run:function(){
 	    this.canvas = $('#canvas').get(0).getContext('2d');
 	    this.interval = setInterval(function(){ComponentManager.refresh();},50);
@@ -18,16 +21,17 @@ var ComponentManager = {
         this.canvas.fillRect(0,0,this.variables.width,this.variables.height);
         this.canvas.fillStyle='#000000';
 
-        ComponentManager.components.forEach(function(c){
-            c.draw(this.canvas);
-        },this);
-
         CardManager.cards.forEach(function(c){
             c.drawing.draw(this.canvas);
         },this);
         CardManager.emptyCards.forEach(function(c){
             c.drawing.draw(this.canvas);
         },this);
+        ComponentManager.components.forEach(function(c){
+            c.draw(this.canvas);
+        },this);
+
+
 	},
 	add:function(component){
 		this.components.push(component);
@@ -109,7 +113,10 @@ function BoxCard(x,y,width,height){
 	}
 }
 
-function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation){
+/* Draw a card on canvas */
+/* @param value : card to draw with properties val, color */
+/* @param orientation : use to rotate the card */
+function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation,lineWidth){
 	canvas.save();
 	canvas.translate(x,y);
 	var rotate = 0;
@@ -124,7 +131,7 @@ function drawCard(canvas,x,y,pos,checked,width,height,value,img,orientation){
 	canvas.fillStyle="#FFFFFF";
 	canvas.fillRect(pos,decalage,width,height);
 	canvas.strokeStyle="#000000";
-	canvas.lineWidth=1;
+	canvas.lineWidth=lineWidth || 1;
 	canvas.strokeRect(pos,decalage,width,height);
 	if(img){
 		canvas.drawImage(img,pos,decalage,width,height);
@@ -195,8 +202,8 @@ function TitleBox(name,orientation,player){
 
         if(this.playCall){
             var infos = calculateCardPosition(player,0,40);
-            canvas.font = "14px Arial";
-            canvas.fillStyle="black";
+            canvas.font = "bold 14px Arial";
+            canvas.fillStyle="orange";
             canvas.fillText("CALL",infos.x,infos.y);
         }
     }
