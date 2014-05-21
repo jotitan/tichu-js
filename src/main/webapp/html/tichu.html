@@ -3,11 +3,12 @@
 <head>
 <script type="text/javascript" src="lib/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="lib/jquery-ui-1.10.4.custom.min.js"></script>
+<script type="text/javascript" src="js/graphics.js"></script>
 <script type="text/javascript" src="js/card.js"></script>
 <script type="text/javascript" src="js/tichu.js"></script>
+<script type="text/javascript" src="js/mahjongPanel.js"></script>
 <script type="text/javascript" src="js/player.js"></script>
 <script type="text/javascript" src="js/table.js"></script>
-<script type="text/javascript" src="js/graphics.js"></script>
 <script type="text/javascript" src="js/network.js"></script>
 <script type="text/javascript" src="js/chat.js"></script>
 <script type="text/javascript" src="js/actions.js"></script>
@@ -56,7 +57,7 @@
 </div>
 
 <div id="idMahjongChoice">
-    <canvas height="160" width="240"></canvas>
+    <canvas height="160" width="200"></canvas>
 </div>
 
 <script>
@@ -67,8 +68,8 @@ CardManager.init();
 Actions.init();
 Chat.init();
 Scorer.init();
-ComponentManager.run();
-
+MahjongPanel.init('idMahjongChoice');
+    ComponentManager.run();
 
 </script>
 

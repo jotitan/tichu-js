@@ -217,7 +217,7 @@ var SenderManager = {
             case "BOMB_PLAYED":PlayerManager.playBomb(data.object);break;
             case "CALL_PLAYED":PlayerManager.call(data.object);break;
             case "NO_CALL_WHEN_FIRST":Chat.error("Have to play a card");break;
-            case "BAD_FOLD":Chat.error("Bad fold");break;
+            case "BAD_FOLD":Chat.error("Bad fold " + data.object);break;
             case "TURN_WIN":
                 this.temporize(5000,function(){PlayerManager.winTurn(data.object);});
                 break;

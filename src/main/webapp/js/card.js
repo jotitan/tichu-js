@@ -127,8 +127,8 @@ function DrawingCard(x,y,card){
 	this.x = x;
 	this.y = y;
 	this.pos = 0;
-	this.width = 25;
-	this.height = 40;
+	this.width = ComponentManager.variables.widthCard;
+	this.height = ComponentManager.variables.heightCard;
 	this.value = null;
 	this.color = card.color;
 	this.recto = false;

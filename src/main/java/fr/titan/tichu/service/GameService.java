@@ -288,8 +288,9 @@ public class GameService {
             return;
         }
         try {
-            if (!game.verifyFold(fold, player)) {
-                messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
+            AnalyseFoldType analyse = game.verifyFold(fold, player);
+            if (!analyse.equals(AnalyseFoldType.OK)) {
+                messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, analyse);
                 return;
             }
         } catch (CheatException cheatEx) {
@@ -306,8 +307,9 @@ public class GameService {
         Game game = cacheService.getGameByTokenPlayer(token);
         Player player = game.getPlayerByToken(token);
         // Verifie mahjong
-        if (!game.verifyCall(player)) {
-            messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, "");
+        AnalyseFoldType analyse = game.verifyCall(player);
+        if (analyse != AnalyseFoldType.OK) {
+            messageCache.sendMessage(game, player, ResponseType.BAD_FOLD, analyse);
             return;
         }
 

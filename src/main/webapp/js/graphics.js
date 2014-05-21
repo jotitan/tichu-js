@@ -6,7 +6,8 @@ var ComponentManager = {
 	interval:null,
 	canvas:null,
     variables:{
-        width:600,height:400
+        width:600,height:400 ,
+        widthCard:25,heightCard:40
     },
     stop:function(){
         clearInterval(this.interval);
@@ -21,15 +22,16 @@ var ComponentManager = {
         this.canvas.fillRect(0,0,this.variables.width,this.variables.height);
         this.canvas.fillStyle='#000000';
 
+        ComponentManager.components.forEach(function(c){
+            c.draw(this.canvas);
+        },this);
         CardManager.cards.forEach(function(c){
             c.drawing.draw(this.canvas);
         },this);
         CardManager.emptyCards.forEach(function(c){
             c.drawing.draw(this.canvas);
         },this);
-        ComponentManager.components.forEach(function(c){
-            c.draw(this.canvas);
-        },this);
+
 
 
 	},

@@ -231,23 +231,28 @@ public class Game implements Serializable {
         return false;
     }
 
-    /* Verify if fold can be play */
-    /* Change the return to explain problem */
-    /* TODO : return an real error code */
-    public boolean verifyFold(Fold fold, Player player) throws CheatException {
+    /**
+     * Verify if fold can be play
+     * 
+     * @param fold
+     * @param player
+     * @return type of error : * No dog in a fold with many cards * have to play mahjong * dog play in turn * higher fold
+     * @throws CheatException
+     */
+    public AnalyseFoldType verifyFold(Fold fold, Player player) throws CheatException {
         // Verify if the mahjongValue contract is respected
         List<Card> cards = cardPackage.getCards(fold.getCards());
         if (this.folds.isEmpty()) {
             if (isDogPresent(cards) && (cards.size() != 1)) {
-                return false;
+                return AnalyseFoldType.DOG_IMPOSSIBLE;
             }
             if (this.mahjongValue == null) {
-                return true;
+                return AnalyseFoldType.OK;
             }
             if (!player.hasCard(this.mahjongValue)) {
-                return true;
+                return AnalyseFoldType.OK;
             } else {
-                return false; // can play mahjong card
+                return AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE; // can play mahjong card
             }
         } else {
             // Verify that card belongs to player
@@ -258,30 +263,32 @@ public class Game implements Serializable {
             }
             // Can't play dogs when fold are on table
             if (isDogPresent(cards)) {
-                return false;
+                return AnalyseFoldType.NO_DOG_IN_TURN;
             }
             Fold last = this.folds.getLast();
             if (this.mahjongValue != null && player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size())
                     && !isMajhongPresent(cards)) {
-                return false;
+                return AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE;
             }
 
-            return last.getType().equals(fold.getType()) && last.getHigh() < fold.getHigh() && last.getNb() == fold.getNb();
+            return last.getType().equals(fold.getType()) && last.getHigh() < fold.getHigh() && last.getNb() == fold.getNb() ? AnalyseFoldType.OK
+                    : AnalyseFoldType.FOLD_TOO_LOW;
         }
     }
 
-    public boolean verifyCall(Player player) {
+    public AnalyseFoldType verifyCall(Player player) {
         if (this.mahjongValue == null) {
-            return true;
+            return AnalyseFoldType.OK;
         }
 
         if (this.folds.isEmpty()) {
             // Impossible to call when first
+            return AnalyseFoldType.NO_CALL_WHEN_FIRST;
         } else {
             Fold last = this.folds.getLast();
-            return !player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size());
+            return player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size()) ? AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE
+                    : AnalyseFoldType.OK;
         }
-        return true;
     }
 
     public boolean verifyBomb(Fold bomb) {

@@ -56,7 +56,7 @@ public class MessagePublishThread extends Thread {
         return new JedisPubSub() {
             @Override
             public void onMessage(String channel, String message) {
-                logger.info("Receive on " + channel + " : " + message);
+                logger.debug("Receive on " + channel + " : " + message);
                 clientCommunication.send(message);
             }
 

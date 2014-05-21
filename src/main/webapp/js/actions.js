@@ -1,4 +1,4 @@
-/* User action */
+/* User action displayed in buttons */
 
 var Actions = {
 	div:null,
