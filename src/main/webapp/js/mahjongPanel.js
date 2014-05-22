@@ -18,8 +18,8 @@ var MahjongPanel = {
             width:240,
             height:300,
             buttons:[
-                {text:'No value',click:function(){Mahjong.define();}},
-                {text:'Define',click:function(){Mahjong.define();}}
+                {text:'No value',click:function(){MahjongPanel.define();}},
+                {text:'Define',click:function(){MahjongPanel.define();}}
             ]
         });
         $('canvas',this.div).bind('mousedown.swap',function(e){MahjongPanel.getValue(e);});

@@ -385,7 +385,7 @@ var Table = {
                     var fold = CombinaisonsValidator.check(cards);
                     // Mahjong case
                     if(cards[0].value == 1){
-                        Mahjong.open(function(value){
+                        MahjongPanel.open(function(value){
                             fold.mahjongValue = value;
                             SenderManager.sendCards(fold);
                         });

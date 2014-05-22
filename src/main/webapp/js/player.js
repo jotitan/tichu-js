@@ -317,8 +317,8 @@ var PlayerManager = {
         player.playBomb(bomb);
         CombinaisonsValidator.addFold(bomb);
     },
-    call:function(player){
-        var player = this.getByOrientation(player.orientation);
+    call:function(playerInfo){
+        var player = this.getByOrientation(playerInfo.orientation);
         player.playCall();
         Chat.info(player.name + " CALL");
     }

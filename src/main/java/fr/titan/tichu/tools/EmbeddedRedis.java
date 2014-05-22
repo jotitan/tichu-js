@@ -104,8 +104,11 @@ public class EmbeddedRedis {
     public void save(String pattern) {
         Set<String> keys = jedis.keys(pattern);
         for (String key : keys) {
-            String saveKey = key + ".save";
-            copyTo(key, saveKey);
+            // Don't save key if represent of save (end with .save)
+            if (!key.endsWith(".save")) {
+                String saveKey = key + ".save";
+                copyTo(key, saveKey);
+            }
         }
         System.err.println(keys.size() + " keys saved");
     }
