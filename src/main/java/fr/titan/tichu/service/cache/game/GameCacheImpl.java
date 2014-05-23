@@ -91,4 +91,9 @@ public class GameCacheImpl implements GameCache {
     public Set<String> getGames() {
         return gameCache.getGames();
     }
+
+    @Override
+    public boolean createGame(Game game) throws Exception {
+        return gameCache.createGame(game);
+    }
 }

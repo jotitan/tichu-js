@@ -48,7 +48,7 @@ public class GameService {
         game.getPlayers().get(1).setName(gameRequest.getPlayerN());
         game.getPlayers().get(2).setName(gameRequest.getPlayerE());
         game.getPlayers().get(3).setName(gameRequest.getPlayerS());
-        cacheService.saveGame(game);
+        cacheService.createGame(game);
         return game;
     }
 

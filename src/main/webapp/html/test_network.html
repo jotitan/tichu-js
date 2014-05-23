@@ -6,7 +6,7 @@
 
 <body>
 
-<input type="button" onclick="createPartie()" value="Create partie"/>
+
 
 <script>
 
@@ -18,8 +18,58 @@ function createPartie(){
     $.ajax({url:url,data:datas,type:'GET',dataType:'jsonp',success:function(data){console.log(data)}});
 }
 
+    function create(){
+        var params = {};
+        $(':text[name]:visible,:password[name]:visible','#idCreatePartie').each(function(i){
+            params[$(this).attr('name')] = $(this).val();
+        });
+
+        var url = location.origin + location.pathname.substr(0,location.pathname.substr(1).indexOf("/")+1);
+        url += '/rest/game/create';
+        $.ajax({url:url,data:params,type:'GET',dataType:'jsonp',success:function(data){
+          if(data.status == 1){
+            $('#idMessage').html('Game created').removeClass().addClass('success');
+          }else{
+            $('#idMessage').html('Error when creating the game').removeClass().addClass('error');
+          }
+        }});
+    }
+
+
 </script>
 
+<style>
+    .success{
+        color:green;
+        font-weight:bold;
+    }
+
+    .error{
+        color:red;
+        font-weight:bold;
+    }
+</style>
+
+<div id="idMessage"></div>
+
+<div id="idCreatePartie">
+Game name : <input type="text" name="name"/>
+<input type="checkbox" id="idClickPass" onclick="$(this).is(':checked') ? $('#idPassword').show(): $('#idPassword').hide()"/>
+<label for="idClickPass">Pass</label>
+<span id="idPassword" style="display:none"> : <input type="password" name="password"/></span> <br/>
+
+
+<span style="display:inline-block;width:200px"></span>
+<span style="display:inline-block;width:200px">Joueur N : <input type="text" name="playerN"/></span><br/>
+<span style="display:inline-block;width:200px">Joueur O : <input type="text" name="playerO"/></span>
+<span style="display:inline-block;width:200px"></span>
+<span style="display:inline-block;width:200px">Joueur E : <input type="text" name="playerE"/></span><br/>
+<span style="display:inline-block;width:200px"></span>
+<span style="display:inline-block;width:200px">Joueur S : <input type="text" name="playerS"/></span><br/>
+
+<input type="button" onclick="create()" value="Create partie"/>
+
+</div>
 
 </body>
 

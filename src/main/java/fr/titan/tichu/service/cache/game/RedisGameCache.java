@@ -36,7 +36,11 @@ public class RedisGameCache implements GameCache {
     }
 
     @Override
-    public boolean saveGame(Game game) {
+    public boolean createGame(Game game) throws Exception {
+        return saveGame(game, true);
+    }
+
+    private boolean saveGame(Game game, boolean failIfExist) throws Exception {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
@@ -44,10 +48,23 @@ public class RedisGameCache implements GameCache {
             // If first insert, save name in global liste
             if (!jedis.exists(key)) {
                 jedis.sadd("games", game.getGame());
+            } else {
+                if (failIfExist) {
+                    throw new Exception("Game with name " + game.getGame() + " already exist");
+                }
             }
             return "OK".equals(jedis.set(key.getBytes(), ObjectHelper.serialize(game)));
         } finally {
             jedisPool.returnResource(jedis);
+        }
+    }
+
+    @Override
+    public boolean saveGame(Game game) {
+        try {
+            return saveGame(game, false);
+        } catch (Exception e) {
+            return false;
         }
     }
 

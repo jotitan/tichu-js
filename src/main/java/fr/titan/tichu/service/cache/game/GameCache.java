@@ -12,6 +12,8 @@ import java.util.Set;
  */
 @ImplementedBy(GameCacheImpl.class)
 public interface GameCache {
+    boolean createGame(Game game) throws Exception;
+
     boolean saveGame(Game game);
 
     Game getGame(String name);

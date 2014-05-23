@@ -28,9 +28,14 @@ public class MemoryGameCache implements GameCache {
     }
 
     @Override
+    public boolean createGame(Game game) throws Exception {
+        return saveGame(game);
+    }
+
+    @Override
     public boolean saveGame(Game game) {
         if (gameByNames.containsKey(game.getGame())) {
-            return false;
+
         }
         gameByNames.put(game.getGame(), game);
         return true;

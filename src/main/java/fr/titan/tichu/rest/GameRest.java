@@ -62,8 +62,8 @@ public class GameRest {
     @Path("/create")
     // @Consumes("application/json")
     @Produces("application/json")
-    public Response createGame(@QueryParam("name") String name, @QueryParam("playerO") String pO, @QueryParam("playerN") String pN,
-            @QueryParam("playerE") String pE, @QueryParam("playerS") String pS, @QueryParam("callback") String callback) {
+    public Response createGame(@QueryParam("name") String name, @QueryParam("password") String password, @QueryParam("playerO") String pO,
+            @QueryParam("playerN") String pN, @QueryParam("playerE") String pE, @QueryParam("playerS") String pS, @QueryParam("callback") String callback) {
         logger.info("CREATE " + name);
         GameRequest game = new GameRequest(name, pO, pN, pE, pS);
         try {
