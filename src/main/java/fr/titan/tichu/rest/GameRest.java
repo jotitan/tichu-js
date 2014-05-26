@@ -65,8 +65,8 @@ public class GameRest {
     public Response createGame(@QueryParam("name") String name, @QueryParam("password") String password, @QueryParam("playerO") String pO,
             @QueryParam("playerN") String pN, @QueryParam("playerE") String pE, @QueryParam("playerS") String pS, @QueryParam("callback") String callback) {
         logger.info("CREATE " + name);
-        GameRequest game = new GameRequest(name, pO, pN, pE, pS);
         try {
+            GameRequest game = new GameRequest(name, pO, pN, pE, pS);
             gameService.createGame(game);
         } catch (Exception e) {
             return buildResponse(new ResponseRest(0, e.getMessage()), callback);

@@ -30,7 +30,7 @@ function createPartie(){
           if(data.status == 1){
             $('#idMessage').html('Game created').removeClass().addClass('success');
           }else{
-            $('#idMessage').html('Error when creating the game').removeClass().addClass('error');
+            $('#idMessage').html('Error when creating the game : ' + data.message).removeClass().addClass('error');
           }
         }});
     }

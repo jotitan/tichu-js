@@ -11,7 +11,10 @@ public class GameRequest {
     private String playerE;
     private String playerS;
 
-    public GameRequest(String name, String playerO, String playerN, String playerE, String playerS) {
+    public GameRequest(String name, String playerO, String playerN, String playerE, String playerS) throws Exception{
+        if(name == null || "".equals(name.trim())) {
+            throw new Exception("Name of game is empty") ;
+        }
         this.playerO = playerO != null ? playerO : "Player O";
         this.playerN = playerN != null ? playerN : "Player N";
         this.playerE = playerE != null ? playerE : "Player E";
