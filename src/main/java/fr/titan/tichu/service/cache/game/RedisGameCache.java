@@ -1,5 +1,6 @@
 package fr.titan.tichu.service.cache.game;
 
+import com.google.common.collect.Maps;
 import fr.titan.tichu.service.cache.RedisConfiguration;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -10,6 +11,7 @@ import fr.titan.tichu.service.ObjectHelper;
 import redis.clients.jedis.JedisPool;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -116,6 +118,36 @@ public class RedisGameCache implements GameCache {
             jedis = jedisPool.getResource();
             String keyGame = "game:player:" + player.getToken();
             jedis.set(keyGame, game.getGame());
+
+            if (game.isPublicGame()) {
+                int nbConnected = game.getConnectedPlayers();
+                switch (nbConnected) {
+                case 0:
+                    jedis.sadd("games:bynb:1", game.getGame());
+                    break;
+                case 3:
+                    // Remove key
+                    jedis.srem("games:bynb:3", game.getGame());
+                    break;
+                default:
+                    jedis.smove("games:bynb:" + (nbConnected), "games:bynb:" + (nbConnected + 1), game.getGame());
+                }
+            }
+        } finally {
+            jedisPool.returnResource(jedis);
+        }
+    }
+
+    @Override
+    public Map<Integer, Set<String>> getFreeChairGames() {
+        Jedis jedis = null;
+        try {
+            Map<Integer, Set<String>> games = Maps.newHashMap();
+            jedis = jedisPool.getResource();
+            games.put(1, jedis.smembers("games:bynb:1"));
+            games.put(2, jedis.smembers("games:bynb:2"));
+            games.put(3, jedis.smembers("games:bynb:3"));
+            return games;
         } finally {
             jedisPool.returnResource(jedis);
         }

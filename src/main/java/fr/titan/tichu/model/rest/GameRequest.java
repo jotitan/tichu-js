@@ -1,5 +1,7 @@
 package fr.titan.tichu.model.rest;
 
+import fr.titan.tichu.tools.StringUtils;
+
 /**
  * User: Titan Date: 30/03/14 Time: 01:45
  */
@@ -11,14 +13,14 @@ public class GameRequest {
     private String playerE;
     private String playerS;
 
-    public GameRequest(String name, String playerO, String playerN, String playerE, String playerS) throws Exception{
-        if(name == null || "".equals(name.trim())) {
-            throw new Exception("Name of game is empty") ;
+    public GameRequest(String name, String playerO, String playerN, String playerE, String playerS) throws Exception {
+        if (name == null || "".equals(name.trim())) {
+            throw new Exception("Name of game is empty");
         }
-        this.playerO = playerO != null ? playerO : "Player O";
-        this.playerN = playerN != null ? playerN : "Player N";
-        this.playerE = playerE != null ? playerE : "Player E";
-        this.playerS = playerS != null ? playerS : "Player S";
+        this.playerO = StringUtils.isEmpty(playerO) ? "Player O" : playerO;
+        this.playerN = StringUtils.isEmpty(playerN) ? "Player N" : playerN;
+        this.playerE = StringUtils.isEmpty(playerE) ? "Player E" : playerE;
+        this.playerS = StringUtils.isEmpty(playerS) ? "Player S" : playerS;
         this.name = name;
     }
 

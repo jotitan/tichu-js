@@ -1,6 +1,7 @@
 package fr.titan.tichu.service.cache.game;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -95,5 +96,10 @@ public class GameCacheImpl implements GameCache {
     @Override
     public boolean createGame(Game game) throws Exception {
         return gameCache.createGame(game);
+    }
+
+    @Override
+    public Map<Integer, Set<String>> getFreeChairGames() {
+        return gameCache.getFreeChairGames();
     }
 }

@@ -47,6 +47,14 @@ public class GameRest {
     }
 
     @GET
+    @Produces("application/json")
+    @Path("/listFree")
+    public Response listFreeChairGames(@QueryParam("callback") String callback) {
+        logger.info("LIST FREE");
+        return buildResponse(gameService.getFreeChairGames(), callback);
+    }
+
+    @GET
     @Path("/info/{name}")
     public Response getInfoGame(@PathParam("name") String name, @QueryParam("callback") String callback) {
         logger.info("INFO " + name);

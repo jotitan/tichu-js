@@ -44,6 +44,9 @@ public class Game implements Serializable {
     /* Wait this player to play */
     private Player currentPlayer = null;
 
+    /** When game is visible by anyone */
+    public boolean publicGame = true;
+
     /* Last player who make a fold */
     private Player lastPlayer = null;
 
@@ -430,6 +433,14 @@ public class Game implements Serializable {
         return game;
     }
 
+    public int getConnectedPlayers() {
+        int nb = 0;
+        for (Player player : players) {
+            nb += player.isConnected() ? 1 : 0;
+        }
+        return nb;
+    }
+
     public List<Fold> getFolds() {
         return folds;
     }
@@ -440,5 +451,13 @@ public class Game implements Serializable {
 
     public Team getTeam2() {
         return team2;
+    }
+
+    public boolean isPublicGame() {
+        return publicGame;
+    }
+
+    public void setPublicGame(boolean publicGame) {
+        this.publicGame = publicGame;
     }
 }

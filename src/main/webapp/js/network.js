@@ -1,5 +1,5 @@
 /* Manage messages between server and clients */
-var BASE_URL = location.href;
+var BASE_URL = location.href + (location.href.endsWith("/")?"":"/");
 var Logger = {
     threshold:2,
     info:function(message){
@@ -14,7 +14,7 @@ var Logger = {
 }
 
 var GameInfo = {
-    baseUrl: BASE_URL + 'rest',
+   baseUrl: BASE_URL + 'rest',
    loadGame:function(name,callback){
        $.ajax({
            url:this.baseUrl + '/game/info/' + name,
@@ -26,8 +26,20 @@ var GameInfo = {
    },
    listGames:function(callback){
         $.ajax({
-            url:this.baseUrl + '/game/list',
-            dataType:'jsonp'
+            url:this.baseUrl + '/game/listFree',
+            dataType:'jsonp' ,
+            success:function(data){
+                var list = [];
+                for(var nb in data){
+                    data[nb].forEach(function(game){
+                        list.push({game:game,nb:4-nb});
+                    });
+                }
+                list.sort(function(a,b){
+                    return b.nb - a.nb;
+                });
+                callback(list);
+            }
         })
    }
 }

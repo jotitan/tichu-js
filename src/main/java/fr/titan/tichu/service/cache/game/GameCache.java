@@ -5,6 +5,7 @@ import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,5 +39,7 @@ public interface GameCache {
     Long lastHeartbeat(Player player);
 
     Set<String> getGames();
+
+    Map<Integer, Set<String>> getFreeChairGames();
 
 }

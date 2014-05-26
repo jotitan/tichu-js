@@ -69,17 +69,17 @@ function Card(value,color){
 function MahjongCard(){
 	Card.call(this,1);
 	
-	this.drawing = new ImgCard(0,0,"img/mahjong.png",this);	
+	this.drawing = new ImgCard(0,0,"/img/mahjong.png",this);
 }
 
 function DogsCard(){
 	Card.call(this,15);
-	this.drawing = new ImgCard(0,0,"img/dogs.png",this);	
+	this.drawing = new ImgCard(0,0,"/img/dogs.png",this);
 }
 
 function PhoenixCard(){
 	Card.call(this,16);
-	this.drawing = new ImgCard(0,0,"img/phoenix.png",this);
+	this.drawing = new ImgCard(0,0,"/img/phoenix.png",this);
 	this.replaceValue == null;
 
 	this.getValue = function(){
@@ -94,7 +94,7 @@ function PhoenixCard(){
 
 function DragonCard(){
 	Card.call(this,17);
-	this.drawing = new ImgCard(0,0,"img/dragon.png",this);
+	this.drawing = new ImgCard(0,0,"/img/dragon.png",this);
 	
 	this.getScore = function(){return 25;}
 }
@@ -133,7 +133,7 @@ function DrawingCard(x,y,card){
 	this.color = card.color;
 	this.recto = false;
 	this.imgRecto = new Image();
-	this.imgRecto.src=BASE_URL + 'img/recto.png';
+	this.imgRecto.src=BASE_URL + '/img/recto.png';
 	this.checked = false;
 	this.deep = 0;
 	

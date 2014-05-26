@@ -1,6 +1,7 @@
 package fr.titan.tichu.service.cache.game;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Singleton;
@@ -76,5 +77,10 @@ public class MemoryGameCache implements GameCache {
     @Override
     public Set<String> getGames() {
         return gameByNames.keySet();
+    }
+
+    @Override
+    public Map<Integer, Set<String>> getFreeChairGames() {
+        return null;
     }
 }

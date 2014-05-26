@@ -29,7 +29,7 @@ public class EmbeddedRedis {
                 embed.resetKeys();
                 break;
             case "keys":
-                embed.keys();
+                embed.keys("*");
                 break;
             case "exit":
                 System.out.println("Bye");
@@ -38,6 +38,9 @@ public class EmbeddedRedis {
                 embed.help();
                 break;
             default:
+                if (value.startsWith("keys ")) {
+                    embed.keys(value.substring(5) + "*");
+                }
                 if (value.startsWith("show ")) {
                     embed.show(value.substring(5));
                 }
@@ -144,11 +147,8 @@ public class EmbeddedRedis {
         System.err.println(keys.size() + " keys restored");
     }
 
-    private void keys() {
-        for (String key : jedis.keys("*")) {
-            System.out.print(key + " , ");
-        }
-        System.out.println("");
+    private void keys(String pattern) {
+        System.out.println(Joiner.on(" , ").join(jedis.keys(pattern)));
     }
 
     private void showStats() {

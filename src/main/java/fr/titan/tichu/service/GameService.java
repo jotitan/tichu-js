@@ -1,6 +1,7 @@
 package fr.titan.tichu.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -97,6 +98,10 @@ public class GameService {
 
     public Set<String> getGames() {
         return cacheService.getGames();
+    }
+
+    public Map<Integer,Set<String>> getFreeChairGames() {
+        return cacheService.getFreeChairGames();
     }
 
     /**
