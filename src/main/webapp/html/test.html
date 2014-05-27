@@ -4,25 +4,35 @@
     <title>Test bootstrap</title>
     <script type="text/javascript" src="/tichu/lib/jquery-1.11.0.min.js"></script>
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/tichu/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/tichu/css/bootstrap-theme.min.css">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="/tichu/lib/bootstrap.min.js"></script>
 
 </head>
 <body>
 
 
 <div role="navigation" class="navbar navbar-default">
-<div class="container">
+<div class="container-fluid">
     <div class="navbar-header">
-        <button class="navbar-toggle">Exemple</button>
+        <a class="navbar-brand" href="#">Tichu</a>
+    </div>
+    <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+            <li><a href="create.html">Create</a></li>
+            <li><a href="#t1" data-toggle="tab">Join1</a></li>
+            <li><a href="#t2" data-toggle="tab">Join 2</a></li>
+        </ul>
     </div>
 </div>
 </div>
+
+<div class="tab-content">
+<div id="t1" class="tab-pane active">Test 1</div>
+
+<div id="t2" class="tab-pane">Test 2</div>
+</div>
+
 </body>
 </html>

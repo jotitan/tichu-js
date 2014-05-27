@@ -1,63 +1,118 @@
 <html>
 
 <head>
-<script type="text/javascript" src="/tichu/lib/jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="/tichu/lib/jquery-ui-1.10.4.custom.min.js"></script>
-<script type="text/javascript" src="/tichu/js/graphics.js"></script>
-<script type="text/javascript" src="/tichu/js/card.js"></script>
-<script type="text/javascript" src="/tichu/js/mahjongPanel.js"></script>
-<script type="text/javascript" src="/tichu/js/player.js"></script>
-<script type="text/javascript" src="/tichu/js/table.js"></script>
-<script type="text/javascript" src="/tichu/js/network.js"></script>
-<script type="text/javascript" src="/tichu/js/chat.js"></script>
-<script type="text/javascript" src="/tichu/js/actions.js"></script>
-<script type="text/javascript" src="/tichu/js/score.js"></script>
-<script type="text/javascript" src="/tichu/js/gameConnect.js"></script>
-<script type="text/javascript" src="/tichu/js/CombinaisonsValidator.js"></script>
+    <script type="text/javascript" src="/tichu/lib/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="/tichu/lib/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/tichu/js/graphics.js"></script>
+    <script type="text/javascript" src="/tichu/js/card.js"></script>
+    <script type="text/javascript" src="/tichu/js/mahjongPanel.js"></script>
+    <script type="text/javascript" src="/tichu/js/player.js"></script>
+    <script type="text/javascript" src="/tichu/js/table.js"></script>
+    <script type="text/javascript" src="/tichu/js/network.js"></script>
+    <script type="text/javascript" src="/tichu/js/chat.js"></script>
+    <script type="text/javascript" src="/tichu/js/actions.js"></script>
+    <script type="text/javascript" src="/tichu/js/score.js"></script>
+    <script type="text/javascript" src="/tichu/js/gameConnect.js"></script>
+    <script type="text/javascript" src="/tichu/js/CombinaisonsValidator.js"></script>
 
-<link rel="stylesheet" type="text/css" href="/tichu/css/ui-lightness/jquery-ui-1.10.4.custom.min.css"/>
-<link rel="stylesheet" type="text/css" href="/tichu/css/style.css"/>
+    <script type="text/javascript" src="/tichu/js/create.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/tichu/css/ui-lightness/jquery-ui-1.10.4.custom.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/tichu/css/style.css"/>
+
+    <!-- Boostrap -->
+    <link rel="stylesheet" href="/tichu/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/tichu/css/bootstrap-theme.min.css">
+
+    <script src="/tichu/lib/bootstrap.min.js"></script>
 
 </head>
 
 <body>
 
-<canvas id="canvas" width="600" height="400" style="border:solid 1px black;float:left"></canvas>
-<div id="idScoreDiv" style="float:left;width:200px;color:white;background-color:#111111;height:400px;text-align:center">
-    <div style="float:left;width:49%">Eux</div>
-    <div style="float:left;width:49%">Nous</div>
-    <hr style="clear:both;border:dashed 1px white;margin-bottom:20px"/>
-    <div class="scoreLeft" style="float:left;width:49%"></div>
-    <div class="scoreRight" style="float:left;width:49%"></div>
-    <hr style="clear:both"/>
-    <div class="totalScoreLeft" style="float:left;width:49%"></div>
-    <div class="totalScoreRight" style="float:left;width:49%"></div>
-</div>
-<div style="clear:both"></div>
-<div id="actions"></div>
-<div style="width:600px;height:150px;overflow:auto" id="idChatDiv"></div>
-<input type="text" style="width:500px;" id="idMessage"/>
-
-<div id="selectGame">
-    <div id="idMessageInfo"></div>
-    Game : <input type="text" id="idGameName" value="test"/><button id="idLoadGame">OK</button><br/>
-    <span class="glue"></span>
-    <span style="" class="box joueur_N">N : <span></span></span>     <br/>
-    <span style="" class="box joueur_O">O : <span></span></span>
-    <span class="glue">
-         <input type="text" style="width:100%" id="idRename"/>
-         <span id="idPass" style="display:none;"><input type="password" style="width:100%"/></span>
-    </span>
-    <span style="" class="box joueur_E">E : <span></span></span><br/>
-    <span class="glue"></span>
-    <span style="" class="box joueur_S">S : <span></span></span>     <br/>
-    <hr/>
-    <div class="error" id="idErrorMessage"></div>
+<div role="navigation" class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Tichu</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" id="idMenu">
+                <li><a href="#create" data-toggle="tab">Create</a></li>
+                <li style="display:none" id="idPlayTab"><a href="#play" data-toggle="tab">Play</a></li>
+                <li class="active"><a href="#join" data-toggle="tab">Join game</a></li>
+            </ul>
+        </div>
+    </div>
 </div>
 
-<div id="idMahjongChoice">
-    <canvas height="160" width="200"></canvas>
+<div id="idMessageInfo" class="alert"></div>
+
+<div class="tab-content">
+    <div id="play" class="tab-pane">
+        <canvas id="canvas" width="600" height="400" style="border:solid 1px black;float:left"></canvas>
+        <div id="idScoreDiv" style="float:left;width:200px;color:white;background-color:#111111;height:400px;text-align:center">
+            <div style="float:left;width:49%">Eux</div>
+            <div style="float:left;width:49%">Nous</div>
+            <hr style="clear:both;border:dashed 1px white;margin-bottom:20px"/>
+            <div class="scoreLeft" style="float:left;width:49%"></div>
+            <div class="scoreRight" style="float:left;width:49%"></div>
+            <hr style="clear:both"/>
+            <div class="totalScoreLeft" style="float:left;width:49%"></div>
+            <div class="totalScoreRight" style="float:left;width:49%"></div>
+        </div>
+        <div style="clear:both"></div>
+        <div id="actions"></div>
+        <div style="width:600px;height:150px;overflow:auto" id="idChatDiv"></div>
+        <input type="text" style="width:500px;" id="idMessage"/>
+
+
+
+        <div id="idMahjongChoice">
+            <canvas height="160" width="200"></canvas>
+        </div>
+    </div>
+
+    <div id="join" class="tab-pane active">
+        Game : <input type="text" id="idGameName" value="test"/><button id="idLoadGame">OK</button><br/>
+        <span class="glue"></span>
+        <span style="" class="box joueur_N">N : <span></span></span>     <br/>
+        <span style="" class="box joueur_O">O : <span></span></span>
+            <span class="glue">
+                 <input type="text" style="width:100%" id="idRename"/>
+                 <span id="idPass" style="display:none;"><input type="password" style="width:100%"/></span>
+            </span>
+        <span style="" class="box joueur_E">E : <span></span></span><br/>
+        <span class="glue"></span>
+        <span style="" class="box joueur_S">S : <span></span></span>     <br/>
+        <hr/>
+        <button id="idConnectGame">Connect</button>
+    </div>
+
+    <div id="create" class="tab-pane">
+        <div id="idMessageCreate"></div>
+
+        <div id="idCreatePartie">
+            Game name : <input type="text" name="name"/>
+            <input type="checkbox" id="idClickPass" onclick="$(this).is(':checked') ? $('#idPassword').show(): $('#idPassword').hide()"/>
+            <label for="idClickPass">Pass</label>
+            <span id="idPassword" style="display:none"> : <input type="password" name="password"/></span> <br/>
+
+
+            <span style="display:inline-block;width:200px"></span>
+            <span style="display:inline-block;width:200px">Joueur N : <input type="text" name="playerN"/></span><br/>
+            <span style="display:inline-block;width:200px">Joueur O : <input type="text" name="playerO"/></span>
+            <span style="display:inline-block;width:200px"></span>
+            <span style="display:inline-block;width:200px">Joueur E : <input type="text" name="playerE"/></span><br/>
+            <span style="display:inline-block;width:200px"></span>
+            <span style="display:inline-block;width:200px">Joueur S : <input type="text" name="playerS"/></span><br/>
+
+            <input type="button" onclick="create()" value="Create partie"/>
+
+        </div>
+    </div>
 </div>
+
+
 
 <script>
 
