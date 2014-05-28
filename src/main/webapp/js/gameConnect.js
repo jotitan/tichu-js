@@ -3,7 +3,7 @@ var GameConnect = {
     selected : null,
     errorDiv:null,
     init:function(){
-        this.div = $('#join');
+        this.div = $('#connectModal');
         this.errorDiv = $('#idMessageInfo');
         $('#idLoadGame').click(function(){
             GameInfo.loadGame($('#idGameName').val(),function(data){GameConnect.loadGame(data);});
@@ -20,6 +20,10 @@ var GameConnect = {
                   GameConnect._clickConnect();
              }}]
         });
+    },
+    setAndLoad:function(name){
+        $('#idGameName').val(name);
+        $('#idLoadGame').click();
     },
     _clickConnect:function(){
         if(!this.selected){
@@ -41,6 +45,7 @@ var GameConnect = {
             this.showError(data.message)
             $('span[class*="joueur_"] > span',this.div).unbind('click').html('');
         }else{
+            $('#idJoin > a').click();
             if(data.password){
                 $('#idPass').show();
             }else{

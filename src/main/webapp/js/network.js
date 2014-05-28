@@ -1,5 +1,5 @@
 /* Manage messages between server and clients */
-var BASE_URL = location.href + (location.href.endsWith("/")?"":"/");
+var BASE_URL = location.protocol + "//" + location.host + location.pathname + (location.pathname.endsWith("/")?"":"/");
 var Logger = {
     threshold:2,
     info:function(message){

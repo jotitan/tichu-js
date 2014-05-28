@@ -50,6 +50,7 @@ public class RedisGameCache implements GameCache {
             // If first insert, save name in global liste
             if (!jedis.exists(key)) {
                 jedis.sadd("games", game.getGame());
+                jedis.sadd("games:bynb:0", game.getGame());
             } else {
                 if (failIfExist) {
                     throw new Exception("Game with name " + game.getGame() + " already exist");
@@ -122,15 +123,15 @@ public class RedisGameCache implements GameCache {
             if (game.isPublicGame()) {
                 int nbConnected = game.getConnectedPlayers();
                 switch (nbConnected) {
-                case 0:
-                    jedis.sadd("games:bynb:1", game.getGame());
-                    break;
                 case 3:
                     // Remove key
                     jedis.srem("games:bynb:3", game.getGame());
                     break;
                 default:
-                    jedis.smove("games:bynb:" + (nbConnected), "games:bynb:" + (nbConnected + 1), game.getGame());
+                    long ret = jedis.smove("games:bynb:" + (nbConnected), "games:bynb:" + (nbConnected + 1), game.getGame());
+                    if (ret == 0) {
+                        // Error, no element move
+                    }
                 }
             }
         } finally {
@@ -144,6 +145,7 @@ public class RedisGameCache implements GameCache {
         try {
             Map<Integer, Set<String>> games = Maps.newHashMap();
             jedis = jedisPool.getResource();
+            games.put(0, jedis.smembers("games:bynb:0"));
             games.put(1, jedis.smembers("games:bynb:1"));
             games.put(2, jedis.smembers("games:bynb:2"));
             games.put(3, jedis.smembers("games:bynb:3"));

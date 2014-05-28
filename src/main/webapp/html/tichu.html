@@ -39,13 +39,7 @@
             <ul class="nav navbar-nav" id="idMenu">
                 <li><a href="#create" data-toggle="tab">Create</a></li>
                 <li style="display:none" id="idPlayTab"><a href="#play" data-toggle="tab">Play</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Join game <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#list" data-toggle="tab">List public game</a></li>
-                        <li><a href="#join" data-toggle="tab">By name</a></li>
-                    </ul>
-                </li>
+                <li class="active"><a href="#join" data-toggle="tab">Join</a></li>
             </ul>
             <p class="navbar-text pull-right">Tichu with friends</p>
         </div>
@@ -80,26 +74,65 @@
         </div>
     </div>
 
-    <div id="list" class="tab-pane">
-        <button class="btn btn-success">Refresh</button>
+    <div id="join" class="tab-pane active">
+        <form class="form-inline">
+            <input type="text" id="idGameName" class="form-control" placeholder="Game"/>
+            <input type="button" id="idLoadGame" value="ok" class="btn btn-success"/>
+            <button class="btn btn-success" id="idRefresh">Refresh</button>
+        </form>
+        <table id="idListGame" class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Game</th>
+                <th>Free chair</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody class="table table-hover table-bordered"></tbody>
+        </table>
+
+        <script>
+            $('#idRefresh').bind('click',function(){
+               GameInfo.listGames(function(data){
+                $('#idListGame > tbody').empty();
+                data.forEach(function(g,i){
+                   var tr = $('<tr><td>' + i + '</td><td>' + g.game
+                        + '</td><td>' + g.nb + '</td><td><span><a href="#join">join</a></span></td></tr>');
+                   tr.find('span').click(function(e){
+                      GameConnect.setAndLoad(g.game);
+                      $('#connectModal').modal('show');
+                    });
+                   $('#idListGame').append(tr);
+                });
+               });
+            });
+            $('#idRefresh').click();
+        </script>
     </div>
 
-    <div id="join" class="tab-pane active">
-        <form class="form-inline" role="form">
-        <input type="text" id="idGameName" class="form-control" placeholder="Game"/>
-        <button id="idLoadGame" class="btn btn-success">OK</button><br/>
-        </form>
-        <span class="glue"></span>
-        <span style="" class="box joueur_N">N : <span></span></span>     <br/>
-        <span style="" class="box joueur_O">O : <span></span></span>
-            <span class="glue">
-                 <input type="text" style="width:100%" id="idRename"/>
-                 <span id="idPass" style="display:none;"><input type="password" style="width:100%"/></span>
-            </span>
-        <span style="" class="box joueur_E">E : <span></span></span><br/>
-        <span class="glue"></span>
-        <span style="" class="box joueur_S">S : <span></span></span>     <br/>
-        <button id="idConnectGame" class="btn btn-success">Connect</button>
+    <div id="connectModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h4>Connect to game</h4></div>
+                <div class="modal-body">
+                    <span class="glue"></span>
+                    <span style="" class="box joueur_N">N : <span></span></span>     <br/>
+                    <span style="" class="box joueur_O">O : <span></span></span>
+                        <span class="glue">
+                             <input type="text" style="width:100%" id="idRename"/>
+                             <span id="idPass" style="display:none;"><input type="password" style="width:100%"/></span>
+                        </span>
+                    <span style="" class="box joueur_E">E : <span></span></span><br/>
+                    <span class="glue"></span>
+                    <span style="" class="box joueur_S">S : <span></span></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button><br/>
+                    <button type="button" id="idConnectGame" class="btn btn-primary">Connect</button><br/>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="create" class="tab-pane">
