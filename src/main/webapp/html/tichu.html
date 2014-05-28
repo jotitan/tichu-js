@@ -39,9 +39,17 @@
             <ul class="nav navbar-nav" id="idMenu">
                 <li><a href="#create" data-toggle="tab">Create</a></li>
                 <li style="display:none" id="idPlayTab"><a href="#play" data-toggle="tab">Play</a></li>
-                <li class="active"><a href="#join" data-toggle="tab">Join game</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Join game <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#list" data-toggle="tab">List public game</a></li>
+                        <li><a href="#join" data-toggle="tab">By name</a></li>
+                    </ul>
+                </li>
             </ul>
+            <p class="navbar-text pull-right">Tichu with friends</p>
         </div>
+
     </div>
 </div>
 
@@ -72,8 +80,15 @@
         </div>
     </div>
 
+    <div id="list" class="tab-pane">
+        <button class="btn btn-success">Refresh</button>
+    </div>
+
     <div id="join" class="tab-pane active">
-        Game : <input type="text" id="idGameName" value="test"/><button id="idLoadGame">OK</button><br/>
+        <form class="form-inline" role="form">
+        <input type="text" id="idGameName" class="form-control" placeholder="Game"/>
+        <button id="idLoadGame" class="btn btn-success">OK</button><br/>
+        </form>
         <span class="glue"></span>
         <span style="" class="box joueur_N">N : <span></span></span>     <br/>
         <span style="" class="box joueur_O">O : <span></span></span>
@@ -84,30 +99,30 @@
         <span style="" class="box joueur_E">E : <span></span></span><br/>
         <span class="glue"></span>
         <span style="" class="box joueur_S">S : <span></span></span>     <br/>
-        <hr/>
-        <button id="idConnectGame">Connect</button>
+        <button id="idConnectGame" class="btn btn-success">Connect</button>
     </div>
 
     <div id="create" class="tab-pane">
         <div id="idMessageCreate"></div>
 
         <div id="idCreatePartie">
-            Game name : <input type="text" name="name"/>
-            <input type="checkbox" id="idClickPass" onclick="$(this).is(':checked') ? $('#idPassword').show(): $('#idPassword').hide()"/>
-            <label for="idClickPass">Pass</label>
-            <span id="idPassword" style="display:none"> : <input type="password" name="password"/></span> <br/>
+            <form class="form-inline" role="form">
+                <input type="text" name="name" placeholder="Game" class="form-control"/>
+                <input type="checkbox" id="idClickPass" onclick="$(this).is(':checked') ? $('#idPassword').show(): $('#idPassword').hide()"/>
+                <label for="idClickPass">Pass</label>
+                <span id="idPassword" style="display:none"> : <input type="password" name="password" class="form-control"/></span> <br/>
 
 
-            <span style="display:inline-block;width:200px"></span>
-            <span style="display:inline-block;width:200px">Joueur N : <input type="text" name="playerN"/></span><br/>
-            <span style="display:inline-block;width:200px">Joueur O : <input type="text" name="playerO"/></span>
-            <span style="display:inline-block;width:200px"></span>
-            <span style="display:inline-block;width:200px">Joueur E : <input type="text" name="playerE"/></span><br/>
-            <span style="display:inline-block;width:200px"></span>
-            <span style="display:inline-block;width:200px">Joueur S : <input type="text" name="playerS"/></span><br/>
+                <span style="display:inline-block;width:200px"></span>
+                <span style="display:inline-block;width:200px">Joueur N : <input type="text" name="playerN" class="form-control"/></span><br/>
+                <span style="display:inline-block;width:200px">Joueur O : <input type="text" name="playerO" class="form-control"/></span>
+                <span style="display:inline-block;width:200px"></span>
+                <span style="display:inline-block;width:200px">Joueur E : <input type="text" name="playerE" class="form-control"/></span><br/>
+                <span style="display:inline-block;width:200px"></span>
+                <span style="display:inline-block;width:200px">Joueur S : <input type="text" name="playerS" class="form-control"/></span><br/>
 
-            <input type="button" onclick="create()" value="Create partie"/>
-
+                <button onclick="create()" class="btn btn-success" >Create partie</button>
+            </form>
         </div>
     </div>
 </div>
