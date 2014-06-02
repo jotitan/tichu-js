@@ -16,8 +16,8 @@ var GameConnect = {
         $('#idGameName').val(name);
         $('#idLoadGame').click();
     },
-    delete:function(game){
-
+    delete:function(game,callback){
+        GameInfo.delete(game,callback);
     },
     _clickConnect:function(){
         if(!this.selected){
@@ -86,8 +86,7 @@ var GameConnect = {
                      $('#connectModal').modal('show');
                  });
                  tr.find('span.delete').click(function(e){
-                     GameConnect.delete(g.game);
-                     tr.remove();
+                     GameConnect.delete(g.game,function(){tr.remove();});
                  });
                  $('#idListGame').append(tr);
              });

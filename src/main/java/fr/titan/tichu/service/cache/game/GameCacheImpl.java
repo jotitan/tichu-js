@@ -59,8 +59,8 @@ public class GameCacheImpl implements GameCache {
     }
 
     @Override
-    public void removeGame(String name) {
-        gameCache.removeGame(name);
+    public boolean removeGame(String name) {
+        return gameCache.removeGame(name);
     }
 
     @Override

@@ -42,8 +42,8 @@ public class MemoryGameCache implements GameCache {
         return true;
     }
 
-    public void removeGame(String game) {
-        gameByNames.remove(game);
+    public boolean removeGame(String game) {
+        return gameByNames.remove(game) != null;
     }
 
     public void close() {

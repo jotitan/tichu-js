@@ -37,16 +37,6 @@ public class RedisGameCache implements GameCache {
         }
     }
 
-    public boolean deleteGame(){
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
-            return true;
-        } finally {
-            jedisPool.returnResource(jedis);
-        }
-    }
-
     @Override
     public boolean createGame(Game game) throws Exception {
         return saveGame(game, true);
@@ -60,7 +50,7 @@ public class RedisGameCache implements GameCache {
             // If first insert, save name in global liste
             if (!jedis.exists(key)) {
                 jedis.sadd("games", game.getGame());
-                if(game.isPublicGame()){
+                if (game.isPublicGame()) {
                     jedis.sadd("games:bynb:0", game.getGame());
                 }
             } else {
@@ -103,12 +93,18 @@ public class RedisGameCache implements GameCache {
     }
 
     @Override
-    public void removeGame(String name) {
+    public boolean removeGame(String name) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             String key = "game:" + name;
-            jedis.del(key);
+            long del = jedis.del(key);
+            jedis.srem("games", name);
+            jedis.srem("games:bynb:0", name);
+            jedis.srem("games:bynb:1", name);
+            jedis.srem("games:bynb:2", name);
+            jedis.srem("games:bynb:3", name);
+            return del > 0;
         } finally {
             jedisPool.returnResource(jedis);
         }

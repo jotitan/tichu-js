@@ -43,8 +43,8 @@ public class GameService {
         return game != null ? game.toGameWS() : null;
     }
 
-    public boolean deleteGame(String name){
-
+    public boolean removeGame(String name) {
+        return cacheService.removeGame(name);
     }
 
     public Game createGame(GameRequest gameRequest) throws Exception {
@@ -105,7 +105,7 @@ public class GameService {
         return cacheService.getGames();
     }
 
-    public Map<Integer,Set<String>> getFreeChairGames() {
+    public Map<Integer, Set<String>> getFreeChairGames() {
         return cacheService.getFreeChairGames();
     }
 
@@ -351,8 +351,8 @@ public class GameService {
 
             if (game.isRoundEnded()) {
                 Team teamCapot = game.isCapot();
-                if(teamCapot!=null){
-                    broadCast(game,ResponseType.CAPOT,teamCapot);
+                if (teamCapot != null) {
+                    broadCast(game, ResponseType.CAPOT, teamCapot);
                 }
                 endRound(game);
                 return;

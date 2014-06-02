@@ -41,6 +41,19 @@ var GameInfo = {
                 callback(list);
             }
         })
+   },
+   delete:function(name,callback){
+    $.ajax({
+        url:this.baseUrl + '/game/delete/' + name,
+        dataType:'json',
+        success:function(data){
+         if(data.status == 1){
+            callback();
+         }else{
+            MessageInfo.fail("Impossible to delete " + name);
+         }
+        }
+    });
    }
 }
 

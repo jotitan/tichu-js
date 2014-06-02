@@ -21,7 +21,7 @@ public interface GameCache {
 
     Game getGameByTokenPlayer(String token);
 
-    void removeGame(String name);
+    boolean removeGame(String name);
 
     void close();
 
