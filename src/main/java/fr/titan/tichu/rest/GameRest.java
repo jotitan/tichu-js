@@ -27,7 +27,7 @@ public class GameRest {
     private Logger logger = LoggerFactory.getLogger(GameRest.class);
 
     @Inject
-    private GameService gameService;// = new GameService();
+    private GameService gameService;
 
     public GameRest() {
     }
@@ -70,11 +70,12 @@ public class GameRest {
     @Path("/create")
     // @Consumes("application/json")
     @Produces("application/json")
-    public Response createGame(@QueryParam("name") String name, @QueryParam("password") String password, @QueryParam("playerO") String pO,
+    public Response createGame(@QueryParam("name") String name, @QueryParam("password") String password,
+                               @QueryParam("privateGame")Boolean privateGame, @QueryParam("playerO") String pO,
             @QueryParam("playerN") String pN, @QueryParam("playerE") String pE, @QueryParam("playerS") String pS, @QueryParam("callback") String callback) {
         logger.info("CREATE " + name);
         try {
-            GameRequest game = new GameRequest(name, pO, pN, pE, pS);
+            GameRequest game = new GameRequest(name, privateGame!=null ?!privateGame:true,pO, pN, pE, pS);
             gameService.createGame(game);
         } catch (Exception e) {
             return buildResponse(new ResponseRest(0, e.getMessage()), callback);

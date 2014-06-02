@@ -90,6 +90,9 @@ public class Game implements Serializable {
         this.cardOfFolds = Lists.newArrayList();
         this.lastFold = Lists.newArrayList();
         this.folds = Lists.newLinkedList();
+        for(Player player : players){
+            player.newTurn();
+        }
     }
 
     /* Init the game for the round */
@@ -144,12 +147,13 @@ public class Game implements Serializable {
         return null;
     }
 
+    public Team isCapot(){
+        return orderEndRound == 2 ?
+        team1.hasFinished()?team1:team2.hasFinished()?team2:null:null;
+    }
+
     public boolean isRoundEnded() {
-        int nbEnded = 0;
-        for (Player player : players) {
-            nbEnded += player.ended() ? 1 : 0;
-        }
-        return nbEnded >= 3;
+        return orderEndRound >=3 || isCapot()!=null;
     }
 
     public List<Player> getPlayersByOrder() {
@@ -338,7 +342,7 @@ public class Game implements Serializable {
 
     /* Define the next player */
     private void searchNextPlayer() throws Exception {
-        if (this.orderEndRound >= 3) {
+        if (isRoundEnded()) {
             throw new Exception("End of game");
         }
         /* First round */

@@ -7,13 +7,14 @@ import fr.titan.tichu.tools.StringUtils;
  */
 public class GameRequest {
     private String name;
+    private boolean publicGame;
     private String password;
     private String playerO;
     private String playerN;
     private String playerE;
     private String playerS;
 
-    public GameRequest(String name, String playerO, String playerN, String playerE, String playerS) throws Exception {
+    public GameRequest(String name, boolean publicGame, String playerO, String playerN, String playerE, String playerS) throws Exception {
         if (name == null || "".equals(name.trim())) {
             throw new Exception("Name of game is empty");
         }
@@ -22,6 +23,7 @@ public class GameRequest {
         this.playerE = StringUtils.isEmpty(playerE) ? "Player E" : playerE;
         this.playerS = StringUtils.isEmpty(playerS) ? "Player S" : playerS;
         this.name = name;
+        this.publicGame = publicGame;
     }
 
     public String getName() {
@@ -70,5 +72,13 @@ public class GameRequest {
 
     public void setPlayerS(String playerS) {
         this.playerS = playerS;
+    }
+
+    public boolean isPublicGame() {
+        return publicGame;
+    }
+
+    public void setPublicGame(boolean publicGame) {
+        this.publicGame = publicGame;
     }
 }

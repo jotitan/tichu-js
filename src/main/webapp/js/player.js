@@ -105,12 +105,13 @@ function Player(orientation,name,visible){
 		    }
             var cards = fold.cards.map(function(c){
                 var card = CardManager.get(c.value, c.color);
-                if(card.isPhoenix){
+                if(card.isPhoenix()){
                     card.replaceValue = fold.jokerValue;
                 }
                 card.bombs.forEach(function(bomb){
                     this.removeBomb(bomb);
                 },this);
+                card.bombs = [];
                 return card;
             },this);
             Table.doPlayFold(cards,this);
@@ -128,7 +129,7 @@ function Player(orientation,name,visible){
 
     this.removeBomb = function(bomb){
         var idx = this.bombs.indexOf(bomb);
-        if(idx > 0){
+        if(idx >= 0){
             this.bombs.splice(idx,1);
         }
         if(bomb.remove!=null){
@@ -298,15 +299,20 @@ var PlayerManager = {
     },
     winTurn:function(player){
         if(player){
-            Chat.info("Player " + player.name + " win the turn");
+            Chat.info("Player " + player.name + " win the round");
         }
         this.resetTurn();
+    },
+    endRound:function(data){
+        var player = this.getByOrientation(data.orientation);
+        Chat.info("Player " + player.name + " end the round");
     },
     resetTurn:function(){
         Table.resetTurn();
         CombinaisonsValidator.resetTurn();
         this.players.forEach(function(p){
             p.playFoldOnTurn = 0;
+            p.drawing.playCall = false;
         });
     },
     playFold:function(fold){

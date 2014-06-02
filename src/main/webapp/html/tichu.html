@@ -3,6 +3,7 @@
 <head>
     <script type="text/javascript" src="/tichu/lib/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="/tichu/lib/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/tichu/js/message.js"></script>
     <script type="text/javascript" src="/tichu/js/graphics.js"></script>
     <script type="text/javascript" src="/tichu/js/card.js"></script>
     <script type="text/javascript" src="/tichu/js/mahjongPanel.js"></script>
@@ -25,6 +26,7 @@
     <link rel="stylesheet" href="/tichu/css/bootstrap-theme.min.css">
 
     <script src="/tichu/lib/bootstrap.min.js"></script>
+
 
 </head>
 
@@ -67,8 +69,6 @@
         <div style="width:600px;height:150px;overflow:auto" id="idChatDiv"></div>
         <input type="text" style="width:500px;" id="idMessage"/>
 
-
-
         <div id="idMahjongChoice">
             <canvas height="160" width="200"></canvas>
         </div>
@@ -78,7 +78,7 @@
         <form class="form-inline">
             <input type="text" id="idGameName" class="form-control" placeholder="Game"/>
             <input type="button" id="idLoadGame" value="ok" class="btn btn-success"/>
-            <button class="btn btn-success" id="idRefresh">Refresh</button>
+            <input type="button" id="idRefresh" value="Refresh" class="btn btn-success"/>
         </form>
         <table id="idListGame" class="table">
             <thead>
@@ -91,24 +91,6 @@
             </thead>
             <tbody class="table table-hover table-bordered"></tbody>
         </table>
-
-        <script>
-            $('#idRefresh').bind('click',function(){
-               GameInfo.listGames(function(data){
-                $('#idListGame > tbody').empty();
-                data.forEach(function(g,i){
-                   var tr = $('<tr><td>' + i + '</td><td>' + g.game
-                        + '</td><td>' + g.nb + '</td><td><span><a href="#join">join</a></span></td></tr>');
-                   tr.find('span').click(function(e){
-                      GameConnect.setAndLoad(g.game);
-                      $('#connectModal').modal('show');
-                    });
-                   $('#idListGame').append(tr);
-                });
-               });
-            });
-            $('#idRefresh').click();
-        </script>
     </div>
 
     <div id="connectModal" class="modal fade">
@@ -141,6 +123,9 @@
         <div id="idCreatePartie">
             <form class="form-inline" role="form">
                 <input type="text" name="name" placeholder="Game" class="form-control"/>
+                <input type="checkbox" id="privateGame" name="privateGame"/>
+                <label for="privateGame">Private</label>
+
                 <input type="checkbox" id="idClickPass" onclick="$(this).is(':checked') ? $('#idPassword').show(): $('#idPassword').hide()"/>
                 <label for="idClickPass">Pass</label>
                 <span id="idPassword" style="display:none"> : <input type="password" name="password" class="form-control"/></span> <br/>
@@ -154,7 +139,7 @@
                 <span style="display:inline-block;width:200px"></span>
                 <span style="display:inline-block;width:200px">Joueur S : <input type="text" name="playerS" class="form-control"/></span><br/>
 
-                <button onclick="create()" class="btn btn-success" >Create partie</button>
+                <input type="button" onclick="create()" class="btn btn-success" value="Create"/>
             </form>
         </div>
     </div>
@@ -164,6 +149,7 @@
 
 <script>
 
+MessageInfo.init('idMessageInfo');
 GameConnect.init();
 PlayerManager.init();
 CardManager.init();

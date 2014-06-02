@@ -71,6 +71,10 @@ public class Team implements Serializable {
         return player1.getCardOfFolds().size() == 0 && player2.getCardOfFolds().size() == 0;
     }
 
+    public boolean hasFinished(){
+        return player1.ended() && player2.ended();
+    }
+
     public void resetScore() {
         this.score = 0;
     }

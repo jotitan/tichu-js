@@ -230,11 +230,12 @@ var SenderManager = {
             case "CALL_PLAYED":PlayerManager.call(data.object);break;
             case "NO_CALL_WHEN_FIRST":Chat.error("Have to play a card");break;
             case "BAD_FOLD":Chat.error("Bad fold " + data.object);break;
+            case "CAPOT":Chat.info("Capot");break;
             case "TURN_WIN":
                 this.temporize(5000,function(){PlayerManager.winTurn(data.object);});
                 break;
             case "ROUND_WIN":Chat.info("Player " + data.object.name + " finish first");break;
-            case "PLAYER_END_ROUND":PlayerManager.endTurn(data.object);break;
+            case "PLAYER_END_ROUND":PlayerManager.endRound(data.object);break;
             case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break;
             case "ANNONCE_FORBIDDEN":Chat.error("Annonce forbidden " + data.object);break;
             case "SCORE":
@@ -284,7 +285,7 @@ var Fifo = {
     }  ,
 
     start : function(){
-        while(this.buffer.length>0 && this.pause == true){
+        while(this.buffer.length>0 && this.pause == false){
             this._execTask(this._get());
         }
     },

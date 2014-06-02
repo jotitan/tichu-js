@@ -409,6 +409,10 @@ public class Player implements Serializable {
         lastFoldIsCall = false;
     }
 
+    public void newTurn(){
+        lastFoldIsCall = false;
+    }
+
     public int getSucceedAnnonce() {
         if (annonce == null) {
             return 0;

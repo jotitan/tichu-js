@@ -12,11 +12,12 @@ var Actions = {
         }else{
             title+= " " + bomb.cards[0].value + " - " + bomb.cards[bomb.cards.length -1].value + " " + bomb.cards[0].color;
         }
+        var id = title.replace(' ','');
         var btn = {name:title,fct:function(){
             Table.behaviours.gameMode.playBomb(bomb);
-        },class:"bomb",id:title};
+        },class:"bomb",id:id};
         bomb.remove = function(){
-            Actions.deleteById(title);
+            Actions.deleteById(id);
         };
         this._addButton(btn);
 	},

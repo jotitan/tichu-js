@@ -43,12 +43,17 @@ public class GameService {
         return game != null ? game.toGameWS() : null;
     }
 
+    public boolean deleteGame(String name){
+
+    }
+
     public Game createGame(GameRequest gameRequest) throws Exception {
         Game game = new Game(gameRequest.getName());
         game.getPlayers().get(0).setName(gameRequest.getPlayerO());
         game.getPlayers().get(1).setName(gameRequest.getPlayerN());
         game.getPlayers().get(2).setName(gameRequest.getPlayerE());
         game.getPlayers().get(3).setName(gameRequest.getPlayerS());
+        game.setPublicGame(gameRequest.isPublicGame());
         cacheService.createGame(game);
         return game;
     }
@@ -345,6 +350,10 @@ public class GameService {
             }
 
             if (game.isRoundEnded()) {
+                Team teamCapot = game.isCapot();
+                if(teamCapot!=null){
+                    broadCast(game,ResponseType.CAPOT,teamCapot);
+                }
                 endRound(game);
                 return;
             }

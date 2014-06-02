@@ -259,13 +259,6 @@ var CombinaisonsValidator = {
 var BombDetector = {
     /** @return : list of bomb */
     detect:function(cards){
-        var bombs = this._detectStraight(cards);
-        this._detectSquares(cards).forEach(function(bomb){
-           bombs.push(bomb);
-        });
-        return bombs;
-    },
-    _detectStraight:function(cards){
         var copyCards = cards.map(function(c){return c;});
 
         copyCards.sort(function(a,b){
@@ -275,22 +268,29 @@ var BombDetector = {
             return a.color > b.color;
         });
 
+        var bombs = this._detectStraight(copyCards);
+        this._detectSquares(copyCards).forEach(function(bomb){
+           bombs.push(bomb);
+        });
+        return bombs;
+    },
+    _detectStraight:function(cards){
         var bombs = [];
-        var color = copyCards[0].color;
-        var value = copyCards[0].value;
+        var color = cards[0].color;
+        var value = cards[0].value;
         var tempCards = [];
         var nb = 1;
-        for(var i = 1 ; i < copyCards.length ; i++){
-            if(color!=copyCards[i].color || value+1 != copyCards[i].value){
+        for(var i = 1 ; i < cards.length ; i++){
+            if(color!=cards[i].color || value+1 != cards[i].value){
                 if(nb>=5){  // Got a bomb
                     bombs.push(new Bomb(tempCards,CombinaisonType.STRAIGHTBOMB));
                 }
                 nb = 0;
                 tempCards = [];
             }
-            color = copyCards[i].color;
-            value = copyCards[i].value;
-            tempCards.push(copyCards[i]);
+            color = cards[i].color;
+            value = cards[i].value;
+            tempCards.push(cards[i]);
             nb++;
         }
         if(nb>=5){  // Got a bomb
