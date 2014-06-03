@@ -52,7 +52,7 @@ public class GameServiceTest {
 
     @Test
     public void testGame() throws Exception {
-        Game game = gameService.createGame(new GameRequest("game1", "joueur1", "joueur2", "joueur3", "joueur4"));
+        Game game = gameService.createGame(new GameRequest("game1", true, "joueur1", "joueur2", "joueur3", "joueur4"));
         MessageCache messageCache = CacheFactory.getMessageCache(null, 0);
 
         Player player2 = gameService.joinGame(game.getGame(), "joueur2", null);
