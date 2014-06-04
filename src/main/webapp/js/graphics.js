@@ -215,7 +215,7 @@ function TitleBox(name,orientation,player){
     }
 
     this.setOffline = function(){
-        this.color = '#FF0000';
+        this.color = '#AAAAAA';
     }
 
     this.setName = function(name){

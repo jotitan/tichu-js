@@ -259,38 +259,33 @@ var CombinaisonsValidator = {
 var BombDetector = {
     /** @return : list of bomb */
     detect:function(cards){
-        var copyCards = cards.map(function(c){return c;});
-
-        copyCards.sort(function(a,b){
-            if(a.color == b.color){
-                return a.value - b.value;
-            }
-            return a.color > b.color;
-        });
-
-        var bombs = this._detectStraight(copyCards);
-        this._detectSquares(copyCards).forEach(function(bomb){
+        var bombs = this._detectStraight(cards);
+        this._detectSquares(cards).forEach(function(bomb){
            bombs.push(bomb);
         });
         return bombs;
     },
     _detectStraight:function(cards){
+        var copyCards = cards.map(function(c){return c;});
+        copyCards.sort(function(a,b){
+            return a.color == b.color ? a.value - b.value : a.color > b.color;
+        });
         var bombs = [];
-        var color = cards[0].color;
-        var value = cards[0].value;
-        var tempCards = [];
+        var color = copyCards[0].color;
+        var value = copyCards[0].value;
+        var tempCards = [copyCards[0]];
         var nb = 1;
-        for(var i = 1 ; i < cards.length ; i++){
-            if(color!=cards[i].color || value+1 != cards[i].value){
+        for(var i = 1 ; i < copyCards.length ; i++){
+            if(color!=copyCards[i].color || value+1 != copyCards[i].value){
                 if(nb>=5){  // Got a bomb
                     bombs.push(new Bomb(tempCards,CombinaisonType.STRAIGHTBOMB));
                 }
                 nb = 0;
                 tempCards = [];
             }
-            color = cards[i].color;
-            value = cards[i].value;
-            tempCards.push(cards[i]);
+            color = copyCards[i].color;
+            value = copyCards[i].value;
+            tempCards.push(copyCards[i]);
             nb++;
         }
         if(nb>=5){  // Got a bomb
@@ -299,11 +294,15 @@ var BombDetector = {
         return bombs;
     },
     _detectSquares:function(cards){
+        var copyCards = cards.map(function(c){return c;});
+        copyCards.sort(function(a,b){
+            return a.value == b.value ? a.color > b.color : a.value - b.value;
+        });
         var bombs = [];
         var tempCards = [];
         var previous = null;
         var nb = 0;
-        cards.forEach(function(card){
+        copyCards.forEach(function(card){
             if(previous == null || card.value == previous){
 
             }else{

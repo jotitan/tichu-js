@@ -12,7 +12,7 @@ var Actions = {
         }else{
             title+= " " + bomb.cards[0].value + " - " + bomb.cards[bomb.cards.length -1].value + " " + bomb.cards[0].color;
         }
-        var id = title.replace(' ','');
+        var id = title.replace(/ /g,'');
         var btn = {name:title,fct:function(){
             Table.behaviours.gameMode.playBomb(bomb);
         },class:"bomb",id:id};
