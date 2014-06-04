@@ -76,7 +76,7 @@ public class Game implements Serializable {
     public void newTurn() {
         if (this.lastPlayer != null) {
             this.lastPlayer.addCardsOfFold(this.cardOfFolds);
-            if (this.lastPlayer.ended()) {
+            if (this.lastPlayer.ended() || isDogPresent(this.lastFold)) {
                 try {
                     this.nextPlayer();
                     this.lastPlayer = this.currentPlayer;
@@ -90,7 +90,7 @@ public class Game implements Serializable {
         this.cardOfFolds = Lists.newArrayList();
         this.lastFold = Lists.newArrayList();
         this.folds = Lists.newLinkedList();
-        for(Player player : players){
+        for (Player player : players) {
             player.newTurn();
         }
     }
@@ -147,13 +147,12 @@ public class Game implements Serializable {
         return null;
     }
 
-    public Team isCapot(){
-        return orderEndRound == 2 ?
-        team1.hasFinished()?team1:team2.hasFinished()?team2:null:null;
+    public Team isCapot() {
+        return orderEndRound == 2 ? team1.hasFinished() ? team1 : team2.hasFinished() ? team2 : null : null;
     }
 
     public boolean isRoundEnded() {
-        return orderEndRound >=3 || isCapot()!=null;
+        return orderEndRound >= 3 || isCapot() != null;
     }
 
     public List<Player> getPlayersByOrder() {
@@ -335,6 +334,7 @@ public class Game implements Serializable {
 
     public void nextPlayer() throws Exception {
         if (this.currentPlayer != null && isDogPresent(this.lastFold)) {
+            // Shift the player to the next to simulate dogs behaviour
             this.currentPlayer = this.players.get(this.currentPlayer.getOrientation().getLeft().getPos());
         }
         searchNextPlayer();

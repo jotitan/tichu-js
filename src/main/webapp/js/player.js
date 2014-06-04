@@ -101,7 +101,7 @@ function Player(orientation,name,visible){
         this.drawing.playCall = false;
 		try{
 		    if(fold.mahjongValue!=null){
-                Chat.info("A " + fold.mahjongValue + " is needed !")
+                MessageInfo.info("A " + fold.mahjongValue + " is needed !")
 		    }
             var cards = fold.cards.map(function(c){
                 var card = CardManager.get(c.value, c.color);
@@ -299,13 +299,13 @@ var PlayerManager = {
     },
     winTurn:function(player){
         if(player){
-            Chat.info("Player " + player.name + " win the round");
+            MessageInfo.info("Player " + player.name + " win the round");
         }
         this.resetTurn();
     },
     endRound:function(data){
         var player = this.getByOrientation(data.orientation);
-        Chat.info("Player " + player.name + " end the round");
+        MessageInfo.info("Player " + player.name + " end the round");
     },
     resetTurn:function(){
         Table.resetTurn();
@@ -328,6 +328,6 @@ var PlayerManager = {
     call:function(playerInfo){
         var player = this.getByOrientation(playerInfo.orientation);
         player.playCall();
-        Chat.info(player.name + " CALL");
+        MessageInfo.info(player.name + " CALL");
     }
 }

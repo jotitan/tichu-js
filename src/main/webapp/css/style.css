@@ -26,3 +26,7 @@
 .error {
     color:red;
 }
+
+.alert {
+    padding:5px;
+}

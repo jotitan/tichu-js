@@ -136,7 +136,7 @@ var Table = {
       }
     },
     showGameWinner:function(teamWin){
-        Chat.info("End of the game, team " + (teamWin+1) + " win");
+        MessageInfo.info("End of the game, team " + (teamWin+1) + " win");
         Scorer.showWinner(teamWin);
     },
     resetTurn:function(){

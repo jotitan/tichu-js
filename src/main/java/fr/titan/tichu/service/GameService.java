@@ -360,7 +360,7 @@ public class GameService {
             if (game.isLastIsDog()) {
                 game.newTurn();
                 broadCast(game, ResponseType.TURN_WIN, null);
-                nextPlayer(game, false);
+                broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
             } else
                 nextPlayer(game);
         } else {
@@ -382,16 +382,10 @@ public class GameService {
     }
 
     private void nextPlayer(Game game) {
-        nextPlayer(game, true);
-    }
-
-    private void nextPlayer(Game game, boolean nextPlayer) {
         try {
-            if (nextPlayer) {
-                game.nextPlayer();
-                if (game.isTurnWin()) {
-                    newTurn(game);
-                }
+            game.nextPlayer();
+            if (game.isTurnWin()) {
+                newTurn(game);
             }
             broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
         } catch (Exception e) {
@@ -415,6 +409,5 @@ public class GameService {
                 broadCast(token, ResponseType.PLAYER_DISCONNECTED, player.getPlayerWS());
             }
         }
-
     }
 }

@@ -240,21 +240,21 @@ var SenderManager = {
             case "CARDS_CHANGED":Table.behaviours.changeMode.disable();break;
             case "NEW_CARDS":Table.receiveCards(data.object);break;
             case "NEXT_PLAYER":PlayerManager.nextPlayer(data.object);break;
-            case "GAME_MODE":Chat.info("Let's go");break;
-            case "NOT_YOUR_TURN":Chat.error("Not your turn, stop it");break;
+            case "GAME_MODE":MessageInfo.info("Let's go");break;
+            case "NOT_YOUR_TURN":MessageInfo.fail("Not your turn, stop it");break;
             case "FOLD_PLAYED":PlayerManager.playFold(data.object);break;
             case "BOMB_PLAYED":PlayerManager.playBomb(data.object);break;
             case "CALL_PLAYED":PlayerManager.call(data.object);break;
-            case "NO_CALL_WHEN_FIRST":Chat.error("Have to play a card");break;
-            case "BAD_FOLD":Chat.error("Bad fold " + data.object);break;
-            case "CAPOT":Chat.info("Capot");break;
+            case "NO_CALL_WHEN_FIRST":MessageInfo.fail("Have to play a card");break;
+            case "BAD_FOLD":MessageInfo.fail("Bad fold " + data.object);break;
+            case "CAPOT":MessageInfo.info("Capot");break;
             case "TURN_WIN":
                 this.temporize(5000,function(){PlayerManager.winTurn(data.object);});
                 break;
-            case "ROUND_WIN":Chat.info("Player " + data.object.name + " finish first");break;
+            case "ROUND_WIN":MessageInfo.info("Player " + data.object.name + " finish first");break;
             case "PLAYER_END_ROUND":PlayerManager.endRound(data.object);break;
             case "PLAYER_ANNONCE":Table.playerDoAnnonce(data.object,data.object.annonce);break;
-            case "ANNONCE_FORBIDDEN":Chat.error("Annonce forbidden " + data.object);break;
+            case "ANNONCE_FORBIDDEN":MessageInfo.fail("Annonce forbidden " + data.object);break;
             case "SCORE":
                 Scorer.addResult(data.object);
                 this.temporize(4000);

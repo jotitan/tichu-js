@@ -11,7 +11,7 @@ var MessageInfo = {
     _cleanClass:function(){
       this.div.removeClass().addClass('alert');
     },
-    info:function(){
+    info:function(message){
         this._cleanClass();
         this.div.html(message).addClass('alert-info');
     },
