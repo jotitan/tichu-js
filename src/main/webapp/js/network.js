@@ -230,6 +230,7 @@ var SenderManager = {
                 Table.connectPlayer(data.object.playerUser.orientation,true);
                 Table.display(data.object);
             break;
+            case "CHEATER" : MessageInfo.error("A player try to cheat " + data.object);break;
             case "PLAYER_DISCONNECTED" : Table.disconnectPlayer(data.object.orientation);break;
             case "PLAYER_SEATED" : Table.connectPlayer(data.object.orientation,false);break;
             case "DISTRIBUTION" : Table.distribute(data.object); break;
@@ -249,7 +250,7 @@ var SenderManager = {
             case "BAD_FOLD":MessageInfo.fail("Bad fold " + data.object);break;
             case "CAPOT":MessageInfo.info("Capot");break;
             case "TURN_WIN":
-                this.temporize(5000,function(){PlayerManager.winTurn(data.object);});
+                this.temporize(4000,function(){PlayerManager.winTurn(data.object);});
                 break;
             case "ROUND_WIN":MessageInfo.info("Player " + data.object.name + " finish first");break;
             case "PLAYER_END_ROUND":PlayerManager.endRound(data.object);break;

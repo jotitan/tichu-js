@@ -52,12 +52,13 @@ public class MessageService {
             case HEARTBEAT:
                 gameCache.heartbeat(token);
                 break;
+            case DRAGON_CHOICE:
+                gameService.giveFoldAfterDragon(token,request.getValue());
+                break;
             }
         } catch (Exception e) {
         }
     }
-
-
 
     private Object readObject(String value, Class c) throws Exception {
         ObjectMapper om = new ObjectMapper();

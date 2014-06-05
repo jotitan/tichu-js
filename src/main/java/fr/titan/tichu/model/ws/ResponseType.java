@@ -12,7 +12,8 @@ public enum ResponseType {
             "No call accepted when player play first"), BAD_FOLD("Imposible to play this combination now"), NEXT_PLAYER("Next player to play"), ROUND_WIN(
             "When a player win the round"), TURN_WIN("A player win the turn"), PLAYER_END_ROUND("A player end the turn"), SCORE("Score of the round"), GAME_WIN(
             "A team has won"), ANNONCE_FORBIDDEN("When player can't make annonce"), CHEATER("When a player try to cheat"), PLAYER_ANNONCE(
-            "Player make an annonce"), EMPTY("Use for test"),CHAT("Chat message"),CAPOT("When team make capot");
+            "Player make an annonce"), EMPTY("Use for test"), CHAT("Chat message"), GIVE_FOLD_DRAGON("Give fold to another player when dragon is played"), CAPOT(
+            "When team make capot");
 
     ResponseType(String description) {
         this.description = description;

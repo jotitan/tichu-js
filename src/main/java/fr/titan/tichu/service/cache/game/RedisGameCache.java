@@ -21,10 +21,14 @@ public class RedisGameCache implements GameCache {
 
     private JedisPool jedisPool;
 
-    public RedisGameCache(String host, int port) throws Exception {
+    public RedisGameCache(String host, int port, String password) throws Exception {
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
         config.setMaxTotal(RedisConfiguration.NUMBER_CONNECTION);
-        jedisPool = new JedisPool(config, host, port);
+        if(password!=null && !"".equals(password.trim())){
+            jedisPool = new JedisPool(config, host, port,1000,password);
+        }else{
+            jedisPool = new JedisPool(config, host, port);
+        }
 
         Jedis jedis = null;
         try {

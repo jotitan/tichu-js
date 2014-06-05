@@ -27,14 +27,14 @@ public class RedisMessageCache implements MessageCache {
 
     final private JedisPool jedisPool;
 
-    public RedisMessageCache(String host, int port, String pass) throws Exception {
+    public RedisMessageCache(String host, int port, String password) throws Exception {
         /* In this case, 2 connections per user, so 2 block resource */
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
         config.setMaxTotal(RedisConfiguration.NUMBER_CONNECTION);
-        if(pass == null || "".equals(pass.trim())){
+        if (password == null || "".equals(password.trim())) {
             jedisPool = new JedisPool(config, host, port);
-        }else{
-            jedisPool = new JedisPool(config, host, port,1000,pass);
+        } else {
+            jedisPool = new JedisPool(config, host, port, 1000, password);
         }
         Jedis jedis = null;
         try {

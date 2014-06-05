@@ -24,10 +24,9 @@ public class MessageCacheImpl implements MessageCache {
 
     @Inject
     public MessageCacheImpl(RedisConfiguration redisConfiguration) {
-        Object[] config = redisConfiguration.getConfiguration();
-        if (config != null) {
+        if (redisConfiguration.getHost() != null) {
             try {
-                messageCache = new RedisMessageCache((String) config[0], (Integer) config[1]);
+                messageCache = new RedisMessageCache(redisConfiguration.getHost(), redisConfiguration.getPort(), redisConfiguration.getPassword());
             } catch (Exception e) {
                 setDefault();
             }

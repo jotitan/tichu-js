@@ -88,7 +88,10 @@ public class GameService {
                 if (player.getPlayerStatus().equals(PlayerStatus.FREE_CHAIR) || player.getPlayerStatus().equals(PlayerStatus.DISCONNECTED)
                         || canForceReconnect(player)) {
                     player.setPlayerStatus(PlayerStatus.AUTHENTICATE);
-                    player.createToken(gameName);
+                    // Keep the token if already exist
+                    if (player.getToken() == null) {
+                        player.createToken(gameName);
+                    }
                     cacheService.addPlayer(player, game);
                     cacheService.saveGame(game);
                     cacheService.heartbeat(player.getToken());
@@ -395,8 +398,22 @@ public class GameService {
 
     /* When a turn is over, run a new turn */
     private void newTurn(Game game) {
+        // TODO : detect if player have played dragon
         broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
         game.newTurn();
+    }
+
+    /* When dragon win the turn, have to give cards to an ennemy */
+    /**
+     * @param playerToGive
+     *            : left or right
+     */
+    public void giveFoldAfterDragon(String token, String playerToGive) {
+        Game game = cacheService.getGameByTokenPlayer(token);
+        Player player = "left".equals(playerToGive) ? game.getPlayer(game.getCurrentPlayer().getOrientation().getLeft()) : game.getPlayer(game
+                .getCurrentPlayer().getOrientation().getRight());
+
+        broadCast(game, ResponseType.GIVE_FOLD_DRAGON, player.getPlayerWS());
     }
 
     public void playerDisconnect(String token) {

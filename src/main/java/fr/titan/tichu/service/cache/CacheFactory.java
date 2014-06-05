@@ -24,6 +24,7 @@ public class CacheFactory {
 
     private static String host;
     private static int port;
+    private static String pass;
 
     static {
         Properties p = new Properties();
@@ -31,6 +32,7 @@ public class CacheFactory {
             p.load(CacheFactory.class.getResourceAsStream("/tichu.properties"));
             host = p.getProperty("redis.host");
             port = Integer.valueOf(p.getProperty("redis.port"));
+            pass = p.getProperty("redis.pass");
         } catch (IOException ioex) {
             logger.error("Error when loading redis properties, default configuration");
         } catch (Exception e) {
@@ -42,7 +44,7 @@ public class CacheFactory {
             return messageCache;
         }
         try {
-            messageCache = new RedisMessageCache(host, port);
+            messageCache = new RedisMessageCache(host, port, pass);
         } catch (Exception e) {
             logger.info("No Redis found, use memory cache instead (" + host + ":" + port + ")");
             messageCache = new MemoryMessageCache();

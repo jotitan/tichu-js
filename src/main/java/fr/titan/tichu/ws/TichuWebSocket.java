@@ -35,6 +35,7 @@ public class TichuWebSocket implements TichuClientCommunication {
     private GameService gameService;
 
     @Inject
+
     private MessageCache messageCache;
 
     private String playerName;

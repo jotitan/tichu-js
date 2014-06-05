@@ -299,7 +299,7 @@ var PlayerManager = {
     },
     winTurn:function(player){
         if(player){
-            MessageInfo.info("Player " + player.name + " win the round");
+            MessageInfo.info("Player " + player.name + " win the turn");
         }
         this.resetTurn();
     },

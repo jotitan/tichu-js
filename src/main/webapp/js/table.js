@@ -48,6 +48,7 @@ var Table = {
     },
     /* Display the context */
     display:function(data){
+        Actions.empty();
         data.players.forEach(function(p){
             var pl = PlayerManager.getByOrientation(p.orientation);
             pl.setName(p.name);
@@ -338,6 +339,7 @@ var Table = {
             enable:function(){
                 console.log("enable");
                 $('#canvas').bind('mousedown.play',function(e){Table.behaviours.gameMode._down(e);});
+                // Not show call button if player first
                 Actions.build('call');
             },
             disable:function(){

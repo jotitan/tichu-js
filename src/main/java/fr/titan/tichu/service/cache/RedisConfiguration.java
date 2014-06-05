@@ -18,19 +18,33 @@ public class RedisConfiguration {
 
     final public static Integer NUMBER_CONNECTION = 64;
 
-    public Object[] getConfiguration() {
+    private String host;
+    private Integer port;
+    private String password;
+
+    public RedisConfiguration() {
         Properties p = new Properties();
         try {
             p.load(RedisConfiguration.class.getResourceAsStream("/tichu.properties"));
-
         } catch (IOException ioex) {
             logger.error("Error when loading redis properties, default configuration");
         } catch (Exception e) {
-            return null;
+
         }
-        String host = p.getProperty("redis.host");
-        int port = Integer.valueOf(p.getProperty("redis.port"));
-        return new Object[] { host, port };
+        host = p.getProperty("redis.host");
+        port = Integer.valueOf(p.getProperty("redis.port"));
+        password = p.getProperty("redis.pass");
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }

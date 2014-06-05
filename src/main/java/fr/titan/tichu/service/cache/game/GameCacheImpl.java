@@ -26,12 +26,11 @@ public class GameCacheImpl implements GameCache {
 
     @Inject
     public GameCacheImpl(RedisConfiguration redisConfiguration) {
-        Object[] config = redisConfiguration.getConfiguration();
-        if (config != null) {
+        if (redisConfiguration.getHost() != null) {
             try {
-                gameCache = new RedisGameCache((String) config[0], (Integer) config[1]);
+                gameCache = new RedisGameCache(redisConfiguration.getHost(),redisConfiguration.getPort(),redisConfiguration.getPassword());
             } catch (Exception e) {
-                setDefault((String) config[0], (Integer) config[1]);
+                setDefault(redisConfiguration.getHost(), redisConfiguration.getPort());
             }
         } else {
             setDefault(null, null);
