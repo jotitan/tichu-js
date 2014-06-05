@@ -1,9 +1,12 @@
 package fr.titan.tichu.tools;
 
 import com.google.common.base.Joiner;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.embedded.RedisServer;
 
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -12,6 +15,7 @@ import java.util.Set;
  */
 public class EmbeddedRedis {
     private RedisServer server;
+    private JedisPool jedisPool;
     private Jedis jedis;
 
     public static void main(String[] args) throws Exception {
@@ -60,10 +64,25 @@ public class EmbeddedRedis {
     }
 
     public EmbeddedRedis() throws Exception {
-        server = new RedisServer(7600);
-        server.start();
-        jedis = new Jedis("localhost", 7600);
-        jedis.connect();
+        Properties p = new Properties();
+        p.load(getClass().getResourceAsStream("/tichu.properties"));
+        if("localhost".equals(p.getProperty("redis.host"))){
+            // Local server
+            server = new RedisServer(Integer.valueOf(p.getProperty("redis.port")));
+            server.start();
+        }
+        GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+        config.setMaxTotal(12);
+        if(p.containsKey("redis.pass") && !"".equals(p.getProperty("redis.pass").trim())){
+            jedisPool = new JedisPool(config,p.getProperty("redis.host"),Integer.valueOf(p.getProperty("redis.port")),1000,p.getProperty("redis.pass"));
+        }else{
+            jedisPool = new JedisPool(config,p.getProperty("redis.host"),Integer.valueOf(p.getProperty("redis.port")),1000);
+        }
+
+        jedis = jedisPool.getResource();
+        if(jedis.isConnected()){
+            System.out.println("Connected on " + p.getProperty("redis.host") + ":" + p.getProperty("redis.port"));
+        }
     }
 
     public void help() {
@@ -79,8 +98,10 @@ public class EmbeddedRedis {
     }
 
     public void stop() throws Exception {
-        jedis.close();
-        server.stop();
+        jedisPool.returnResource(jedis);
+        if(server != null){
+            server.stop();
+        }
     }
 
     public void show(String key) {

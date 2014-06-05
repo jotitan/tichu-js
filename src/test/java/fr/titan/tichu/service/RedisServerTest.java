@@ -22,8 +22,21 @@ public class RedisServerTest {
 
     @Before
     public void startRedisServer() throws IOException {
-        redisServer = new RedisServer(6379);
-        redisServer.start();
+        //redisServer = new RedisServer(6379);
+        //redisServer.start();
+    }
+
+    @Test
+    public void testConnect(){
+        GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+        config.setMaxTotal(12);
+          JedisPool pool = new JedisPool(config,"pub-redis-13488.eu-west-1-1.1.ec2.garantiadata.com",13488,1000,"tichu-titan",0);
+          Jedis jedis = pool.getResource();
+        System.out.println(jedis.exists("toto"));
+
+        jedis.set("toto","bieng");
+        System.out.println(jedis.get("toto"));
+        pool.returnResource(jedis);
     }
 
     @Test
@@ -185,6 +198,6 @@ public class RedisServerTest {
 
     @After
     public void stopRedisServer() throws Exception {
-        redisServer.stop();
+   //     redisServer.stop();
     }
 }

@@ -37,24 +37,6 @@ public class CacheFactory {
         }
     }
 
-    /**
-     * Return the correct cache manager.
-     * 
-     * @return If redis up, return redis implementation, otherwise return memory implementation
-     */
-    public static GameCache getCache(String host, Integer port) {
-        if (gameCache != null) {
-            return gameCache;
-        }
-        try {
-            gameCache = new RedisGameCache(host, port);
-        } catch (Exception e) {
-            logger.info("No Redis found, use memory cache instead (" + host + ":" + port + ")");
-            gameCache = new MemoryGameCache();
-        }
-        return gameCache;
-    }
-
     public static MessageCache getMessageCache(String host, Integer port) {
         if (messageCache != null) {
             return messageCache;
