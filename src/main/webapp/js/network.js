@@ -205,6 +205,9 @@ var SenderManager = {
     callGame:function(){
         this._send('CALL','')
     },
+    sendChangePlayer:function(player){
+        this._send('DRAGON_CHOICE',player);
+    },
     _send:function(type,object){
         var data = typeof object == "object" ? JSON.stringify(object) : object;
         this._sendJSON(type,data);
@@ -230,7 +233,7 @@ var SenderManager = {
                 Table.connectPlayer(data.object.playerUser.orientation,true);
                 Table.display(data.object);
             break;
-            case "CHEATER" : MessageInfo.error("A player try to cheat " + data.object);break;
+            case "CHEATER" : Table.showCheater(data.object);break;
             case "PLAYER_DISCONNECTED" : Table.disconnectPlayer(data.object.orientation);break;
             case "PLAYER_SEATED" : Table.connectPlayer(data.object.orientation,false);break;
             case "DISTRIBUTION" : Table.distribute(data.object); break;
@@ -247,7 +250,9 @@ var SenderManager = {
             case "BOMB_PLAYED":PlayerManager.playBomb(data.object);break;
             case "CALL_PLAYED":PlayerManager.call(data.object);break;
             case "NO_CALL_WHEN_FIRST":MessageInfo.fail("Have to play a card");break;
-            case "BAD_FOLD":MessageInfo.fail("Bad fold " + data.object);break;
+            case "WHERE_GIVE_FOLD":Table.selectPlayerToGiveFold();break;
+            case "GIVE_FOLD_DRAGON":Table.giveFoldForDragon(data.object);break;
+            case "BAD_FOLD":Table.showBadFold(data.object);break;
             case "CAPOT":MessageInfo.info("Capot");break;
             case "TURN_WIN":
                 this.temporize(4000,function(){PlayerManager.winTurn(data.object);});

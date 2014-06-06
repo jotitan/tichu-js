@@ -388,7 +388,7 @@ public class GameService {
         try {
             game.nextPlayer();
             if (game.isTurnWin()) {
-                if(!newTurn(game)){
+                if (!newTurn(game)) {
                     // Dragon case
                     return;
                 }
@@ -401,12 +401,15 @@ public class GameService {
 
     /* When a turn is over, run a new turn */
     private boolean newTurn(Game game) {
-        // TODO : detect if player have played dragon
-        if(game.isLastIsDragon()){
-
+        // If dragon last fold, ask player where to give the fold
+        if (game.isLastIsDragon()) {
+            messageCache.sendMessage(game, game.getLastPlayer(), ResponseType.WHERE_GIVE_FOLD, null);
+            return false;
+        } else {
+            broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
+            game.newTurn();
+            return true;
         }
-        broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
-        game.newTurn();
     }
 
     /* When dragon win the turn, have to give cards to an ennemy */
@@ -419,10 +422,12 @@ public class GameService {
         Player player = "left".equals(playerToGive) ? game.getPlayer(game.getCurrentPlayer().getOrientation().getLeft()) : game.getPlayer(game
                 .getCurrentPlayer().getOrientation().getRight());
 
+        player.addCardsOfFold(game.getCardOfFolds());
         broadCast(game, ResponseType.GIVE_FOLD_DRAGON, player.getPlayerWS());
         broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
         game.newTurn();
         broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
+        cacheService.saveGame(game);
     }
 
     public void playerDisconnect(String token) {

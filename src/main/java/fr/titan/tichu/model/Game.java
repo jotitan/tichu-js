@@ -217,17 +217,11 @@ public class Game implements Serializable {
     }
 
     public boolean isLastIsDragon() {
-        return this.lastFold!=null && this.lastFold.size() == 1
-                && this.lastFold.contains(cardPackage.getDragonCard());
+        return this.lastFold != null && this.lastFold.size() == 1 && this.lastFold.contains(cardPackage.getDragonCard());
     }
 
     private boolean isDogPresent(List<Card> cards) {
-        for (Card card : cards) {
-            if (card.isDog()) {
-                return true;
-            }
-        }
-        return false;
+        return cards.contains(cardPackage.getDogsCard());
     }
 
     private boolean isMajhongPresent(List<Card> cards) {
@@ -260,7 +254,7 @@ public class Game implements Serializable {
             if (this.mahjongValue == null) {
                 return AnalyseFoldType.OK;
             }
-            if (!player.hasCard(this.mahjongValue)) {
+            if (!player.hasCard((float) this.mahjongValue)) {
                 return AnalyseFoldType.OK;
             } else {
                 return AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE; // can play mahjong card
@@ -277,7 +271,8 @@ public class Game implements Serializable {
                 return AnalyseFoldType.NO_DOG_IN_TURN;
             }
             Fold last = this.folds.getLast();
-            if (this.mahjongValue != null && player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size())
+            if (this.mahjongValue != null
+                    && player.canPlayMahjongValue((float) this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size())
                     && !isMajhongPresent(cards)) {
                 return AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE;
             }
@@ -297,7 +292,7 @@ public class Game implements Serializable {
             return AnalyseFoldType.NO_CALL_WHEN_FIRST;
         } else {
             Fold last = this.folds.getLast();
-            return player.canPlayMahjongValue(this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size()) ? AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE
+            return player.canPlayMahjongValue((float) this.mahjongValue, last.getType(), last.getHigh(), last.getCards().size()) ? AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE
                     : AnalyseFoldType.OK;
         }
     }
@@ -469,4 +464,5 @@ public class Game implements Serializable {
     public void setPublicGame(boolean publicGame) {
         this.publicGame = publicGame;
     }
+
 }

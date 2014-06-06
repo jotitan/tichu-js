@@ -109,7 +109,7 @@ public class GameServiceTest {
 
         // Test play
         Player p = game.getCurrentPlayer();
-        Fold fold = new Fold(FoldType.SINGLE, p.getCards().get(0).toCardWS().getValue(), p.getCards().get(0).toCardWS());
+        Fold fold = new Fold(FoldType.SINGLE, (float) p.getCards().get(0).toCardWS().getValue(), p.getCards().get(0).toCardWS());
         fold.setPlayer(p.getOrientation());
         gameService.playFold(p.getToken(), fold);
 

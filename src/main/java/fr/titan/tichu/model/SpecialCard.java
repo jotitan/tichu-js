@@ -53,4 +53,8 @@ public class SpecialCard extends Card {
     public CardWS toCardWS() {
         return new CardWS(this.code, "white");
     }
+
+    public String toString() {
+        return this.getType().toString();
+    }
 }

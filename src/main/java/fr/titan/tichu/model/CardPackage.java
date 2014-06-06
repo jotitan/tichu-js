@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Represent un paquet de carte
  */
-public class CardPackage implements Serializable{
+public class CardPackage implements Serializable {
     private List<Card> cards;
     private Map<String, Card> indexCards = new HashMap<String, Card>();
     private Card mahjongCard;
@@ -89,5 +89,9 @@ public class CardPackage implements Serializable{
 
     public Card getDragonCard() {
         return dragonCard;
+    }
+
+    public Card getDogsCard() {
+        return dogsCard;
     }
 }

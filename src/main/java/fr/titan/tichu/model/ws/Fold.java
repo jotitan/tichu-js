@@ -14,17 +14,17 @@ import fr.titan.tichu.model.FoldType;
 public class Fold implements Serializable{
     private List<CardWS> cards = new ArrayList<CardWS>();
     private FoldType type;
-    private int high;
+    private Float high;
     private int nb;
     // Value user want after mahjong
     private Integer mahjongValue;
-    private Integer jokerValue;
+    private Float jokerValue;
     private Orientation player;
 
     public Fold() {
     }
 
-    public Fold(FoldType type, int high, CardWS... cards) {
+    public Fold(FoldType type, Float high, CardWS... cards) {
         this.cards = Arrays.asList(cards);
         this.type = type;
         this.high = high;
@@ -54,11 +54,11 @@ public class Fold implements Serializable{
         return type.equals(FoldType.SQUAREBOMB) || type.equals(FoldType.STRAIGHTBOMB);
     }
 
-    public int getHigh() {
+    public Float getHigh() {
         return high;
     }
 
-    public void setHigh(int high) {
+    public void setHigh(Float high) {
         this.high = high;
     }
 
@@ -86,11 +86,11 @@ public class Fold implements Serializable{
         this.nb = nb;
     }
 
-    public Integer getJokerValue() {
+    public Float getJokerValue() {
         return jokerValue;
     }
 
-    public void setJokerValue(Integer jokerValue) {
+    public void setJokerValue(Float jokerValue) {
         this.jokerValue = jokerValue;
     }
 

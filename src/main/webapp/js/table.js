@@ -46,6 +46,32 @@ var Table = {
     doPlayCall:function(player){
 
     },
+    selectPlayerToGiveFold:function(){
+      $('#choosePlayerChange').modal('show');
+      $('button[value]','#choosePlayerChange').unbind('click').bind('click',function(){
+        SenderManager.sendChangePlayer($(this).val());
+        $('#choosePlayerChange').modal('hide');
+      });
+    },
+    giveFoldForDragon:function(player){
+        var pl = PlayerManager.getByOrientation(player.orientation);
+        MessageInfo.info("Fold give to " + pl.name)
+    },
+    showCheater:function(player){
+        var pl = PlayerManager.getByOrientation(player.orientation);
+        MessageInfo.error("A player try to cheat " + pl.name)
+    },
+    showBadFold:function(message){
+         var formatMessage = "Bad fold : ";
+         switch(message){
+            case "DOG_IMPOSSIBLE":formatMessage+="Impossible to play dog";break;
+            case "MUST_PLAY_MAHJONG_VALUE":formatMessage+="Have to play requested card";break;
+            case "NO_DOG_IN_TURN":formatMessage+="Don't play dog during turn";break;
+            case "FOLD_TOO_LOW":formatMessage+="The fold is to low";break;
+            case "NO_CALL_WHEN_FIRST":formatMessage+="Impossible to call when you're first";break;
+         }
+         MessageInfo.fail(formatMessage);
+    },
     /* Display the context */
     display:function(data){
         Actions.empty();
@@ -337,13 +363,13 @@ var Table = {
         gameMode:{
             cards:[],
             enable:function(){
-                console.log("enable");
                 $('#canvas').bind('mousedown.play',function(e){Table.behaviours.gameMode._down(e);});
                 // Not show call button if player first
-                Actions.build('call');
+                if(Table.cardFolds.length != 0){
+                    Actions.build('call');
+                }
             },
             disable:function(){
-                console.log("disable");
                 $('#canvas').unbind('mousedown.play');
                 Actions.empty();
                 this.cards = [];
@@ -366,10 +392,15 @@ var Table = {
                     }
                 }
                 var _self = this;
-                if(this.cards.length){
-                    Actions.build('play','call');
-                }else{
-                    Actions.build('call');
+                if(Table.cardFolds.length == 0 && this.cards.length){
+                    Actions.build('play');
+                }
+                if(Table.cardFolds.length != 0){
+                    if(this.cards.length){
+                        Actions.build('play','call');
+                    }else{
+                        Actions.build('call');
+                    }
                 }
             },
             playBomb:function(bomb){

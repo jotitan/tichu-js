@@ -74,7 +74,7 @@ public class Player implements Serializable {
         sortCards();
     }
 
-    public boolean hasCard(int value) {
+    public boolean hasCard(Float value) {
         for (Card card : cards) {
             if (card.getValue() == value) {
                 return true;
@@ -102,7 +102,7 @@ public class Player implements Serializable {
      * @param length
      * @return
      */
-    public boolean canPlayMahjongValue(int value, FoldType type, Integer high, Integer length) {
+    public boolean canPlayMahjongValue(Float value, FoldType type, Float high, Integer length) {
         if (!hasCard(value)) {
             return false;
         }
@@ -138,7 +138,7 @@ public class Player implements Serializable {
         case FULLHOUSE:
             nb = Math.min(3, countCards(value));
             // Pas obligatoire d etre au dessus
-            int maxOther = getMaxCards(value, 0);
+            Float maxOther = getMaxCards(value, 0F);
             switch (nb) {
             case 3:
                 if (value <= high) {
@@ -297,7 +297,7 @@ public class Player implements Serializable {
         }
     }
 
-    private boolean isStraightBomb(int valueMahjong) {
+    private boolean isStraightBomb(Float valueMahjong) {
         Map<String, List<Card>> colorStraight = Maps.newHashMap();
         for (Card card : cards) {
             if (card instanceof ValueCard) {
@@ -333,7 +333,7 @@ public class Player implements Serializable {
     }
 
     /* Count card with this value */
-    private int countCards(int value) {
+    private int countCards(Float value) {
         int nb = 0;
         for (Card card : cards) {
             nb += (card.getValue() == value) ? 1 : 0;
@@ -350,10 +350,10 @@ public class Player implements Serializable {
      * @param min
      *            : value are greater than min
      */
-    private int getMaxCards(int exceptValue, int min) {
+    private Float getMaxCards(Float exceptValue, Float min) {
         int previous = 0;
-        int nb = 0;
-        int max = 0;
+        Float nb = 0F;
+        Float max = 0F;
         for (Card card : cards) {
             if (card.getValue() != exceptValue & card.getValue() > min) {
                 if (previous == 0 || card.getValue() == previous) {
@@ -362,7 +362,7 @@ public class Player implements Serializable {
                 } else {
                     max = Math.max(nb, max);
                     previous = card.getValue();
-                    nb = 1;
+                    nb = 1F;
                 }
             }
         }
@@ -409,7 +409,7 @@ public class Player implements Serializable {
         lastFoldIsCall = false;
     }
 
-    public void newTurn(){
+    public void newTurn() {
         lastFoldIsCall = false;
     }
 
