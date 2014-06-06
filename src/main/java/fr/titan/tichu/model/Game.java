@@ -216,6 +216,11 @@ public class Game implements Serializable {
         return isDogPresent(this.lastFold);
     }
 
+    public boolean isLastIsDragon() {
+        return this.lastFold!=null && this.lastFold.size() == 1
+                && this.lastFold.contains(cardPackage.getDragonCard());
+    }
+
     private boolean isDogPresent(List<Card> cards) {
         for (Card card : cards) {
             if (card.isDog()) {

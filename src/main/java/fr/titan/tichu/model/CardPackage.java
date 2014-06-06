@@ -86,4 +86,8 @@ public class CardPackage implements Serializable{
     public Card getMahjongCard() {
         return mahjongCard;
     }
+
+    public Card getDragonCard() {
+        return dragonCard;
+    }
 }

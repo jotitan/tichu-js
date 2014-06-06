@@ -388,7 +388,10 @@ public class GameService {
         try {
             game.nextPlayer();
             if (game.isTurnWin()) {
-                newTurn(game);
+                if(!newTurn(game)){
+                    // Dragon case
+                    return;
+                }
             }
             broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
         } catch (Exception e) {
@@ -397,8 +400,11 @@ public class GameService {
     }
 
     /* When a turn is over, run a new turn */
-    private void newTurn(Game game) {
+    private boolean newTurn(Game game) {
         // TODO : detect if player have played dragon
+        if(game.isLastIsDragon()){
+
+        }
         broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
         game.newTurn();
     }
@@ -414,6 +420,9 @@ public class GameService {
                 .getCurrentPlayer().getOrientation().getRight());
 
         broadCast(game, ResponseType.GIVE_FOLD_DRAGON, player.getPlayerWS());
+        broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
+        game.newTurn();
+        broadCast(game, ResponseType.NEXT_PLAYER, game.getCurrentPlayer().getPlayerWS());
     }
 
     public void playerDisconnect(String token) {
