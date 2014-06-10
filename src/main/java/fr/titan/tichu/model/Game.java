@@ -254,7 +254,7 @@ public class Game implements Serializable {
             if (this.mahjongValue == null) {
                 return AnalyseFoldType.OK;
             }
-            if (!player.hasCard((float) this.mahjongValue)) {
+            if (!player.hasCard((float) this.mahjongValue) && !isMajhongPresent(cards)) {
                 return AnalyseFoldType.OK;
             } else {
                 return AnalyseFoldType.MUST_PLAY_MAHJONG_VALUE; // can play mahjong card
