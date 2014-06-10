@@ -48,6 +48,18 @@ var Table = {
     },
     selectPlayerToGiveFold:function(){
       $('#choosePlayerChange').modal('show');
+      // Hide button if player end
+
+      if(PlayerManager.isLeftPlayerEnded()){
+        $('button[value="left"]','#choosePlayerChange').hide();
+      } else{
+        $('button[value="left"]','#choosePlayerChange').show();
+      }
+      if(PlayerManager.isRightPlayerEnded()){
+        $('button[value="right"]','#choosePlayerChange').hide();
+      } else{
+        $('button[value="right"]','#choosePlayerChange').show();
+      }
       $('button[value]','#choosePlayerChange').unbind('click').bind('click',function(){
         SenderManager.sendChangePlayer($(this).val());
         $('#choosePlayerChange').modal('hide');

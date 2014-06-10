@@ -156,11 +156,13 @@ public class Game implements Serializable {
     }
 
     public List<Player> getPlayersByOrder() {
-        List<Player> players = new ArrayList<Player>(4);
+        List<Player> orderedPlayers = new ArrayList<Player>(4);
         for (Player player : players) {
-            players.add(player.getEndPosition(), player);
+            if (player.getEndPosition() >= 0) {
+                orderedPlayers.add(player.getEndPosition(), player);
+            }
         }
-        return players;
+        return orderedPlayers;
     }
 
     public Player getLosePlayer() {

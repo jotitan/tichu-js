@@ -315,6 +315,14 @@ var PlayerManager = {
             p.drawing.playCall = false;
         });
     },
+    isLeftPlayerEnded:function(){
+        var posPlayer = this.orientations.indexOf(this.getPlayerUser().orientation);
+        return this.getByOrientation(this.orientations[(posPlayer+1)%4]).getNbCards() ==0;
+    },
+    isRightPlayerEnded:function(player){
+        var posPlayer = this.orientations.indexOf(this.getPlayerUser().orientation);
+        return this.getByOrientation(this.orientations[(posPlayer+3)%4]).getNbCards() ==0;
+    },
     playFold:function(fold){
         var player = this.getByOrientation(fold.player);
         player.playFold(fold);
