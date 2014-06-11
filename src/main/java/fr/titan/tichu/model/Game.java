@@ -99,7 +99,6 @@ public class Game implements Serializable {
 
     /* Init the game for the round */
     public void newRound() {
-        saveScore();
         newTurn();
         orderEndRound = 0;
         this.lastPlayer = null;
@@ -124,12 +123,12 @@ public class Game implements Serializable {
         if (players == null || players.size() != 4) {
             return null;
         }
-        Map<Integer,Player> orderPlayers = getPlayersByOrder();
-        boolean isCapot = isCapot()!=null;
-        if (orderPlayers.size() !=4 && !isCapot) {
+        Map<Integer, Player> orderPlayers = getPlayersByOrder();
+        boolean isCapot = isCapot() != null;
+        if (orderPlayers.size() != 4 && !isCapot) {
             return null;
         }
-        if(!isCapot){
+        if (!isCapot) {
             /* First take folds of last */
             orderPlayers.get(0).addCardsOfFold(orderPlayers.get(3).getCardOfFolds());
             /* The before last take card in hand of the last */
@@ -159,8 +158,8 @@ public class Game implements Serializable {
         return orderEndRound >= 3 || isCapot() != null;
     }
 
-    public Map<Integer,Player> getPlayersByOrder() {
-        Map<Integer,Player> orderedPlayers = Maps.newHashMap();
+    public Map<Integer, Player> getPlayersByOrder() {
+        Map<Integer, Player> orderedPlayers = Maps.newHashMap();
         for (Player player : players) {
             orderedPlayers.put((player.getEndPosition() + 4) % 4, player);
         }
