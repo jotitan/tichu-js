@@ -132,7 +132,7 @@ var Table = {
         Scorer.newgame();
         if(data.scoreTeam1!=null && data.scoreTeam2!=null && data.scoreTeam1.length == data.scoreTeam2.length){
             for(var i = 0 ; i < data.scoreTeam1.length ; i++){
-                scorer.addResult({score1:data.scoreTeam1[i],score2:data.scoreTeam2[i]})
+                Scorer.addResult({score1:data.scoreTeam1[i],score2:data.scoreTeam2[i]})
             }
         }
 

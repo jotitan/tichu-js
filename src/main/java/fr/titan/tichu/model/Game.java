@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 
+import com.google.common.collect.Maps;
 import fr.titan.tichu.Orientation;
 import fr.titan.tichu.exception.CheatException;
 import fr.titan.tichu.model.ws.Fold;
@@ -122,15 +124,17 @@ public class Game implements Serializable {
         if (players == null || players.size() != 4) {
             return null;
         }
-        List<Player> orderPlayers = getPlayersByOrder();
-        if (orderPlayers.size() == 0) {
+        Map<Integer,Player> orderPlayers = getPlayersByOrder();
+        boolean isCapot = isCapot()!=null;
+        if (orderPlayers.size() !=4 && !isCapot) {
             return null;
         }
-        /* First take folds of last */
-        orderPlayers.get(0).addCardsOfFold(orderPlayers.get(3).getCardOfFolds());
-        /* The before last take card in hand of the last */
-        orderPlayers.get(2).addCardsOfFold(orderPlayers.get(3).getCards());
-
+        if(!isCapot){
+            /* First take folds of last */
+            orderPlayers.get(0).addCardsOfFold(orderPlayers.get(3).getCardOfFolds());
+            /* The before last take card in hand of the last */
+            orderPlayers.get(2).addCardsOfFold(orderPlayers.get(3).getCards());
+        }
         GameWS game = new GameWS();
 
         game.setScore1(team1.buildScore(team2.isCapot()));
@@ -155,12 +159,10 @@ public class Game implements Serializable {
         return orderEndRound >= 3 || isCapot() != null;
     }
 
-    public List<Player> getPlayersByOrder() {
-        List<Player> orderedPlayers = new ArrayList<Player>(4);
+    public Map<Integer,Player> getPlayersByOrder() {
+        Map<Integer,Player> orderedPlayers = Maps.newHashMap();
         for (Player player : players) {
-            if (player.getEndPosition() >= 0) {
-                orderedPlayers.add(player.getEndPosition(), player);
-            }
+            orderedPlayers.put((player.getEndPosition() + 4) % 4, player);
         }
         return orderedPlayers;
     }

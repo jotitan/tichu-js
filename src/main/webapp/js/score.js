@@ -8,6 +8,7 @@ var Scorer = {
         this.div = $('#idScoreDiv')
     },
     addResult:function(result){
+        console.log($('.scoreLeft',this.div))
         this._showScore($('.scoreLeft',this.div),$('.totalScoreLeft',this.div),result.score1,true);
         this._showScore($('.scoreRight',this.div),$('.totalScoreRight',this.div),result.score2,false);
     },
@@ -40,6 +41,6 @@ var Scorer = {
         divTotalScore.html(score.cumulateScore);
     },
     newgame:function(){
-        this.div.empty();
+        this.div.find('.scoreLeft','.scoreRight','.totalScoreLeft','.totalScoreRight').empty();
     }
 }

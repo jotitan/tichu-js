@@ -10,12 +10,16 @@ import fr.titan.tichu.model.ws.RequestWS;
 import fr.titan.tichu.model.ws.ResponseType;
 import fr.titan.tichu.service.cache.game.GameCache;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Lead message between server and gamers
  */
 @Singleton
 public class MessageService {
+
+    private Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Inject
     private GameService gameService;
@@ -57,6 +61,7 @@ public class MessageService {
                 break;
             }
         } catch (Exception e) {
+            logger.error("Error",e);
         }
     }
 
