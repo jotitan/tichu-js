@@ -86,7 +86,7 @@ var Table = {
     },
     /* Display the context */
     display:function(data){
-        Actions.empty();
+        Actions.empty(true);
         data.players.forEach(function(p){
             var pl = PlayerManager.getByOrientation(p.orientation);
             pl.setName(p.name);
@@ -384,6 +384,9 @@ var Table = {
             disable:function(){
                 $('#canvas').unbind('mousedown.play');
                 Actions.empty();
+                PlayerManager.getPlayerUser().cards.forEach(function(c){
+                    c.setChecked(false);
+                });
                 this.cards = [];
             },
             _down:function(e){
