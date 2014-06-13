@@ -33,7 +33,7 @@ public class Team implements Serializable {
 
     public Score buildScore(boolean isOtherCapot) {
         int partialScore = (isOtherCapot) ? 200 : 0;
-        if (!isOtherCapot) {
+        if (!isOtherCapot && !isCapot()) {
             partialScore += player1.getPointCards() + player2.getPointCards();
         }
         int pointAnnonce = getPointAnnonce(player1) + getPointAnnonce(player2);
@@ -68,7 +68,7 @@ public class Team implements Serializable {
     }
 
     public boolean isCapot() {
-        return player1.getCardOfFolds().size() == 0 && player2.getCardOfFolds().size() == 0;
+        return player1.getCards().size() > 0 && player2.getCards().size() > 0;
     }
 
     public boolean hasFinished(){

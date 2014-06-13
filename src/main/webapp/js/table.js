@@ -213,8 +213,14 @@ var Table = {
         this.folds.splice(this.folds.length -1,1);
         CombinaisonsValidator.removeLast();
     },
+    _initGame:function(){
+        PlayerManager.players.forEach(function(p){
+            p.setNecessaryEmptyCards(0);
+        });
+    },
     /* First part of card (can make grand tichu) */
     distributeFirstPart:function(cards){
+        this._initGame();
         Actions.build('grandTichu','lastCards');
         PlayerManager.players.forEach(function(p){
            if(p.equals(PlayerManager.getPlayerUser())){

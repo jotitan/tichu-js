@@ -355,7 +355,7 @@ public class GameService {
             if (game.isRoundEnded()) {
                 Team teamCapot = game.isCapot();
                 if (teamCapot != null) {
-                    broadCast(game, ResponseType.CAPOT, teamCapot);
+                    broadCast(game, ResponseType.CAPOT, teamCapot.getPlayer1().getName() + " - " + teamCapot.getPlayer2().getName());
                 }
                 endRound(game);
                 return;

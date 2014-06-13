@@ -253,7 +253,7 @@ var SenderManager = {
             case "WHERE_GIVE_FOLD":Table.selectPlayerToGiveFold();break;
             case "GIVE_FOLD_DRAGON":Table.giveFoldForDragon(data.object);break;
             case "BAD_FOLD":Table.showBadFold(data.object);break;
-            case "CAPOT":MessageInfo.info("Capot");break;
+            case "CAPOT":MessageInfo.info("Team " + data.object + " made Capot");break;
             case "TURN_WIN":
                 this.temporize(4000,function(){PlayerManager.winTurn(data.object);});
                 break;

@@ -129,6 +129,7 @@ public class Game implements Serializable {
             return null;
         }
         if (!isCapot) {
+            this.lastPlayer.addCardsOfFold(this.cardOfFolds);
             /* First take folds of last */
             orderPlayers.get(0).addCardsOfFold(orderPlayers.get(3).getCardOfFolds());
             /* The before last take card in hand of the last */
