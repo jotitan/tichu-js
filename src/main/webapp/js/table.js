@@ -217,6 +217,7 @@ var Table = {
         PlayerManager.players.forEach(function(p){
             p.setNecessaryEmptyCards(0);
         });
+        CardManager.resetStatus();
     },
     /* First part of card (can make grand tichu) */
     distributeFirstPart:function(cards){
