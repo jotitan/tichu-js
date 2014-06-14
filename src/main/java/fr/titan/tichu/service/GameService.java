@@ -1,5 +1,6 @@
 package fr.titan.tichu.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -423,6 +424,7 @@ public class GameService {
                 .getCurrentPlayer().getOrientation().getRight());
 
         player.addCardsOfFold(game.getCardOfFolds());
+        game.setCardOfFolds(new ArrayList<Card>());
         broadCast(game, ResponseType.GIVE_FOLD_DRAGON, player.getPlayerWS());
         broadCast(game, ResponseType.TURN_WIN, game.getLastPlayer().getPlayerWS());
         game.newTurn();

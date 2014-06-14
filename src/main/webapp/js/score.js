@@ -25,7 +25,7 @@ var Scorer = {
     _showScore:function(divResult,divTotalScore,score,onLeft){
         var div = $('<div></div>');
         if(score.capot){
-            div.append('-');
+            div.append('CAPOT');
         }else{
             div.append('<span>' + score.score + '</span>');
             if(score.annonce!=null){

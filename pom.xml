@@ -96,7 +96,23 @@
 
     </dependencies>
 
+    <properties>
+        <env>local</env>
+    </properties>
+
     <build>
+        <defaultGoal>compile</defaultGoal>
+        <filters>
+            <filter>src/main/filters/conf-${env}.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
+
         <finalName>tichu</finalName>
         <plugins>
             <plugin>
@@ -117,7 +133,5 @@
             </plugin>
         </plugins>
     </build>
-
-
 
 </project>
