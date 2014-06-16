@@ -26,6 +26,7 @@ public class GameCacheImpl implements GameCache {
 
     @Inject
     public GameCacheImpl(RedisConfiguration redisConfiguration) {
+        logger.info("Create game cache");
         if (redisConfiguration.getHost() != null) {
             try {
                 gameCache = new RedisGameCache(redisConfiguration.getHost(),redisConfiguration.getPort(),redisConfiguration.getPassword());

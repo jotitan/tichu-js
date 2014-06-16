@@ -30,6 +30,7 @@ public class GameRest {
     private GameService gameService;
 
     public GameRest() {
+        logger.info("Instace GAME REST");
     }
 
     @GET

@@ -32,7 +32,7 @@ public class GameService {
     private Logger logger = LoggerFactory.getLogger(GameService.class);
 
     public GameService() {
-
+          logger.info("Create game service");
     }
 
     public Game getGame(String name) {
