@@ -26,11 +26,13 @@ public class GameRest {
 
     private Logger logger = LoggerFactory.getLogger(GameRest.class);
 
-    @Inject
+    private static Injector injector = Guice.createInjector();
+
+    // @Inject
     private GameService gameService;
 
     public GameRest() {
-        logger.info("Instace GAME REST");
+        gameService = injector.getInstance(GameService.class);
     }
 
     @GET

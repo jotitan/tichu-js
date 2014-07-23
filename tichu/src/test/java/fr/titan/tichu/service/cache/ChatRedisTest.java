@@ -1,25 +1,25 @@
 package fr.titan.tichu.service.cache;
 
+import java.util.List;
+
+import junit.framework.Assert;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import redis.embedded.RedisServer;
+
 import com.google.common.collect.Lists;
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Module;
+
 import fr.titan.tichu.Orientation;
 import fr.titan.tichu.model.Game;
 import fr.titan.tichu.model.Player;
 import fr.titan.tichu.model.ws.ResponseType;
 import fr.titan.tichu.service.cache.message.MemoryMessageCache;
 import fr.titan.tichu.service.cache.message.MessageCache;
-import fr.titan.tichu.service.cache.message.MessageCacheImpl;
 import fr.titan.tichu.service.cache.message.RedisMessageCache;
 import fr.titan.tichu.service.mock.TichuWebSocketMock;
-import junit.framework.Assert;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import redis.embedded.RedisServer;
-
-import java.util.List;
 
 /**
  * Test redis implementation of chat

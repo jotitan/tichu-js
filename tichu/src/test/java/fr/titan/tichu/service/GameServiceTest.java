@@ -9,6 +9,8 @@ import fr.titan.tichu.model.ws.ChangeCards;
 import fr.titan.tichu.model.ws.Fold;
 import fr.titan.tichu.model.ws.ResponseType;
 import fr.titan.tichu.service.cache.CacheFactory;
+import fr.titan.tichu.service.cache.game.MemoryGameCache;
+import fr.titan.tichu.service.cache.message.MemoryMessageCache;
 import fr.titan.tichu.service.cache.message.MessageCache;
 import fr.titan.tichu.service.cache.message.MessageCacheImpl;
 import fr.titan.tichu.service.mock.TichuWebSocketMock;
@@ -43,11 +45,18 @@ public class GameServiceTest {
             responses.add(type);
         }
 
+        @Override
+        protected void uniCast(Game game, Player player, ResponseType type, Object object) {
+            System.out.println("MOCK UNCAST " + game.getGame() + " : " + player.getName() + ", " + type + " : " + object);
+            responses.add(type);
+        }
     }
 
     @Before
     public void init() {
         gameService = new MockGameService();
+        gameService.setCacheService(new MemoryGameCache());
+        gameService.setMessageCache(new MemoryMessageCache());
     }
 
     @Test
@@ -77,9 +86,9 @@ public class GameServiceTest {
         messageCache.register(game.getGame(), player4.getToken(), new TichuWebSocketMock(player4.getName(), responses));
         gameService.connectGame(player4.getToken());
 
-        gameService.checkTableComplete(player4.getToken());
-
         Assert.assertTrue(game.canPlay());
+
+        gameService.checkTableComplete(player4.getToken());
 
         ChangeCards cc1 = new ChangeCards();
         cc1.setToLeft(player1.getCards().get(0).toCardWS());
