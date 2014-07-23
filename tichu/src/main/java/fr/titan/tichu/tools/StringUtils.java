@@ -1,4 +1,4 @@
-package fr.tichu.tools;
+package fr.titan.tichu.tools;
 
 /**
  *

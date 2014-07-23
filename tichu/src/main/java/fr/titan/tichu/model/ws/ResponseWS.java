@@ -1,4 +1,4 @@
-package fr.tichu.model.ws;
+package fr.titan.tichu.model.ws;
 
 /**
  * Object to communicate with client with websocket

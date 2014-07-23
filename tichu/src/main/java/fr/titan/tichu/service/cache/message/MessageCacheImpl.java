@@ -1,4 +1,4 @@
-package fr.tichu.service.cache.message;
+package fr.titan.tichu.service.cache.message;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

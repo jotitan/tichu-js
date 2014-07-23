@@ -1,7 +1,7 @@
-package fr.tichu.model;
+package fr.titan.tichu.model;
 
 
-import fr.tichu.model.ws.CardWS;
+import fr.titan.tichu.model.ws.CardWS;
 
 import java.io.Serializable;
 import java.util.*;

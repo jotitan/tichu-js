@@ -1,4 +1,4 @@
-package fr.tichu.model;
+package fr.titan.tichu.model;
 
 import fr.titan.tichu.model.ws.CardWS;
 

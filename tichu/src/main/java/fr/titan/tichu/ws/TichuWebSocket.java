@@ -1,4 +1,4 @@
-package fr.tichu.ws;
+package fr.titan.tichu.ws;
 
 import com.google.inject.Inject;
 import fr.titan.tichu.TichuClientCommunication;
@@ -14,6 +14,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

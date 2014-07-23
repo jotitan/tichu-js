@@ -1,11 +1,13 @@
-package fr.tichu.service;
+package fr.titan.tichu.service;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import fr.titan.tichu.Orientation;
 import fr.titan.tichu.exception.CheatException;
+import fr.titan.tichu.model.*;
 import fr.titan.tichu.model.rest.GameRequest;
+import fr.titan.tichu.model.ws.*;
 import fr.titan.tichu.service.cache.game.GameCache;
 import fr.titan.tichu.service.cache.message.MessageCache;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package fr.tichu.model;
+package fr.titan.tichu.model;
 
 /**
  * User: Titan Date: 27/03/14 Time: 15:19

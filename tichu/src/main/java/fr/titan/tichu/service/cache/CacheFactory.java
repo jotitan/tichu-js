@@ -1,4 +1,4 @@
-package fr.tichu.service.cache;
+package fr.titan.tichu.service.cache;
 
 import fr.titan.tichu.service.cache.game.GameCache;
 import fr.titan.tichu.service.cache.message.MemoryMessageCache;

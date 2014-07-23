@@ -1,4 +1,4 @@
-package fr.tichu.model.ws;
+package fr.titan.tichu.model.ws;
 
 import com.google.common.collect.Lists;
 import fr.titan.tichu.model.Card;

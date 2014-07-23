@@ -1,4 +1,4 @@
-package fr.tichu.tools;
+package fr.titan.tichu.tools;
 
 import com.google.common.base.Joiner;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;

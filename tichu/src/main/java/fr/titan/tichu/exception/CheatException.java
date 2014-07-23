@@ -1,4 +1,4 @@
-package fr.tichu.exception;
+package fr.titan.tichu.exception;
 
 /**
  *

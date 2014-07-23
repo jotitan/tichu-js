@@ -1,4 +1,4 @@
-package fr.tichu.model;
+package fr.titan.tichu.model;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

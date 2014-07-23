@@ -1,4 +1,4 @@
-package fr.tichu.rest;
+package fr.titan.tichu.rest;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;

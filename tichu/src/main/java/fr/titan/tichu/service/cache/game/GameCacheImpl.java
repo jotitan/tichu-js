@@ -1,4 +1,4 @@
-package fr.tichu.service.cache.game;
+package fr.titan.tichu.service.cache.game;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

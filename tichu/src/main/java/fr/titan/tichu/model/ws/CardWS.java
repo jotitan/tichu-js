@@ -1,4 +1,4 @@
-package fr.tichu.model.ws;
+package fr.titan.tichu.model.ws;
 
 import java.io.Serializable;
 

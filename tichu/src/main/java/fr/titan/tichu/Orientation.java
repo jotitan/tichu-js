@@ -1,4 +1,4 @@
-package tichu;
+package fr.titan.tichu;
 
 /**
  *

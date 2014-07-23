@@ -1,4 +1,4 @@
-package fr.tichu.service;
+package fr.titan.tichu.service;
 
 import java.io.*;
 

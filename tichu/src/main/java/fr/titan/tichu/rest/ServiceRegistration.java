@@ -1,4 +1,4 @@
-package fr.tichu.rest;
+package fr.titan.tichu.rest;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

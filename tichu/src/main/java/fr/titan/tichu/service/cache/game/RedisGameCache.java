@@ -1,4 +1,4 @@
-package fr.tichu.service.cache.game;
+package fr.titan.tichu.service.cache.game;
 
 import com.google.common.collect.Maps;
 import fr.titan.tichu.model.Game;

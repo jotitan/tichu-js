@@ -1,4 +1,4 @@
-package fr.tichu.service.cache.message;
+package fr.titan.tichu.service.cache.message;
 
 import com.google.common.collect.Maps;
 import fr.titan.tichu.TichuClientCommunication;

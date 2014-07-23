@@ -1,4 +1,4 @@
-package tichu;
+package fr.titan.tichu;
 
 import fr.titan.tichu.model.ws.ResponseType;
 import fr.titan.tichu.service.cache.message.MessagePublishThread;

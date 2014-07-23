@@ -1,4 +1,4 @@
-package fr.tichu.ws;
+package fr.titan.tichu.ws;
 
 import com.google.inject.Inject;
 import fr.titan.tichu.TichuClientCommunication;
@@ -8,6 +8,7 @@ import fr.titan.tichu.service.GameService;
 import fr.titan.tichu.service.cache.message.MessageCache;
 import fr.titan.tichu.service.cache.message.MessagePublishThread;
 
+import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 

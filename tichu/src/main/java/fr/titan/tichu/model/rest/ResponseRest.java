@@ -1,4 +1,4 @@
-package fr.tichu.model.rest;
+package fr.titan.tichu.model.rest;
 
 /**
  * User: Titan

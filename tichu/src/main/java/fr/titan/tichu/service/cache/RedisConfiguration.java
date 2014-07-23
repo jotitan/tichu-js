@@ -1,4 +1,4 @@
-package fr.tichu.service.cache;
+package fr.titan.tichu.service.cache;
 
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
